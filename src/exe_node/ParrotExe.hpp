@@ -1,0 +1,142 @@
+#ifndef PATHEXE_H
+#define PATHEXE_H
+//includes
+#include "ardrone_autonomy/Navdata.h"
+//ros related
+#include "ros/ros.h"
+#include "sensor_msgs/Joy.h"
+#include "std_msgs/Bool.h"
+#include "std_msgs/Int16.h"
+#include <geometry_msgs/Twist.h>
+
+#include "quadDubins3D.h"
+#include "QuadCfg.h"
+#include <fstream>
+#include "armadillo"
+
+class ParrotExe{
+ public:
+   //constructor
+   ParrotExe();
+   //read basic params from xml file
+   int ParamFromXML(const char* pFilename="/home/yucong/fuerte_workspace/sandbox/yucong_rrt_avoid/src/common/param.xml");
+   //callback functions 
+   void pathCallback(const ardrone_rrt_avoid::DubinPath_msg::ConstPtr& msg);
+   void newCallback(const std_msgs::Bool::ConstPtr& msg);
+   void navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr);
+   void joyCb(const sensor_msgs::JoyConstPtr joy_msg);
+   //void landCb(const std_msgs::EmptyConstPtr);
+   //void takeoffCb(const std_msgs::EmptyConstPtr);
+   //to publish flags
+   void PublishFlags();
+   //to publish commands
+   void SendControlToDrone(ControlCommand cmd);
+   //to take off or land
+   void sendLand();
+   void sendTakeoff();
+   //command the Parrot
+   int CommandParrot(const double _t_limit);
+   //to publish quad's state
+   void PubQuadState();  
+   //to access flags
+   inline bool GetIfRec(){return this->if_receive;};
+   inline bool GetIfReach(){return this->if_reach;};
+   inline bool GetIfNewPath(){return this->if_new_path;};
+   //set init time
+   inline void SetInitTime(ros::Time _t_now) {this->t_init= _t_now.toSec(); };
+
+ private:
+   //a private struct
+   struct DubinSeg{
+     quadDubins3D d_dubin;
+     QuadCfg cfg_stop;
+   };
+   
+   struct ControlCommand
+   {  //x,y,yaw, reverse
+     inline ControlCommand() {roll = pitch = yaw = gaz = 0;}
+     inline ControlCommand( double pitch, double roll, double gaz, double yaw ) 	 {
+	  this->roll = roll;
+	  this->pitch = pitch;
+	  this->yaw = yaw;
+	  this->gaz = gaz;
+     }
+     double yaw, roll, pitch, gaz;
+   };
+   //index helps to command the parrot 
+   int idx_dubin;//which dubin seg of the path it is in
+   int idx_dubin_sub;//which seg of dubin it is in
+   //flags
+   bool if_receive=false;//if receive a dubins curve
+   int if_reach =0;//0:not reached, 1:reach time limit, 2:reach target
+   //if a new path is received
+   bool if_new_path= false;
+   //if the flag of if_new_path is received
+   bool if_new_rec= false;
+   //if it is controlled by joysticks
+   bool if_joy= false;
+   int uav_state= -1;
+   //ros stuffs
+   //ros NodeHandle
+   ros::NodeHandle nh;
+   //publishers
+   //planning related
+   ros::Publisher pub_rec;//publish if_receive
+   ros::Publisher pub_vel;//publish velocity commands
+   ros::Publisher pub_reach;//if the quad reach the target,end or time limit
+   ros::Publisher pub_state;//the quad publish its state for next cycle planning
+   ros::Publisher pub_new_rec;//if we get the new path flag
+   //quad related
+   ros::Publisher takeoff_pub;
+   ros::Publisher land_pub;
+
+   //subscribers
+   ros::Subscriber sub_path;//subscribe to generated path
+   ros::Subscriber sub_if_new;//subcribe to see if a new path is generated
+   //msgs
+   //if a dubins curve is received
+   std_msgs::Bool rec_msg;
+   //if a new path flag is received
+   std_msgs::Bool new_rec_msg;
+   //if executation of the dubins curve is done
+   std_msgs::Int16 reach_msg;
+   //dubins curve to receive
+   ardrone_rrt_avoid::DubinPath_msg path_msg;
+   //quad state to publish
+   ardrone_rrt_avoid::QuadState_msg state_msg;
+   //velocity command to send
+   //geometry_msgs::Twist twist;
+   //path to execute
+   std::vector<DubinSeg> dubin_segs;
+   //some parameters;
+   double v= 1.0;//forward speed
+   double vz= 1.0;//rise speed
+   double dt= 0.1;//control period
+   double yaw_rate= 45./180.*M_PI; 
+   double end_r= 1.0*0.5;
+   double speed;
+   double rho;
+   arma::mat K1= 10*arma::eye<arma::mat>(3,3); 
+   arma::mat K2= 10*arma::eye<arma::mat>(3,3);
+   //time start the path
+   double t_init;
+   //for logging trajectory
+   std::ofstream log_file;
+   //for controller
+   Controller_MidLevelCnt& controlMid;
+   //data
+   ros::Time tkm1; 
+   ros::Time tk;
+   ros::Duration elapsed_time;
+   double elapsed_time_dbl;
+   double x_est, y_est, z_mea;
+   //in body frame
+   double vxm_est , vym_est , yaw_est;
+   //in global frome
+   double vx_est, vy_est;
+   double yawci, vxfi, vyfi, dzfi;
+   double pitchco, rollco, dyawco, dzco;
+};
+
+
+#endif

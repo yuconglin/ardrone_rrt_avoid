@@ -1,0 +1,17 @@
+<package>
+  <description brief="ardrone_rrt_avoid">
+
+     ardrone_rrt_avoid
+
+  </description>
+  <author>yucong</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/ardrone_rrt_avoid</url>
+  <depend package="ardrone_autonomy"/>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+
+</package>
+
+
