@@ -36,6 +36,7 @@ class ParrotExe{
    void sendTakeoff();
    //command the Parrot
    int CommandParrot(const double _t_limit);
+   int DubinCommand(DubinSeg& db_seg, const double _t_limit); 
    //to publish quad's state
    void PubQuadState();  
    //to access flags
@@ -64,9 +65,10 @@ class ParrotExe{
      double yaw, roll, pitch, gaz;
    };
    //index helps to command the parrot 
-   int idx_dubin;//which dubin seg of the path it is in
-   int idx_dubin_sub;//which seg of dubin it is in
+   int idx_dubin= -1;//which dubin seg of the path it is in
+   int idx_dubin_sub= -1;//which seg of dubin it is in
    //flags
+   bool if_restart= true;//if to start follow a new received path
    bool if_receive=false;//if receive a dubins curve
    int if_reach =0;//0:not reached, 1:reach time limit, 2:reach target
    //if a new path is received
@@ -75,7 +77,7 @@ class ParrotExe{
    bool if_new_rec= false;
    //if it is controlled by joysticks
    bool if_joy= false;
-   int uav_state= -1;
+   int uav_state_idx= -1;
    //ros stuffs
    //ros NodeHandle
    ros::NodeHandle nh;
@@ -86,6 +88,7 @@ class ParrotExe{
    ros::Publisher pub_reach;//if the quad reach the target,end or time limit
    ros::Publisher pub_state;//the quad publish its state for next cycle planning
    ros::Publisher pub_new_rec;//if we get the new path flag
+   ros::Publisher pub_state_idx;//which state the quad is in?
    //quad related
    ros::Publisher takeoff_pub;
    ros::Publisher land_pub;
@@ -100,12 +103,13 @@ class ParrotExe{
    std_msgs::Bool new_rec_msg;
    //if executation of the dubins curve is done
    std_msgs::Int16 reach_msg;
+   std_msgs::Int16 state_idx_msg;
    //dubins curve to receive
    ardrone_rrt_avoid::DubinPath_msg path_msg;
    //quad state to publish
    ardrone_rrt_avoid::QuadState_msg state_msg;
    //velocity command to send
-   //geometry_msgs::Twist twist;
+   geometry_msgs::Twist twist;
    //path to execute
    std::vector<DubinSeg> dubin_segs;
    //some parameters;
@@ -128,6 +132,7 @@ class ParrotExe{
    ros::Time tkm1; 
    ros::Time tk;
    ros::Duration elapsed_time;
+   ros::Time t_start;
    double elapsed_time_dbl;
    double x_est, y_est, z_mea;
    //in body frame
@@ -136,6 +141,8 @@ class ParrotExe{
    double vx_est, vy_est;
    double yawci, vxfi, vyfi, dzfi;
    double pitchco, rollco, dyawco, dzco;
+   //when t_start
+   double x_start,y_start,z_start;
 };
 
 

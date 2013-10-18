@@ -55,7 +55,7 @@ ParrotExe::ParrotExe():log_file("ardrone_path_rec.txt")
    if_new_path= false;
    if_new_rec= false;
    if_joy= false;
-   uav_state= -1;
+   uav_state_idx= -1;
    //publishers
    //for planning related
    pub_rec = nh.advertise<std_msgs::Bool>("path_rec",1);
@@ -129,7 +129,7 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    y_est += elapsed_time_dbl * vy_est;
    z_mea = navdataPtr->altd/1000.;
    //which state the quad is
-   uav_state= navdataPtr->state;
+   uav_state_idx= navdataPtr->state;
 }//navdataCb ends
 
 void ParrotExe::joyCb(const sensor_msgs::JoyConstPtr joy_msg)
@@ -174,14 +174,14 @@ void ParrotExe::joyCb(const sensor_msgs::JoyConstPtr joy_msg)
 	//cout << lastL1Pressed << " " << joy_msg->buttons.at(L1) << endl;
         if( joy_msg->buttons.at(L1) )
 	{
-          if( uav_state == 2 ){
+          if( uav_state_idx == 2 ){
             sendTakeoff();
 	  }
-	  if( uav_state == 3 || uav_state == 7 ){
+	  if( uav_state_idx == 3 || uav_state_idx == 7 ){
 	    sendControlToDrone( ControlCommand(0,0,0,0) );
 	    sendLand();
 	  }
-          if( uav_state == 4 )
+          if( uav_state_idx == 4 )
 	    sendLand();
 	}//if joy_msg ends
 
@@ -198,10 +198,15 @@ void ParrotExe::PublishFlags()
 {//to publish flags 
    rec_msg.data= if_receive;
    pub_rec.publish(rec_msg);
+   
    new_rec_msg.data= if_new_rec;
    pub_new_rec.publish(new_rec_msg);
+   
    reach_msg.data= if_reach;
    pub_reach.publish(reach_msg);
+   
+   state_idx_msg.data= uav_state_idx;
+   pub_state_idx.publish(state_idx_msg);
 }//PublishFlags ends
 
 void ParrotExe::SendControlToDrone(ControlCommand cmd)
@@ -227,5 +232,122 @@ void ParrotExe::sendTakeoff()
    //cout << "take off" << endl;
 }
 
+int ParrotExe::CommandParrot(const double _t_limit)
+{   //if no path, just stop and hover
+   if(if_restart && path_msg.dubin_path.size()==0 )
+   { //command it to stop. for fixed wing, maybe other mechnism
+     twist.linear.x=0;
+     twist.linear.y=0;
+     twist.linear.z=0;
+     twist.angular.z=0;
+     pub_vel.publish(twist);
+     //require a new path
+     if_receive= false;
+     if_new_path= false;
+     if_new_rec= false; 
 
+     cout<<"no path,stop"<<endl;
+     return 0;
+   }
+   
+   //first see if the current position is already at the goal
+   yucong_rrt_avoid::DubinSeg_msg dubin_last = path_msg.dubin_path.back();
+   if( sqrt(pow(x_est-dubin_last.stop_pt.x,2)+pow(y_est-dubin_last.stop_pt.y,2)+pow(z_mea-dubin_last.stop_pt.z,2)) < end_r )
+   {
+     twist.linear.x=0;
+     twist.linear.y=0;
+     twist.linear.z=0;
+     twist.angular.z=0;
+     pub_vel.publish(twist);
+     if_reach= 2;
+     cout<<"got target already"<<endl;
+     return;
+   }
+   
+   if(if_restart)
+   {
+     t_start= ros::Time::now();
+     //if none of the above happens just convert msg to vector of DubinSegs
+     if(!dubin_segs.empty() ) dubin_segs.clear();
+     for(int i=0;i!=path_msg.dubin_path.size();++i)
+     {
+       yucong_rrt_avoid::DubinSeg_msg db_msg= path_msg.dubin_path[i];
+       QuadCfg start(db_msg.d_dubin.start.x,db_msg.d_dubin.start.y,db_msg.d_dubin.start.z,db_msg.d_dubin.start.theta);
+       QuadCfg end(db_msg.d_dubin.end.x,db_msg.d_dubin.end.y,db_msg.d_dubin.end.z,db_msg.d_dubin.end.theta);
+       quadDubins3D db_3d(start,end,rho);
+       //std::cout<<i<<" seg length: "<<db_3d.seg_param[0]<<" "<<db_3d.seg_param[1]<<" "<<db_3d.seg_param[2]<<std::endl;
+       QuadCfg stop(db_msg.stop_pt.x,db_msg.stop_pt.y,db_msg.stop_pt.z,0);
+       //std::cout<<"to msg stop: "<<stop.x<<" "<<stop.y<<" "<<stop.z<<std::endl;
+       DubinSeg db_seg;
+       db_seg.d_dubin= db_3d;
+       db_seg.cfg_stop= stop;
+       dubin_segs.push_back(db_seg); 
+     }//for int i ends
+     
+     //see which DubinSeg it shall follow
+     int idx_sec= -1;
+     if(dubin_segs.size()>1)
+     {
+       int idx= -1;
+       double dwp[dubin_segs.size()+1];
+       double len_wp[dubin_segs.size()];
+
+       double dis_temp= 1e8;
+	     
+       for(int i=0;i!=dubin_segs.size();++i)
+       {
+	  //get the start point of each dubins curve
+	  QuadCfg start= dubin_segs[i].d_dubin.cfg_start; 
+	  double dis=pow(start.x-x_c,2)+pow(start.y-y_c,2)+pow(start.z-z_c,2);
+	  dwp[i]= sqrt(dis);
+	  if(dwp[i]<dis_temp )
+	  {
+	    dis_temp= dwp[i];
+	    idx= i;
+	  }//if dis ends
+
+	  //if( i!=dubin_segs.size()-1 )
+	  {
+	    QuadCfg stop= dubin_segs[i].cfg_stop; 
+	    len_wp[i]= dubin_segs[i].d_dubin.CloseLength(stop.x,stop.y,stop.z);
+	  }
+       }//for int i ends
+       //the final stop point
+       QuadCfg stop= dubin_segs.back().cfg_stop;
+       double dis=pow(stop.x-x_c,2)+pow(stop.y-y_c,2)+pow(stop.z-z_c,2);
+       dis= sqrt(dis);
+       dwp[dubin_segs.size()]= dis;
+       if(dis<dis_temp) idx= dubin_segs.size();
+	     
+       if( idx!=0 && idx!=dubin_segs.size() )
+       {
+	 if( dwp[idx-1]/len_wp[idx-1]< dwp[idx+1]/len_wp[idx] )
+	   idx_sec= idx-1;
+	 else
+	   idx_sec= idx;
+       }
+       else if(idx==dubin_segs.size() )
+	 idx_sec= idx-1;
+       else
+	 idx_sec= idx;
+     }//if(dubin_segs.size()>1) ends
+     else
+       idx_sec= 0;
+     idx_dubin= idx_sec;
+     if_start= false;
+       //then see which seg of the dubins curve it should follow
+   }//if_restart ends
+   else{
+     if(idx_dubin== -1)
+       std::runtime_error("error:idx_dubin unassigned");
+   }//else ends
+   
+   int result= DubinCommand(dubin_segs[idx_dubin], _t_limit);
+   //arrival criterion here
+}//CommandParrot() ends
+
+int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
+{
+
+}//DubinCommand ends
 
