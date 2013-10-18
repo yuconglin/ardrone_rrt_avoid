@@ -343,11 +343,23 @@ int ParrotExe::CommandParrot(const double _t_limit)
    }//else ends
    
    int result= DubinCommand(dubin_segs[idx_dubin], _t_limit);
+   if(result== 1)
+   {
+     if(idx_dubin== dubin_segs.size()-1) if_reach==2; //arived
+     else{
+       ++idx_dubin;
+       result= DubinCommand(dubin_segs[idx_dubin], _t_limit);
+     }//else ends
+   }//end result==1
    //arrival criterion here
 }//CommandParrot() ends
 
 int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
 {
+   //if already at the target, just return
+   QuadCfg cfg_stop= db_seg.cfg_stop;
+   if( sqrt(pow(x_est-cfg_stop.x,2)+pow(y_est-cfg_stop.y,2)+pow(z_mea-cfg_stop.z,2))<end_r )
+   return 1;
 
 }//DubinCommand ends
 
