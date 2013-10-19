@@ -68,7 +68,11 @@ class ParrotExe{
    int idx_dubin= -1;//which dubin seg of the path it is in
    int idx_dubin_sub= -1;//which seg of dubin it is in
    //flags
-   bool if_restart= true;//if to start follow a new received path
+   //for path navigation
+   bool if_restart_path= true;//if to start follow a new received path
+   bool if_restart_dubin= true;
+   bool if_restart_seg= true;
+   //for ros communication
    bool if_receive=false;//if receive a dubins curve
    int if_reach =0;//0:not reached, 1:reach time limit, 2:reach target
    //if a new path is received
@@ -132,9 +136,10 @@ class ParrotExe{
    ros::Time tkm1; 
    ros::Time tk;
    ros::Duration elapsed_time;
-   ros::Time t_start;
+   
    double elapsed_time_dbl;
    double x_est, y_est, z_mea;
+   double x_pre, y_pre, z_pre;
    //in body frame
    double vxm_est , vym_est , yaw_est;
    //in global frome
@@ -142,7 +147,9 @@ class ParrotExe{
    double yawci, vxfi, vyfi, dzfi;
    double pitchco, rollco, dyawco, dzco;
    //when t_start
+   ros::Time t_start;
    double x_start,y_start,z_start;
+   double d_length;
 };
 
 
