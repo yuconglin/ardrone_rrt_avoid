@@ -440,6 +440,13 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
      z_start= z_mea;
      d_length= 0.0; 
    }//if_restart_seg ends
+   //initial criterion
+   //if time limit reached?
+
+   //if length reached?
+   
+   //if cfg_stop reached?
+
    
    quadDubins3D dubin_3d= db_seg.d_dubin;
    QuadCfg cfg_stop= db_seg.cfg_stop;
@@ -534,9 +541,11 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
        double d_yaw= atan2(u(1),u(0) );
        //reset the controller
        controlMid.reset(); 
-       yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, yawci);
+       yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
        controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
-
+       controlMid.setReference( 0.0, 0.0, d_yaw, 0.0, u(0), u(1) );
+       controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
+       sendControlToDrone( ControlCommand( pitchco, u(2), 0, dyawco ) );
      }//if u_mag ends
    }//if type==L_SEG or R_SEG ends
    else //type== S_SEG
