@@ -141,7 +141,7 @@ class ParrotExe{
    double x_est, y_est, z_mea;
    double x_pre, y_pre, z_pre;
    //in body frame
-   double vxm_est , vym_est , yaw_est;
+   double vxm_est , vym_est , yaw_est, vzm_est;
    //in global frome
    double vx_est, vy_est;
    double yawci, vxfi, vyfi, dzfi;

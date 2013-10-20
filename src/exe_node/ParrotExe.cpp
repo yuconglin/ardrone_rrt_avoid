@@ -88,7 +88,7 @@ ParrotExe::ParrotExe():log_file("ardrone_path_rec.txt")
    yawci = 0.0,  vxfi = 0.0, vyfi = 0.0, dzfi=0.; // meter/s
    pitchco = 0.0, rollco = 0.0, dyawco = 0.0, dzco = 0.0;
    // For trajectory control
-   controlMid.setControlMode(Controller_MidLevel_controlMode::TROJECTORY_CONTROL);
+   controlMid.setControlMode(Controller_MidLevel_controlMode::SPEED_CONTROL);
 }
 
 void ParrotExe::pathCallback(const ardrone_rrt_avoid::DubinPath_msg::ConstPtr& msg)
@@ -118,14 +118,18 @@ void ParrotExe::newCallback(const std_msgs::Bool::ConstPtr& msg)
 void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
 {
    //position estimator:x,y ordometry; z altitude measurement but it should be kalman filetered
+   //time
    tk = navdataPtr->header.stamp;
    elapsed_time = tk - tkm1;
    elapsed_time_dbl= elapsed_time.sec+ (double)elapsed_time.nsec/1E9;
+   //velocity
    vxm_est = (double)navdataPtr->vx/1000.0; 
    vym_est = (double)navdataPtr->vy/1000.0;
+   vzm_est = (double)navdataPtr->vz/1000.0;
    yaw_est = (double)navdataPtr->rotZ*M_PI/180;
    vx_est = vxm_est*cos(yaw_est) - vym_est*sin(yaw_est); 
    vy_est = vxm_est*sin(yaw_est) + vym_est*cos(yaw_est); 
+   //position
    x_est += elapsed_time_dbl * vx_est;
    y_est += elapsed_time_dbl * vy_est;
    z_mea = navdataPtr->altd/1000.;
@@ -253,6 +257,7 @@ int ParrotExe::CommandParrot(const double _t_limit)
    
    //first see if the current position is already at the goal
    yucong_rrt_avoid::DubinSeg_msg dubin_last = path_msg.dubin_path.back();
+   
    if( sqrt(pow(x_est-dubin_last.stop_pt.x,2)+pow(y_est-dubin_last.stop_pt.y,2)+pow(z_mea-dubin_last.stop_pt.z,2)) < end_r )
    {
      twist.linear.x=0;
@@ -300,7 +305,7 @@ int ParrotExe::CommandParrot(const double _t_limit)
        {
 	  //get the start point of each dubins curve
 	  QuadCfg start= dubin_segs[i].d_dubin.cfg_start; 
-	  double dis=pow(start.x-x_c,2)+pow(start.y-y_c,2)+pow(start.z-z_c,2);
+	  double dis=pow(start.x-x_est,2)+pow(start.y-y_est,2)+pow(start.z-z_mea,2);
 	  dwp[i]= sqrt(dis);
 	  if(dwp[i]<dis_temp )
 	  {
@@ -316,7 +321,7 @@ int ParrotExe::CommandParrot(const double _t_limit)
        }//for int i ends
        //the final stop point
        QuadCfg stop= dubin_segs.back().cfg_stop;
-       double dis=pow(stop.x-x_c,2)+pow(stop.y-y_c,2)+pow(stop.z-z_c,2);
+       double dis=pow(stop.x-x_est,2)+pow(stop.y-y_est,2)+pow(stop.z-z_mea,2);
        dis= sqrt(dis);
        dwp[dubin_segs.size()]= dis;
        if(dis<dis_temp) idx= dubin_segs.size();
@@ -344,23 +349,48 @@ int ParrotExe::CommandParrot(const double _t_limit)
    }//else ends
    
    int result= DubinCommand(dubin_segs[idx_dubin], _t_limit);
-   if(result== 1)
+   //reaching the end of a dubin's curve
+   if(result==1 || result==2)
    {
-     if(idx_dubin== dubin_segs.size()-1) if_reach==2; //arived
-     else{
+     if(idx_dubin== dubin_segs.size()-1) 
+     {//if it is the last dubin's curve
+       if_reach= 2; //arived
+       if_restart_path== true;
+       SendControlToDrone( ControlCommand(0,0,0,0) );
+     }
+     else
+     { //otherwise, just jump to the next dubin's curve
        ++idx_dubin;
        result= DubinCommand(dubin_segs[idx_dubin], _t_limit);
      }//else ends
    }//end result==1
-   //arrival criterion here
+   
+   if(result==0)
+   {//time up
+     if_reach= 1;
+   }
+
+   if(if_reach==1||if_reach==2)
+   {
+     //for the next path
+     if_receive= false;
+     path_msg.dubin_path.clear();
+     //for the next if_new_path
+     if_new_path= false;
+     if_new_rec= false; 
+   }//set to default
+
 }//CommandParrot() ends
 
 int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
-{
+{  //0:time up, 1:cfg_stop reached, 2: seg end reached, -1: still ongoing
    //if already at the target, just return
    QuadCfg cfg_stop= db_seg.cfg_stop;
    if( sqrt(pow(x_est-cfg_stop.x,2)+pow(y_est-cfg_stop.y,2)+pow(z_mea-cfg_stop.z,2))<end_r )
-   return 1;
+   {
+     if_restart_dubin= true;
+     return 1;
+   }
    //or see which segment the quad is closest to
    //find the closest curve seg
    if(if_restart_dubin)
@@ -377,7 +407,7 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
      
      for(int i=0;i<4;++i)
      {
-	double dis= pow(cfgs[i].x-x_c,2)+pow(cfgs[i].y-y_c,2)+pow(cfgs[i].z-z_c,2);
+	double dis= pow(cfgs[i].x-x_est,2)+pow(cfgs[i].y-y_est,2)+pow(cfgs[i].z-z_mea,2);
 	d[i]= sqrt(dis);
 	
 	if( dubin_3d.seg_param[i]==0) 
@@ -414,20 +444,31 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
    
    idx_dubin_sub= idx_seg;
    double t_limit = _t_limit;
-   int result= SegCommand(dg_seg,idx_dubin_sub,t_limit);
+   int db_result= SegCommand(dg_seg,idx_dubin_sub,t_limit);
    //cfg_stop reached
-   if(result==1) 
-      return 1;
-   //segment ends
-   if(result==2)
+   if(db_result==1)
    {
-      if(idx_dubin_sub==2) return 1;
-      else{
-         ++idx_dubin_sub;
-	 result= SegCommand(db_seg,idx_dubin_sub,t_limit);
+     if_restart_dubin= true;
+     //return db_result;
+   }
+   //segment ends
+   if(db_result==2)
+   {
+      if(idx_dubin_sub==2) 
+      {	//dubin ends actually
+	if_restart_dubin= true;
+	db_result=1
+	//return db_result;
+      }
+      else
+      {
+	//we need to start from a new segment
+        ++idx_dubin_sub;
+	db_result= SegCommand(db_seg,idx_dubin_sub,t_limit);
       }
    }
-   return result;
+   return db_result;
+   //0:time up, 1:cfg_stop reached, 2: seg end reached, -1: still ongoing
 }//DubinCommand ends
 
 int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
@@ -440,13 +481,17 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
      z_start= z_mea;
      d_length= 0.0; 
    }//if_restart_seg ends
+   int seg_result= -1;
    //initial criterion
    //if time limit reached?
-
+   if( ros::Time::now()-t_start>= ros::Duration(t_limit) ) 
+   { 
+      seg_result= 0;
+      if_restart_seg= true;
+      return seg_result;
+      //break;
+   }
    //if length reached?
-   
-   //if cfg_stop reached?
-
    
    quadDubins3D dubin_3d= db_seg.d_dubin;
    QuadCfg cfg_stop= db_seg.cfg_stop;
@@ -461,7 +506,7 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
    //the start and end point of this seg
    QuadCfg cfg_start,cfg_end;
    //get tne start and end
-    if(idx_sub==0){
+   if(idx_sub==0){
       cfg_start= dubin_3d.cfg_start;
       cfg_end= dubin_3d.cfg_i1;
    }
@@ -479,6 +524,48 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
    double s_target= dubin_3d.CloseLength(cfg_stop.x,cfg_stop.y,cfg_stop.z);
    double s_end= dubin_3d.CloseLength(cfg_end.x,cfg_end.y,cfg_end.z);
    
+   arma::colvec v_quad,v_target,v_end;
+
+   //to calculate the length travelled along the seg
+   d_length+= sqrt(pow(x_pre-x_est,2)+pow(y_pre-y_est,2)+pow(z_pre-z_mea,2));
+   //assign previous coordinates
+   x_pre= x_est;
+   y_pre= y_est;
+   z_pre= z_mea; 
+
+   //v_quad
+   v_quad<< vx_est<< vy_est<< vzm_est; 
+
+   //if cfg_stop reached?
+   double target_dis=sqrt(pow(cfg_stop.x-x_est,2)+pow(cfg_stop.y-y_est,2)+pow(cfg_stop.z-z_mea,2));
+   v_target<<cfg_stop.x-x_est<<cfg_stop.y-y_est<<cfg_stop.z-z_mea;
+	    
+   if( dot(v_quad,v_target)<=0&&target_dis<= 3*end_r ||target_dis<end_r
+     ||dot(v_quad,v_target)<=0&&d_length>s_target-s_init
+     ) 
+   {
+      if(dot(v_quad,v_target)<=0 && d_length>s_target-s_init)
+      {
+         //std::cout<<"target length reached:circle"<<std::endl;
+      }
+      seg_result= 1;
+      if_restart_seg= true;
+      return seg_result;
+      //break;
+   }
+
+   //if end of this seg reached?
+   double end_dis=sqrt(pow(cfg_end.x-x_est,2)+pow(cfg_end.y-y_est,2)+pow(cfg_end.z-z_mea,2));
+   v_end<<cfg_end.x-x_est<<cfg_end.y-y_est<<cfg_end.z-z_mea;  
+   if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r
+     ||dot(v_quad,v_end)<=0 && d_length> s_end-s_init 
+     ||d_length>3*(s_end-s_init) ) 
+   {
+     seg_result= 2;
+     if_restart_seg= true;
+     return seg_result;
+   }
+  
    //controlling part
    if(type== L_SEG||type== R_SEG)
    {
@@ -506,7 +593,7 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
      double h_diff= cfg_end.z-cfg_start.z;
      double tan_gamma= h_diff/de_length;
      //vectors for calculation
-     arma::colvec u, u1, u2, fc1, fc2,v_target,v_end;
+     arma::colvec u, u1, u2, fc1, fc2;
      //calculate starts
      double r_n= x_est; 
      double r_e= y_est;
@@ -545,22 +632,61 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
        controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
        controlMid.setReference( 0.0, 0.0, d_yaw, 0.0, u(0), u(1) );
        controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
-       sendControlToDrone( ControlCommand( pitchco, u(2), 0, dyawco ) );
+       sendControlToDrone( ControlCommand( pitchco, rollco, u(2), dyawco ) );
+       //last dt
+       ros::Duration(dt).sleep();
      }//if u_mag ends
    }//if type==L_SEG or R_SEG ends
    else //type== S_SEG
    {
+     double x_start= cfg_start.x;
+     double y_start= cfg_start.y;
+     double z_start= cfg_start.z;
+     double x_end= cfg_end.x;
+     double y_end= cfg_end.y;
+     double z_end= cfg_end.z;
+     double dis= sqrt(pow(x_start-x_end,2)+pow(y_start-y_end,2)+pow(z_start-z_end,2));
+		
+     double phi= atan2(y_end-y_start,x_end-x_start);
+     double gam= asin( (z_end-z_start)/dis );
 
+     arma::colvec n_lon,n_lat,u;
+
+     n_lon<<-sin(phi)<<cos(phi)<<0.;
+     n_lat<<cos(phi)*sin(gam)<<sin(phi)*sin(gam)<<-cos(gam);
+     
+     double a_lon= n_lon(0)*(x_c-x_start)+n_lon(1)*(y_c-y_start)+n_lon(2)*(z_c-z_start);
+     double a_lat= n_lat(0)*(x_c-x_start)+n_lat(1)*(y_c-y_start)+n_lat(2)*(z_c-z_start);
+     //unnormailised velocity
+     u = -K1*(a_lon*n_lon+a_lat*n_lat)+K2*cross(n_lat,n_lon);
+     double u_mag= sqrt(u(0)*u(0)+u(1)*u(1)+u(2)*u(2));
+     
+     if( u_mag!=0. )
+     {
+       double cons= speed/u_mag;
+       u<< u(0)*cons<< u(1)*cons << u(2)*cons;
+       //the desired yaw
+       double d_yaw= atan2(u(1),u(0) );
+       //reset the controller
+       controlMid.reset(); 
+       yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
+       controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
+       controlMid.setReference( 0.0, 0.0, d_yaw, 0.0, u(0), u(1) );
+       controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
+       sendControlToDrone( ControlCommand( pitchco, rollco, u(2), dyawco ) );
+       //last dt
+       ros::Duration(dt).sleep();
+
+     }//if u_mag ends
+   
    }//else ends
    
-   //after sending command for dt
-   x_pre= x_est;
-   y_pre= y_est;
-   z_pre= z_mea;
    //if time limit reached?
+   if( ros::Time::now()-t_start>= ros::Duration(t_limit) ) 
+   { 
+      seg_result= 0;
+      if_restart_seg= true;
+   }
 
-   //if length reached?
-   
-   //if cfg_stop reached?
-
+   return seg_result; 
 } //SegCommand ends
