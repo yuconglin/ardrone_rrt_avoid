@@ -14,7 +14,28 @@
 #include <fstream>
 #include "armadillo"
 
+//ros msgs
+#include "ardrone_rrt_avoid/DubinPath_msg.h"
+
 class ParrotExe{
+   //struct
+   struct DubinSeg{
+     quadDubins3D d_dubin;
+     QuadCfg cfg_stop;
+   };
+   
+   struct ControlCommand
+   {  //x,y,yaw, reverse
+     inline ControlCommand() {roll = pitch = yaw = gaz = 0;}
+     inline ControlCommand( double pitch, double roll, double gaz, double yaw ) 	 {
+	  this->roll = roll;
+	  this->pitch = pitch;
+	  this->yaw = yaw;
+	  this->gaz = gaz;
+     }
+     double yaw, roll, pitch, gaz;
+   };
+ 
  public:
    //constructor
    ParrotExe();
@@ -40,30 +61,16 @@ class ParrotExe{
    //to publish quad's state
    void PubQuadState();  
    //to access flags
-   inline bool GetIfRec(){return this->if_receive;};
-   inline bool GetIfReach(){return this->if_reach;};
-   inline bool GetIfNewPath(){return this->if_new_path;};
+   inline bool GetIfRec(){return this->if_receive;}
+   inline bool GetIfReach(){return this->if_reach;}
+   inline bool GetIfNewPath(){return this->if_new_path;}
+   inline int GetUavStateIdx(){return this->uav_state_idx;}
    //set init time
    inline void SetInitTime(ros::Time _t_now) {this->t_init= _t_now.toSec(); };
-
+   //set all restarts to default
+   void SetRestartDefault();
+ 
  private:
-   //a private struct
-   struct DubinSeg{
-     quadDubins3D d_dubin;
-     QuadCfg cfg_stop;
-   };
-   
-   struct ControlCommand
-   {  //x,y,yaw, reverse
-     inline ControlCommand() {roll = pitch = yaw = gaz = 0;}
-     inline ControlCommand( double pitch, double roll, double gaz, double yaw ) 	 {
-	  this->roll = roll;
-	  this->pitch = pitch;
-	  this->yaw = yaw;
-	  this->gaz = gaz;
-     }
-     double yaw, roll, pitch, gaz;
-   };
    //index helps to command the parrot 
    int idx_dubin= -1;//which dubin seg of the path it is in
    int idx_dubin_sub= -1;//which seg of dubin it is in

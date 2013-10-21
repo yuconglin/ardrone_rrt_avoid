@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.4.6)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+IF(CMAKE_COMPILER_IS_GNUCXX)
+   SET(CMAKE_CXX_FLAGS "-g3 -ggdb -DTIXML_USE_TICPP") 
+#SET(CMAKE_BUILD_TYPE DEBUG)
+ENDIF()
 
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
@@ -8,6 +12,11 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 #set(ROS_BUILD_TYPE RelWithDebInfo)
+if(EXISTS /usr/lib64/libarmadillo.so)
+    set( ARMADILLO_LIBRARIES /usr/lib64/libarmadillo.so )
+else()
+    find_package(Armadillo REQUIRED)
+endif()
 
 rosbuild_init()
 
@@ -17,16 +26,37 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 #uncomment if you have defined messages
-#rosbuild_genmsg()
+rosbuild_genmsg()
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
+include_directories(src/Dubins2D)
+include_directories(src/VirtualQuad)
+rosbuild_add_library(dubin src/Dubins2D/dubins.cpp)
+
+rosbuild_add_boost_directories()
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
+set(TINYCPP_DIR src/tinycpp/)
+include_directories( ${TINYCPP_DIR} )
+add_library(lib_tinycpp
+            ${TINYCPP_DIR}/ticpp.cpp  
+	    ${TINYCPP_DIR}/tinyxml.cpp
+	    ${TINYCPP_DIR}/tinyxmlerror.cpp
+	    ${TINYCPP_DIR}/tinyxmlparser.cpp
+	    ${TINYCPP_DIR}/tinystr.cpp
+	   )
 
+rosbuild_add_library(QuadConfig src/QuadConfig/QuadConfig.cpp)
+include_directories(src/QuadConfig)
+include_directories(src/jesus_codes/include)
+#the main part
+rosbuild_add_library(parrot_exe src/exe_node/ParrotExe.cpp)
+rosbuild_add_executable(exe_dubin src/exe_node/main_dubin.cpp)
+target_link_libraries(exe_dubin parrot_exe dubin lib_tinycpp ${ARMADILLO_LIBRARIES}) 
 #VirtualQuad outside, ticpp.h outside

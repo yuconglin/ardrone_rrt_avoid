@@ -9,6 +9,10 @@
 #include "controller/midlevelCnt/Controller_MidLevelCnt.h"
 #include "controller/midlevelCnt/Controller_MidLevel_controlModes.h"
 #include "Other/jesus_library.h"
+//messages
+#include "ardrone_rrt_avoid/DubinPath_msg.h"
+#include "ardrone_rrt_avoid/DubinSeg_msg.h"
+#include "ardrone_rrt_avoid/QuadState_msg.h"
 
 //function to send command to the parrot
 void SendControlToDrone(ControlCommand cmd); 
@@ -84,7 +88,7 @@ ParrotExe::ParrotExe():log_file("ardrone_path_rec.txt")
    elapsed_time = tk - tkm1;
    elapsed_time_dbl = elapsed_time.sec + ( (double) elapsed_time.nsec)/1E9;
    x_est = 0.0, y_est = 0.0;
-   vxm_est = 0.0, vym_est = 0.0, yaw_est = 0.0; // meter/s
+   vxm_est = 0.0, vym_est = 0.0, vzm_est = 0.0, yaw_est = 0.0; // meter/s
    yawci = 0.0,  vxfi = 0.0, vyfi = 0.0, dzfi=0.; // meter/s
    pitchco = 0.0, rollco = 0.0, dyawco = 0.0, dzco = 0.0;
    // For trajectory control
@@ -237,20 +241,26 @@ void ParrotExe::sendTakeoff()
    //cout << "take off" << endl;
 }
 
+void ParrotExe::SetRestartDefault()
+{
+   if_restart_path= true;
+   if_restart_dubin= true;
+   if_restart_seg= true;
+   idx_dubin= -1;
+   idx_dubin_sub= -1;
+}//SetRestartDefault ends
+
 int ParrotExe::CommandParrot(const double _t_limit)
 {   //if no path, just stop and hover
    if(if_restart_path && path_msg.dubin_path.size()==0 )
    { //command it to stop. for fixed wing, maybe other mechnism
-     twist.linear.x=0;
-     twist.linear.y=0;
-     twist.linear.z=0;
-     twist.angular.z=0;
-     pub_vel.publish(twist);
+     SendControlToDrone( ControlCommand(0,0,0,0) );
      //require a new path
      if_receive= false;
      if_new_path= false;
      if_new_rec= false; 
-
+     //restart to default
+     SetRestartDefault();
      cout<<"no path,stop"<<endl;
      return 0;
    }
@@ -260,12 +270,13 @@ int ParrotExe::CommandParrot(const double _t_limit)
    
    if( sqrt(pow(x_est-dubin_last.stop_pt.x,2)+pow(y_est-dubin_last.stop_pt.y,2)+pow(z_mea-dubin_last.stop_pt.z,2)) < end_r )
    {
-     twist.linear.x=0;
-     twist.linear.y=0;
-     twist.linear.z=0;
-     twist.angular.z=0;
-     pub_vel.publish(twist);
+     SendControlToDrone( ControlCommand(0,0,0,0) );
      if_reach= 2;
+     if_receive= false;
+     if_new_path= false;
+     if_new_rec= false; 
+     //restart to default
+     SetRestartDefault();
      cout<<"got target already"<<endl;
      return;
    }
@@ -273,9 +284,11 @@ int ParrotExe::CommandParrot(const double _t_limit)
    if(if_restart_path)
    {
      if_restart_path= false;
+     //time start to follow a newly received path
      t_start= ros::Time::now();
      //if none of the above happens just convert msg to vector of DubinSegs
      if(!dubin_segs.empty() ) dubin_segs.clear();
+     
      for(int i=0;i!=path_msg.dubin_path.size();++i)
      {
        yucong_rrt_avoid::DubinSeg_msg db_msg= path_msg.dubin_path[i];
@@ -312,12 +325,10 @@ int ParrotExe::CommandParrot(const double _t_limit)
 	    dis_temp= dwp[i];
 	    idx= i;
 	  }//if dis ends
-
-	  //if( i!=dubin_segs.size()-1 )
-	  {
-	    QuadCfg stop= dubin_segs[i].cfg_stop; 
-	    len_wp[i]= dubin_segs[i].d_dubin.CloseLength(stop.x,stop.y,stop.z);
-	  }
+          
+	  QuadCfg stop= dubin_segs[i].cfg_stop; 
+	  len_wp[i]= dubin_segs[i].d_dubin.CloseLength(stop.x,stop.y,stop.z);
+	  
        }//for int i ends
        //the final stop point
        QuadCfg stop= dubin_segs.back().cfg_stop;
@@ -340,6 +351,7 @@ int ParrotExe::CommandParrot(const double _t_limit)
      }//if(dubin_segs.size()>1) ends
      else
        idx_sec= 0;
+     //assign idx_dubin
      idx_dubin= idx_sec;
             //then see which seg of the dubins curve it should follow
    }//if_restart_path ends
@@ -348,6 +360,7 @@ int ParrotExe::CommandParrot(const double _t_limit)
        std::runtime_error("error:idx_dubin unassigned");
    }//else ends
    
+   //yeah, let's follow that dubin's curve 
    int result= DubinCommand(dubin_segs[idx_dubin], _t_limit);
    //reaching the end of a dubin's curve
    if(result==1 || result==2)
@@ -355,7 +368,6 @@ int ParrotExe::CommandParrot(const double _t_limit)
      if(idx_dubin== dubin_segs.size()-1) 
      {//if it is the last dubin's curve
        if_reach= 2; //arived
-       if_restart_path== true;
        SendControlToDrone( ControlCommand(0,0,0,0) );
      }
      else
@@ -378,8 +390,10 @@ int ParrotExe::CommandParrot(const double _t_limit)
      //for the next if_new_path
      if_new_path= false;
      if_new_rec= false; 
+     SetRestartDefault();
    }//set to default
-
+   
+   return 0;
 }//CommandParrot() ends
 
 int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
@@ -396,9 +410,6 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
    if(if_restart_dubin)
    {
      if_restart_dubin= false;
-     //x_start= x_est;
-     //y_start= y_est;
-     //z_start= z_mea;
      QuadCfg cfgs[]={dubin_3d.cfg_start,dubin_3d.cfg_i1,dubin_3d.cfg_i2,dubin_3d.cfg_end};
      double d[4];
     
@@ -433,11 +444,11 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
      if(idx_seg==3)
        idx_seg=2;
      //make sure idx_seg correct value
-     //assert(idx_seg==0||idx_seg==1||idx_seg==2);
      if(!(idx_seg==0||idx_seg==1||idx_seg==2))
        std::runtime_error("idx_seg must be 0 or 1 or 2");
    }//if_restart_dubin ends
-   else{
+   else
+   {
      if(idx_dubin_sub== -1)
        std::runtime_error("error:idx_dubin_sub unassigned");
    }//else ends
@@ -454,25 +465,25 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
    //segment ends
    if(db_result==2)
    {
-      if(idx_dubin_sub==2) 
-      {	//dubin ends actually
-	if_restart_dubin= true;
-	db_result=1
+     if(idx_dubin_sub==2) 
+     {	//dubin ends actually
+       if_restart_dubin= true;
+       db_result=1
 	//return db_result;
-      }
-      else
-      {
+     }
+     else
+     {
 	//we need to start from a new segment
-        ++idx_dubin_sub;
-	db_result= SegCommand(db_seg,idx_dubin_sub,t_limit);
-      }
+       ++idx_dubin_sub;
+       db_result= SegCommand(db_seg,idx_dubin_sub,t_limit);
+     }
    }
    return db_result;
    //0:time up, 1:cfg_stop reached, 2: seg end reached, -1: still ongoing
 }//DubinCommand ends
 
 int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
-{
+{ //-1:
    if(if_restart_seg) 
    {
      if_restart_seg= false;
@@ -491,11 +502,10 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
       return seg_result;
       //break;
    }
-   //if length reached?
    
    quadDubins3D dubin_3d= db_seg.d_dubin;
    QuadCfg cfg_stop= db_seg.cfg_stop;
-   //first: criterion for cfg_stop reaching
+   
    if( !(idx_sub==0||idx_sub==1||idx_sub==2) )
      std::runtime_error("idx_sub must be 0 or 1 or 2.");
    const int* types = DIRDATA[dubin_3d.path2D.type];
