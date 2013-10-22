@@ -4,7 +4,7 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
    SET(CMAKE_CXX_FLAGS "-g3 -ggdb -DTIXML_USE_TICPP") 
 #SET(CMAKE_BUILD_TYPE DEBUG)
 ENDIF()
-
+find_package(OpenCV REQUIRED)
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
 #  Debug          : w/ debug symbols, w/o optimization
@@ -54,9 +54,33 @@ add_library(lib_tinycpp
 
 rosbuild_add_library(QuadConfig src/QuadConfig/QuadConfig.cpp)
 include_directories(src/QuadConfig)
-include_directories(src/jesus_codes/include)
+
+# BEGIN: addon's for multirotor speed controller
+
+# Adding atlante
+# Option 1: include atlante source code in lib on eclipse workspace (important thing is that it is outside the projects source tree)
+include_directories("src/jesus_codes/atlante") # 3rdparty/atlante/atlante")
+#add_subdirectory("/home/yucong/ros_workspace/lib/atlante/atlante" "${PROJECT_SOURCE_DIR}/../bin/3rdparty/atlante-bin" )
+
+# Adding Jesus's code
+include_directories("src/jesus_codes/include")
+add_library(jesus_codes                       
+	  src/jesus_codes/sources/Controller_MidLevelCnt.cpp
+	  src/jesus_codes/sources/Controller_MidLevel_SpeedLoop.cpp
+	  src/jesus_codes/sources/datalogger.cpp
+	  src/jesus_codes/sources/FilteredDerivative.cpp
+	  src/jesus_codes/sources/jesus_library.cpp
+	  src/jesus_codes/sources/LowPassFilter.cpp
+	  src/jesus_codes/sources/matrixLib.cpp
+	  src/jesus_codes/sources/MidLevelControlledsimMultirotor.cpp
+	  src/jesus_codes/sources/PID.cpp
+	  src/jesus_codes/sources/stringdatalogger.cpp
+	  )
+
+# END::: addon's for multirotor speed controller
+
 #the main part
 rosbuild_add_library(parrot_exe src/exe_node/ParrotExe.cpp)
 rosbuild_add_executable(exe_dubin src/exe_node/main_dubin.cpp)
-target_link_libraries(exe_dubin parrot_exe dubin lib_tinycpp ${ARMADILLO_LIBRARIES}) 
+target_link_libraries(exe_dubin parrot_exe jesus_codes dubin lib_tinycpp ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES}) 
 #VirtualQuad outside, ticpp.h outside

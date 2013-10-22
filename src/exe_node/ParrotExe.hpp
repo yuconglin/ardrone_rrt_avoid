@@ -16,14 +16,13 @@
 
 //ros msgs
 #include "ardrone_rrt_avoid/DubinPath_msg.h"
+#include "ardrone_rrt_avoid/QuadState_msg.h"
+
+//declaration of classes used
+class Controller_MidLevelCnt;
 
 class ParrotExe{
-   //struct
-   struct DubinSeg{
-     quadDubins3D d_dubin;
-     QuadCfg cfg_stop;
-   };
-   
+   //struct 
    struct ControlCommand
    {  //x,y,yaw, reverse
      inline ControlCommand() {roll = pitch = yaw = gaz = 0;}
@@ -37,8 +36,14 @@ class ParrotExe{
    };
  
  public:
+   //struct
+   struct DubinSeg{
+     quadDubins3D d_dubin;
+     QuadCfg cfg_stop;
+   };
+
    //constructor
-   ParrotExe();
+   ParrotExe(Controller_MidLevelCnt& _controlMid);
    //read basic params from xml file
    int ParamFromXML(const char* pFilename="/home/yucong/fuerte_workspace/sandbox/yucong_rrt_avoid/src/common/param.xml");
    //callback functions 
@@ -55,9 +60,11 @@ class ParrotExe{
    //to take off or land
    void sendLand();
    void sendTakeoff();
+   void sendEmergencyStop();
    //command the Parrot
    int CommandParrot(const double _t_limit);
-   int DubinCommand(DubinSeg& db_seg, const double _t_limit); 
+   int DubinCommand(DubinSeg& db_seg, const double _t_limit);
+   int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit);
    //to publish quad's state
    void PubQuadState();  
    //to access flags
@@ -89,6 +96,8 @@ class ParrotExe{
    //if it is controlled by joysticks
    bool if_joy= false;
    int uav_state_idx= -1;
+   bool lastR1Pressed= false;
+   bool lastL1Pressed= false;
    //ros stuffs
    //ros NodeHandle
    ros::NodeHandle nh;
@@ -103,6 +112,7 @@ class ParrotExe{
    //quad related
    ros::Publisher takeoff_pub;
    ros::Publisher land_pub;
+   ros::Publisher emergency_pub;
 
    //subscribers
    ros::Subscriber sub_path;//subscribe to generated path

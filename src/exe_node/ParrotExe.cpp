@@ -13,9 +13,10 @@
 #include "ardrone_rrt_avoid/DubinPath_msg.h"
 #include "ardrone_rrt_avoid/DubinSeg_msg.h"
 #include "ardrone_rrt_avoid/QuadState_msg.h"
+//ros messages
+#include "std_msgs/Empty.h"
 
-//function to send command to the parrot
-void SendControlToDrone(ControlCommand cmd); 
+using namespace std;
 
 int ParrotExe::ParamFromXML(const char* pFilename)
 {
@@ -52,7 +53,7 @@ int ParrotExe::ParamFromXML(const char* pFilename)
    return 0;
 }//ParamFromXML ends
 
-ParrotExe::ParrotExe():log_file("ardrone_path_rec.txt")
+ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid):controlMid(_controlMid),log_file("ardrone_path_rec.txt")
 {
    //flags default
    if_receive= false;
@@ -61,6 +62,8 @@ ParrotExe::ParrotExe():log_file("ardrone_path_rec.txt")
    if_new_rec= false;
    if_joy= false;
    uav_state_idx= -1;
+   lastR1Pressed= false;
+   lastL1Pressed= false;
    //publishers
    //for planning related
    pub_rec = nh.advertise<std_msgs::Bool>("path_rec",1);
@@ -69,8 +72,9 @@ ParrotExe::ParrotExe():log_file("ardrone_path_rec.txt")
    pub_state= nh.advertise<ardrone_rrt_avoid::QuadState_msg>("quad_state",1); 
    pub_new_rec= nh.advertise<std_msgs::Bool>("if_new_rec",1);
    //for quad related
-   takeoff_pub= nh_.advertise<std_msgs::Empty>("ardrone/takeoff",1);
-   land_pub= nh_.advertise<std_msgs::Empty>("ardrone/land",1);
+   takeoff_pub= nh.advertise<std_msgs::Empty>("ardrone/takeoff",1);
+   land_pub= nh.advertise<std_msgs::Empty>("ardrone/land",1);
+   emergency_pub= nh.advertise<std_msgs::Empty>("ardrone/reset",1); 
 
    //Subscribers
    sub_path = nh.subscribe("path", 1, &ParrotExe::pathCallback,this);
@@ -92,6 +96,7 @@ ParrotExe::ParrotExe():log_file("ardrone_path_rec.txt")
    yawci = 0.0,  vxfi = 0.0, vyfi = 0.0, dzfi=0.; // meter/s
    pitchco = 0.0, rollco = 0.0, dyawco = 0.0, dzco = 0.0;
    // For trajectory control
+   //controlMid = _controlMid;
    controlMid.setControlMode(Controller_MidLevel_controlMode::SPEED_CONTROL);
 }
 
@@ -179,7 +184,7 @@ void ParrotExe::joyCb(const sensor_msgs::JoyConstPtr joy_msg)
 	c.roll = -joy_msg->axes[ROLL];
 	c.pitch = -joy_msg->axes[PITCH];
 
-	sendControlToDrone(c);
+	SendControlToDrone(c);
 	//cout << lastL1Pressed << " " << joy_msg->buttons.at(L1) << endl;
         if( joy_msg->buttons.at(L1) )
 	{
@@ -187,7 +192,7 @@ void ParrotExe::joyCb(const sensor_msgs::JoyConstPtr joy_msg)
             sendTakeoff();
 	  }
 	  if( uav_state_idx == 3 || uav_state_idx == 7 ){
-	    sendControlToDrone( ControlCommand(0,0,0,0) );
+	    SendControlToDrone( ControlCommand(0,0,0,0) );
 	    sendLand();
 	  }
           if( uav_state_idx == 4 )
@@ -195,7 +200,7 @@ void ParrotExe::joyCb(const sensor_msgs::JoyConstPtr joy_msg)
 	}//if joy_msg ends
 
         if(!lastR1Pressed && joy_msg->buttons.at(R1))
-			sendToggleState();
+			sendEmergencyStop();
        }
     lastL1Pressed =joy_msg->buttons.at(L1);
     lastR1Pressed = joy_msg->buttons.at(R1);
@@ -241,6 +246,11 @@ void ParrotExe::sendTakeoff()
    //cout << "take off" << endl;
 }
 
+void ParrotExe::sendEmergencyStop()
+{//send to emergency stop
+   emergency_pub.publish(std_msgs::Empty() );
+}
+
 void ParrotExe::SetRestartDefault()
 {
    if_restart_path= true;
@@ -266,7 +276,7 @@ int ParrotExe::CommandParrot(const double _t_limit)
    }
    
    //first see if the current position is already at the goal
-   yucong_rrt_avoid::DubinSeg_msg dubin_last = path_msg.dubin_path.back();
+   ardrone_rrt_avoid::DubinSeg_msg dubin_last = path_msg.dubin_path.back();
    
    if( sqrt(pow(x_est-dubin_last.stop_pt.x,2)+pow(y_est-dubin_last.stop_pt.y,2)+pow(z_mea-dubin_last.stop_pt.z,2)) < end_r )
    {
@@ -278,7 +288,7 @@ int ParrotExe::CommandParrot(const double _t_limit)
      //restart to default
      SetRestartDefault();
      cout<<"got target already"<<endl;
-     return;
+     return 0;
    }
    
    if(if_restart_path)
@@ -291,7 +301,7 @@ int ParrotExe::CommandParrot(const double _t_limit)
      
      for(int i=0;i!=path_msg.dubin_path.size();++i)
      {
-       yucong_rrt_avoid::DubinSeg_msg db_msg= path_msg.dubin_path[i];
+       ardrone_rrt_avoid::DubinSeg_msg db_msg= path_msg.dubin_path[i];
        QuadCfg start(db_msg.d_dubin.start.x,db_msg.d_dubin.start.y,db_msg.d_dubin.start.z,db_msg.d_dubin.start.theta);
        QuadCfg end(db_msg.d_dubin.end.x,db_msg.d_dubin.end.y,db_msg.d_dubin.end.z,db_msg.d_dubin.end.theta);
        quadDubins3D db_3d(start,end,rho);
@@ -400,6 +410,7 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
 {  //0:time up, 1:cfg_stop reached, 2: seg end reached, -1: still ongoing
    //if already at the target, just return
    QuadCfg cfg_stop= db_seg.cfg_stop;
+   quadDubins3D dubin_3d= db_seg.d_dubin;
    if( sqrt(pow(x_est-cfg_stop.x,2)+pow(y_est-cfg_stop.y,2)+pow(z_mea-cfg_stop.z,2))<end_r )
    {
      if_restart_dubin= true;
@@ -446,6 +457,9 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
      //make sure idx_seg correct value
      if(!(idx_seg==0||idx_seg==1||idx_seg==2))
        std::runtime_error("idx_seg must be 0 or 1 or 2");
+     
+     idx_dubin_sub= idx_seg;
+
    }//if_restart_dubin ends
    else
    {
@@ -453,9 +467,8 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
        std::runtime_error("error:idx_dubin_sub unassigned");
    }//else ends
    
-   idx_dubin_sub= idx_seg;
    double t_limit = _t_limit;
-   int db_result= SegCommand(dg_seg,idx_dubin_sub,t_limit);
+   int db_result= SegCommand(db_seg,idx_dubin_sub,t_limit);
    //cfg_stop reached
    if(db_result==1)
    {
@@ -468,7 +481,7 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
      if(idx_dubin_sub==2) 
      {	//dubin ends actually
        if_restart_dubin= true;
-       db_result=1
+       db_result=1;
 	//return db_result;
      }
      else
@@ -482,7 +495,7 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
    //0:time up, 1:cfg_stop reached, 2: seg end reached, -1: still ongoing
 }//DubinCommand ends
 
-int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
+int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
 { //-1:
    if(if_restart_seg) 
    {
@@ -495,7 +508,7 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
    int seg_result= -1;
    //initial criterion
    //if time limit reached?
-   if( ros::Time::now()-t_start>= ros::Duration(t_limit) ) 
+   if( ros::Time::now()-t_start>= ros::Duration(_t_limit) ) 
    { 
       seg_result= 0;
       if_restart_seg= true;
@@ -509,7 +522,7 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
    if( !(idx_sub==0||idx_sub==1||idx_sub==2) )
      std::runtime_error("idx_sub must be 0 or 1 or 2.");
    const int* types = DIRDATA[dubin_3d.path2D.type];
-   int type= types[idx_seg];
+   int type= types[idx_sub];
    if(!( type == L_SEG || type == S_SEG || type == R_SEG ))
      std::runtime_error("dubin_sub type incorrect");
    
@@ -593,7 +606,7 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
         vec[1]= -cos(cfg_start.theta);
      }
      
-     double center[3]= {cfg_start.x+rho*vec[0],cfg_star<t.y+rho*vec[1],cfg_start.z};
+     double center[3]= {cfg_start.x+rho*vec[0],cfg_start.y+rho*vec[1],cfg_start.z};
      double c_n= center[0];
      double c_e= center[1];
      double c_d= center[2];
@@ -629,6 +642,8 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
        << ac*pacpr[2]+ap*pappr[2];
      u2= -lambda_h*cross(fc1,fc2);
      u= -K1*u1+K2*u2;
+     double u_mag= sqrt(u(0)*u(0)+u(1)*u(1)+u(2)*u(2));
+
      //unity
      if(u_mag!=0 )
      {
@@ -642,7 +657,7 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
        controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
        controlMid.setReference( 0.0, 0.0, d_yaw, 0.0, u(0), u(1) );
        controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
-       sendControlToDrone( ControlCommand( pitchco, rollco, u(2), dyawco ) );
+       SendControlToDrone( ControlCommand( pitchco, rollco, u(2), dyawco ) );
        //last dt
        ros::Duration(dt).sleep();
      }//if u_mag ends
@@ -665,8 +680,8 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
      n_lon<<-sin(phi)<<cos(phi)<<0.;
      n_lat<<cos(phi)*sin(gam)<<sin(phi)*sin(gam)<<-cos(gam);
      
-     double a_lon= n_lon(0)*(x_c-x_start)+n_lon(1)*(y_c-y_start)+n_lon(2)*(z_c-z_start);
-     double a_lat= n_lat(0)*(x_c-x_start)+n_lat(1)*(y_c-y_start)+n_lat(2)*(z_c-z_start);
+     double a_lon= n_lon(0)*(x_est-x_start)+n_lon(1)*(y_est-y_start)+n_lon(2)*(z_mea-z_start);
+     double a_lat= n_lat(0)*(x_est-x_start)+n_lat(1)*(y_est-y_start)+n_lat(2)*(z_mea-z_start);
      //unnormailised velocity
      u = -K1*(a_lon*n_lon+a_lat*n_lat)+K2*cross(n_lat,n_lon);
      double u_mag= sqrt(u(0)*u(0)+u(1)*u(1)+u(2)*u(2));
@@ -683,7 +698,7 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
        controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
        controlMid.setReference( 0.0, 0.0, d_yaw, 0.0, u(0), u(1) );
        controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
-       sendControlToDrone( ControlCommand( pitchco, rollco, u(2), dyawco ) );
+       SendControlToDrone( ControlCommand( pitchco, rollco, u(2), dyawco ) );
        //last dt
        ros::Duration(dt).sleep();
 
@@ -692,7 +707,7 @@ int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
    }//else ends
    
    //if time limit reached?
-   if( ros::Time::now()-t_start>= ros::Duration(t_limit) ) 
+   if( ros::Time::now()-t_start>= ros::Duration(_t_limit) ) 
    { 
       seg_result= 0;
       if_restart_seg= true;

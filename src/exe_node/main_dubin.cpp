@@ -3,6 +3,7 @@
 #include "quadDubins3D.h"
 #include "ticpp.h"
 #include "QuadCfg.h"
+#include "controller/midlevelCnt/Controller_MidLevelCnt.h"
 
 int main(int argc, char** argv)
 { //first to get the rho
@@ -31,7 +32,7 @@ int main(int argc, char** argv)
   }
   catch(ticpp::Exception& error)
   {
-    cerr << "Error: " << error.m_details << endl;
+    std::cerr << "Error: " << error.m_details << std::endl;
     return 2;                 // signal error
   }
   double rho= v/yaw_rate;
@@ -62,12 +63,15 @@ int main(int argc, char** argv)
   
   std::cout<<"t_limit= "<<t_limit <<std::endl;
   ros::init(argc,argv,"dubin_test");
-  ParrotExe parrot_exe;
+  //the controller
+  Controller_MidLevelCnt controlMid;
+
+  ParrotExe parrot_exe(controlMid);
   ros::Duration(1.0).sleep();
   //while 
   while(ros::ok() )
   {
-    idx_uav_state= GetUavStateIdx();
+    idx_uav_state= parrot_exe.GetUavStateIdx();
     
     if( (idx_uav_state==3||idx_uav_state==7||idx_uav_state==4)
       && !if_dubin_reach )
