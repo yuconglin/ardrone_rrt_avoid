@@ -79,6 +79,8 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid):controlMid(_controlMid
    //Subscribers
    sub_path = nh.subscribe("path", 1, &ParrotExe::pathCallback,this);
    sub_if_new= nh.subscribe("if_new_path",1, &ParrotExe::newCallback,this);
+   joy_sub= nh.subscribe("joy", 1, &ParrotExe::joyCb, this);
+   nav_sub= nh.subscribe("ardrone/navdata", 1, &ParrotExe::navdataDb, this);
    //specify some parameters of the quad
    if(ParamFromXML("/home/yucong/.ros/param.xml")!=0)
      std::runtime_error("ParamFromXML error");
@@ -145,6 +147,12 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    //which state the quad is
    uav_state_idx= navdataPtr->state;
 }//navdataCb ends
+
+int ParrotExe::GetCurrentCfg(QuadCfg& cfg)
+{
+   cfg= QuadCfg(x_est,y_est,z_mea,yaw_est);
+   return 0;
+}//GetCurrentCfg ends
 
 void ParrotExe::joyCb(const sensor_msgs::JoyConstPtr joy_msg)
 {

@@ -65,6 +65,10 @@ class ParrotExe{
    int CommandParrot(const double _t_limit);
    int DubinCommand(DubinSeg& db_seg, const double _t_limit);
    int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit);
+   //for test
+   int LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_limit); 
+   int CircleCommand(const QuadCfg& center,const double rho,double d_the,double _t_limit);
+   
    //to publish quad's state
    void PubQuadState();  
    //to access flags
@@ -72,6 +76,8 @@ class ParrotExe{
    inline bool GetIfReach(){return this->if_reach;}
    inline bool GetIfNewPath(){return this->if_new_path;}
    inline int GetUavStateIdx(){return this->uav_state_idx;}
+   inline bool GetIfJoy(){return this->if_joy;}
+   int GetCurrentCfg(QuadCfg& cfg);
    //set init time
    inline void SetInitTime(ros::Time _t_now) {this->t_init= _t_now.toSec(); };
    //set all restarts to default
@@ -116,7 +122,9 @@ class ParrotExe{
 
    //subscribers
    ros::Subscriber sub_path;//subscribe to generated path
-   ros::Subscriber sub_if_new;//subcribe to see if a new path is generated
+   ros::Subscriber sub_if_new;//subscribe to see if a new path is generated
+   ros::Subscriber joy_sub;//subscribe to joystick command
+   ros::Subscriber nav_sub;//subscribe to navdateCb
    //msgs
    //if a dubins curve is received
    std_msgs::Bool rec_msg;

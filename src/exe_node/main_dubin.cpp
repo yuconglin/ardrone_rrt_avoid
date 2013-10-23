@@ -58,23 +58,41 @@ int main(int argc, char** argv)
   //main part
   double if_process_start= false;
   int idx_uav_state = -1;
+  int pre_uav_state = -1;
   double t_limit= 1.;
   bool if_dubin_reach= false;
+  bool if_joy= false;
+  bool if_start= false;
+  QuadCfg cfg_start;
   
+  if( argc < 2) 
+    std::runtime_error("should be one argument");
+
+  int if_manual= atoi(argv[1]);
   std::cout<<"t_limit= "<<t_limit <<std::endl;
   ros::init(argc,argv,"dubin_test");
   //the controller
-  Controller_MidLevelCnt controlMid;
+  Controller_MidLevelCnt& controlMid;
 
   ParrotExe parrot_exe(controlMid);
   ros::Duration(1.0).sleep();
+  //take off
+  if(if_manual== 0)
+    parrot_exe.sendTakeoff();
+  else if( if_manual==1)
+    std::cout<<"manual takeoff please!"<<std::endl;
+  else
+    std::runtime_error("wrong input. should be 1 or 2");
+  
   //while 
   while(ros::ok() )
   {
     idx_uav_state= parrot_exe.GetUavStateIdx();
-    
+    if_joy= parrot_exe.GetIfJoy();
+    /**************************************************
+    //to navigate along a dubin's curve
     if( (idx_uav_state==3||idx_uav_state==7||idx_uav_state==4)
-      && !if_dubin_reach )
+      && !if_dubin_reach && !if_joy )
     {
       int result= parrot_exe.DubinCommand(db_seg,t_limit);
       if(result==1) 
@@ -82,6 +100,24 @@ int main(int argc, char** argv)
       if(result==1||result==2||result==0) 
 	if_dubin_reach= true;
     }//if ends
+    ****************************************************/
+    //to fix the start moment: takeoff---->hover
+    if(pre_uav_state== 6 && idx_uav_state== 4)
+    {
+      if_start= true;
+      //get the dubin providing segs
+      //first in the local frame, then converted to the global reference frame
+      //in the global frame, start is (0,0,z_m,0) and end is(10,5,z_m,0)
+      parrot_exe.GetCurrentCfg(cfg_start);
+      start= QuadCfg(cfg_start.x,cfg_start.y,cfg_start.z,cfg_start.theta);
+      double x= cfg_start.x*cos(cfg_start.theta)-cfg_start.y*sin(cfg_start.theta);
+      double y= cfg_start.x*sin(cfg_start.theta)+cfg_start.y*cos(cfg_start.theta);
+      end= QuadCfg(x,y,cfg_start.z,cfg_start.theta);
+
+    }
+    //navigate along a segment of a dubin's curve: straight or circle
+
+    pre_uav_state= idx_uav_state;
   }//while ends
 
   
