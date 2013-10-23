@@ -110,9 +110,9 @@ int main(int argc, char** argv)
       //in the global frame, start is (0,0,z_m,0) and end is(10,5,z_m,0)
       parrot_exe.GetCurrentCfg(cfg_start);
       start= QuadCfg(cfg_start.x,cfg_start.y,cfg_start.z,cfg_start.theta);
-      double x= cfg_start.x*cos(cfg_start.theta)-cfg_start.y*sin(cfg_start.theta);
-      double y= cfg_start.x*sin(cfg_start.theta)+cfg_start.y*cos(cfg_start.theta);
-      end= QuadCfg(x,y,cfg_start.z,cfg_start.theta);
+      double x= end.x*cos(cfg_start.theta)-end.y*sin(cfg_start.theta);
+      double y= end.x*sin(cfg_start.theta)+end.y*cos(cfg_start.theta);
+      end= QuadCfg(x, y, cfg_start.z, end.theta+cfg_start.theta);
 
     }
     //navigate along a segment of a dubin's curve: straight or circle
