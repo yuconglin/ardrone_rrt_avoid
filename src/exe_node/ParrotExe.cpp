@@ -503,6 +503,21 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
    //0:time up, 1:cfg_stop reached, 2: seg end reached, -1: still ongoing
 }//DubinCommand ends
 
+int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_limit){
+   if(if_restart_seg)
+   {
+     if_restart_seg= false;
+     x_start= x_est;
+     y_start= y_est;
+     z_start= z_mea;
+     d_length= 0.0; 
+   }
+   int seg_result= -1;
+   //if time limit reached?
+
+
+}//LineCommand ends
+
 int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
 { //-1:
    if(if_restart_seg) 
