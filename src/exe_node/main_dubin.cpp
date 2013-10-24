@@ -60,12 +60,12 @@ int main(int argc, char** argv)
   int idx_uav_state = -1;
   int pre_uav_state = -1;
   double t_limit= 1.;
-  bool if_dubin_reach= false;
+  bool if_reach= false;
   bool if_joy= false;
   bool if_start= false;
   QuadCfg cfg_start;
   
-  if( argc < 2) 
+  if( argc < 3) 
     std::runtime_error("should be one argument");
 
   int if_manual= atoi(argv[1]);
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
   else if( if_manual==1)
     std::cout<<"manual takeoff please!"<<std::endl;
   else
-    std::runtime_error("wrong input. should be 1 or 2");
+    std::runtime_error("wrong input. should be 0 or 1");
   
   //while 
   while(ros::ok() )
@@ -92,13 +92,13 @@ int main(int argc, char** argv)
     /**************************************************
     //to navigate along a dubin's curve
     if( (idx_uav_state==3||idx_uav_state==7||idx_uav_state==4)
-      && !if_dubin_reach && !if_joy )
+      && !if_reach && !if_joy )
     {
       int result= parrot_exe.DubinCommand(db_seg,t_limit);
       if(result==1) 
 	parrot_exe.sendLand();
       if(result==1||result==2||result==0) 
-	if_dubin_reach= true;
+	if_reach= true;
     }//if ends
     ****************************************************/
     //to fix the start moment: takeoff---->hover
@@ -113,9 +113,40 @@ int main(int argc, char** argv)
       double x= end.x*cos(cfg_start.theta)-end.y*sin(cfg_start.theta);
       double y= end.x*sin(cfg_start.theta)+end.y*cos(cfg_start.theta);
       end= QuadCfg(x, y, cfg_start.z, end.theta+cfg_start.theta);
+      //the dubin's curve
+      db_3d= quadDubins3D(start,end,rho);
+      db_seg.d_dubin= db_3d;
+      db_seg.cfg_stop= db_3d.cfg_i1;
 
     }
-    //navigate along a segment of a dubin's curve: straight or circle
+    //two options
+    int option= atoi(argv[2]);
+    if(option==0)
+    {//navigate along a straight line
+      if( (idx_uav_state==3||idx_uav_state==7||idx_uav_state==4)
+          && !if_reach && !if_joy )
+      {
+        int result= parrot_exe.LineCommand(start,end,t_limit);
+	if(result==2)
+	  parrot_exe.sendLand();
+	if(result==0||result=2)
+	  if_reach== true;
+      }//if
+    }
+    else if(option==1)
+    {//the dubin's curve
+      if( (idx_uav_state==3||idx_uav_state==7||idx_uav_state==4)
+      && !if_reach && !if_joy )
+      {
+        int result= parrot_exe.DubinCommand(db_seg,t_limit);
+        if(result==1) 
+	  parrot_exe.sendLand();
+        if(result==1||result==2||result==0) 
+	  if_reach= true;
+      }//if ends
+    }
+    else
+     std::runtime_error("wrong input. should be 0 or 1");
 
     pre_uav_state= idx_uav_state;
   }//while ends

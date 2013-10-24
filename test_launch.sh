@@ -8,6 +8,6 @@ gnome-terminal  \
 						exec bash\""  \
         --tab --title "bottom_yc_img"	--command "bash -c \"
 						env sleep 5s ;
-						rosrun ardrone_rrt_avoid exe_dubin 1;
+						rosrun ardrone_rrt_avoid exe_dubin 1 0;
 						exec bash\""  \
 

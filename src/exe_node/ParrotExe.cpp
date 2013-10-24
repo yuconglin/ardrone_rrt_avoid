@@ -503,7 +503,8 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
    //0:time up, 1:cfg_stop reached, 2: seg end reached, -1: still ongoing
 }//DubinCommand ends
 
-int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_limit){
+int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_limit)
+{
    if(if_restart_seg)
    {
      if_restart_seg= false;
@@ -514,7 +515,86 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
    }
    int seg_result= -1;
    //if time limit reached?
+   if( ros::Time::now()-t_start>= ros::Duration(_t_limit) ) 
+   { 
+      seg_result= 0;
+      if_restart_seg= true;
+      return seg_result;
+      //break;
+   }
+   //total length
+   double t_len= sqrt(pow(start.x-end.x,2)+pow(start.y-end.y,2)+pow(start.z-end.z,2) );
+   arma::colvec v_quad, v_end;
+   //to calculate the length travelled along the seg
+   d_length+= sqrt(pow(x_pre-x_est,2)+pow(y_pre-y_est,2)+pow(z_pre-z_mea,2));
+   //assign previous coordinates
+   x_pre= x_est;
+   y_pre= y_est;
+   z_pre= z_mea; 
 
+   //v_quad
+   v_quad<< vx_est<< vy_est<< vzm_est; 
+   //if the length reached?
+   double end_dis=sqrt(pow(end.x-x_est,2)+pow(end.y-y_est,2)+pow(end.z-z_mea,2));
+   //v_end
+   v_end<<cfg_end.x-x_est<<cfg_end.y-y_est<<cfg_end.z-z_mea;  
+   //if the end is reached?
+   if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r
+     ||dot(v_quad,v_end)<=0 && d_length> t_len 
+     ||d_length>1.5*t_len ) 
+   {
+     seg_result= 2;
+     if_restart_seg= true;
+     return seg_result;
+   }
+   //the control part
+   double x_start= cfg_start.x;
+   double y_start= cfg_start.y;
+   double z_start= cfg_start.z;
+   double x_end= cfg_end.x;
+   double y_end= cfg_end.y;
+   double z_end= cfg_end.z;
+
+   double phi= atan2(y_end-y_start,x_end-x_start);
+   double gam= asin( (z_end-z_start)/dis );
+
+   arma::colvec n_lon,n_lat,u;
+
+   n_lon<<-sin(phi)<<cos(phi)<<0.;
+   n_lat<<cos(phi)*sin(gam)<<sin(phi)*sin(gam)<<-cos(gam);
+   
+   double a_lon= n_lon(0)*(x_est-x_start)+n_lon(1)*(y_est-y_start)+n_lon(2)*(z_mea-z_start);
+   double a_lat= n_lat(0)*(x_est-x_start)+n_lat(1)*(y_est-y_start)+n_lat(2)*(z_mea-z_start);
+   //unnormailised velocity
+   u = -K1*(a_lon*n_lon+a_lat*n_lat)+K2*cross(n_lat,n_lon);
+   double u_mag= sqrt(u(0)*u(0)+u(1)*u(1)+u(2)*u(2));
+   
+   if( u_mag!=0. )
+   {
+     double cons= speed/u_mag;
+     u<< u(0)*cons<< u(1)*cons << u(2)*cons;
+     //the desired yaw
+     double d_yaw= atan2(u(1),u(0) );
+     //reset the controller
+     controlMid.reset(); 
+     yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
+     controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
+     controlMid.setReference( 0.0, 0.0, d_yaw, 0.0, u(0), u(1) );
+     controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
+     SendControlToDrone( ControlCommand( pitchco, rollco, u(2), dyawco ) );
+     //last dt
+     ros::Duration(dt).sleep();
+
+   }//if u_mag ends
+   
+   //if time limit reached?
+   if( ros::Time::now()-t_start>= ros::Duration(_t_limit) ) 
+   { 
+      seg_result= 0;
+      if_restart_seg= true;
+   }
+
+   return seg_result; 
 
 }//LineCommand ends
 

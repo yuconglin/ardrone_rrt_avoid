@@ -67,7 +67,7 @@ class ParrotExe{
    int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit);
    //for test
    int LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_limit); 
-   int CircleCommand(const QuadCfg& center,const double rho,double d_the,double _t_limit);
+   //int CircleCommand(const QuadCfg& center,const double rho,double d_the,double _t_limit);
    
    //to publish quad's state
    void PubQuadState();  
