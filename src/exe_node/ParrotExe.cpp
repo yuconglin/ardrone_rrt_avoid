@@ -80,7 +80,7 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid):controlMid(_controlMid
    sub_path = nh.subscribe("path", 1, &ParrotExe::pathCallback,this);
    sub_if_new= nh.subscribe("if_new_path",1, &ParrotExe::newCallback,this);
    joy_sub= nh.subscribe("joy", 1, &ParrotExe::joyCb, this);
-   nav_sub= nh.subscribe("ardrone/navdata", 1, &ParrotExe::navdataDb, this);
+   nav_sub= nh.subscribe("ardrone/navdata", 1, &ParrotExe::navdataCb, this);
    //specify some parameters of the quad
    if(ParamFromXML("/home/yucong/.ros/param.xml")!=0)
      std::runtime_error("ParamFromXML error");
@@ -537,7 +537,7 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
    //if the length reached?
    double end_dis=sqrt(pow(end.x-x_est,2)+pow(end.y-y_est,2)+pow(end.z-z_mea,2));
    //v_end
-   v_end<<cfg_end.x-x_est<<cfg_end.y-y_est<<cfg_end.z-z_mea;  
+   v_end<< end.x-x_est<< end.y-y_est<< end.z-z_mea;  
    //if the end is reached?
    if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r
      ||dot(v_quad,v_end)<=0 && d_length> t_len 
@@ -548,15 +548,15 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
      return seg_result;
    }
    //the control part
-   double x_start= cfg_start.x;
-   double y_start= cfg_start.y;
-   double z_start= cfg_start.z;
-   double x_end= cfg_end.x;
-   double y_end= cfg_end.y;
-   double z_end= cfg_end.z;
+   double x_start= start.x;
+   double y_start= start.y;
+   double z_start= start.z;
+   double x_end= end.x;
+   double y_end= end.y;
+   double z_end= end.z;
 
    double phi= atan2(y_end-y_start,x_end-x_start);
-   double gam= asin( (z_end-z_start)/dis );
+   double gam= asin( (z_end-z_start)/t_len );
 
    arma::colvec n_lon,n_lat,u;
 

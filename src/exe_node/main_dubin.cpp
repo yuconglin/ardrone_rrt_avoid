@@ -72,7 +72,7 @@ int main(int argc, char** argv)
   std::cout<<"t_limit= "<<t_limit <<std::endl;
   ros::init(argc,argv,"dubin_test");
   //the controller
-  Controller_MidLevelCnt& controlMid;
+  Controller_MidLevelCnt controlMid;
 
   ParrotExe parrot_exe(controlMid);
   ros::Duration(1.0).sleep();
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
         int result= parrot_exe.LineCommand(start,end,t_limit);
 	if(result==2)
 	  parrot_exe.sendLand();
-	if(result==0||result=2)
+	if(result==0||result==2)
 	  if_reach== true;
       }//if
     }
