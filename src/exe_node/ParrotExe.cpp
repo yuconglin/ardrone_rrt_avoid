@@ -55,6 +55,7 @@ int ParrotExe::ParamFromXML(const char* pFilename)
 
 ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid):controlMid(_controlMid),log_file("ardrone_path_rec.txt")
 {
+   cout<<"initialized"<<endl;
    //flags default
    if_receive= false;
    if_reach= 0;
@@ -79,7 +80,7 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid):controlMid(_controlMid
    //Subscribers
    sub_path = nh.subscribe("path", 1, &ParrotExe::pathCallback,this);
    sub_if_new= nh.subscribe("if_new_path",1, &ParrotExe::newCallback,this);
-   joy_sub= nh.subscribe("joy", 1, &ParrotExe::joyCb, this);
+   joy_sub= nh.subscribe(nh.resolveName("joy"), 1, &ParrotExe::joyCb, this);
    nav_sub= nh.subscribe("ardrone/navdata", 1, &ParrotExe::navdataCb, this);
    //specify some parameters of the quad
    if(ParamFromXML("/home/yucong/.ros/param.xml")!=0)
@@ -156,7 +157,8 @@ int ParrotExe::GetCurrentCfg(QuadCfg& cfg)
 
 void ParrotExe::joyCb(const sensor_msgs::JoyConstPtr joy_msg)
 {
-    if(joy_msg->axes.size() < 4) {
+   //cout<<"joycb joycb"<<endl; 
+   if(joy_msg->axes.size() < 4) {
         ROS_WARN_ONCE("Error: Non-compatible Joystick!");
         return;
     }
@@ -181,7 +183,7 @@ void ParrotExe::joyCb(const sensor_msgs::JoyConstPtr joy_msg)
     {
         if_joy = true;
         justStartedControlling = true;
-        //cout << "start control" << endl;
+        cout << "start control" << endl;
     }
     // are we actually controlling with the Joystick?
     if( justStartedControlling || if_joy )
@@ -197,7 +199,8 @@ void ParrotExe::joyCb(const sensor_msgs::JoyConstPtr joy_msg)
         if( joy_msg->buttons.at(L1) )
 	{
           if( uav_state_idx == 2 ){
-            sendTakeoff();
+            cout<<"trying to take off"<<endl;
+	    sendTakeoff();
 	  }
 	  if( uav_state_idx == 3 || uav_state_idx == 7 ){
 	    SendControlToDrone( ControlCommand(0,0,0,0) );

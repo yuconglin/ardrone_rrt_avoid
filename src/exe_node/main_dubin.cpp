@@ -89,6 +89,7 @@ int main(int argc, char** argv)
   {
     idx_uav_state= parrot_exe.GetUavStateIdx();
     if_joy= parrot_exe.GetIfJoy();
+    //std::cout<<"if_joy: "<<if_joy<<std::endl;
     /**************************************************
     //to navigate along a dubin's curve
     if( (idx_uav_state==3||idx_uav_state==7||idx_uav_state==4)
@@ -104,6 +105,7 @@ int main(int argc, char** argv)
     //to fix the start moment: takeoff---->hover
     if(pre_uav_state== 6 && idx_uav_state== 4)
     {
+	    std::cout<<"start start"<<std::endl;
       if_start= true;
       //get the dubin providing segs
       //first in the local frame, then converted to the global reference frame
@@ -149,6 +151,9 @@ int main(int argc, char** argv)
      std::runtime_error("wrong input. should be 0 or 1");
 
     pre_uav_state= idx_uav_state;
+    //don't forget to spin once
+    ros::spinOnce();
+
   }//while ends
 
   
