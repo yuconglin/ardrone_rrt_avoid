@@ -53,7 +53,7 @@ int ParrotExe::ParamFromXML(const char* pFilename)
    return 0;
 }//ParamFromXML ends
 
-ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid):controlMid(_controlMid),log_file("ardrone_path_rec.txt")
+ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid):controlMid(_controlMid),log_file("ardrone_path_rec.txt"),log_nav("ardrone_log_nav.txt")
 {
    cout<<"initialized"<<endl;
    //flags default
@@ -145,6 +145,7 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    x_est += elapsed_time_dbl * vx_est;
    y_est += elapsed_time_dbl * vy_est;
    z_mea = navdataPtr->altd/1000.;
+   log_nav<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<endl;
    //which state the quad is
    uav_state_idx= navdataPtr->state;
 }//navdataCb ends
@@ -520,6 +521,7 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
    //if time limit reached?
    if( ros::Time::now()-t_start>= ros::Duration(_t_limit) ) 
    { 
+      cout<<"now: "<<ros::Time::now().toSec()<<" t_start: "<<t_start.toSec()<<endl;
       seg_result= 0;
       if_restart_seg= true;
       return seg_result;
@@ -548,6 +550,7 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
    {
      seg_result= 2;
      if_restart_seg= true;
+     cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<endl;
      return seg_result;
    }
    //the control part
@@ -576,6 +579,7 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
    {
      double cons= speed/u_mag;
      u<< u(0)*cons<< u(1)*cons << u(2)*cons;
+     cout<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<endl;
      //the desired yaw
      double d_yaw= atan2(u(1),u(0) );
      //reset the controller

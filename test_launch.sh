@@ -12,6 +12,6 @@ gnome-terminal  \
 						exec bash\""  \
         --tab --title "bottom_yc_img"	--command "bash -c \"
 						env sleep 5s ;
-						rosrun ardrone_rrt_avoid exe_dubin 0 0;
+						rosrun ardrone_rrt_avoid exe_dubin 0 0 >record.txt;
 						exec bash\""  \
 

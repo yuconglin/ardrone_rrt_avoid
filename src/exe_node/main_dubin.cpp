@@ -59,7 +59,7 @@ int main(int argc, char** argv)
   double if_process_start= false;
   int idx_uav_state = -1;
   int pre_uav_state = -1;
-  double t_limit= 1.;
+  double t_limit= 1e7;
   bool if_reach= false;
   bool if_joy= false;
   bool if_start= false;
@@ -71,10 +71,12 @@ int main(int argc, char** argv)
   int if_manual= atoi(argv[1]);
   std::cout<<"t_limit= "<<t_limit <<std::endl;
   ros::init(argc,argv,"dubin_test");
+  
   //the controller
   Controller_MidLevelCnt controlMid;
 
   ParrotExe parrot_exe(controlMid);
+  std::cout<<"now init: "<<ros::Time::now().toSec()<<std::endl;
   ros::Duration(1.0).sleep();
   //take off
   if(if_manual== 0)
@@ -107,6 +109,10 @@ int main(int argc, char** argv)
     {
 	    std::cout<<"start start"<<std::endl;
       if_start= true;
+     
+      std::cout <<"time now: "<<ros::Time::now().toSec()<<std::endl;
+      parrot_exe.SetStartTime(ros::Time::now() );
+      std::cout<<"t_start in secs: "<<parrot_exe.GetStartTimeSec()<<std::endl;
       //get the dubin providing segs
       //first in the local frame, then converted to the global reference frame
       //in the global frame, start is (0,0,z_m,0) and end is(10,5,z_m,0)
@@ -114,6 +120,7 @@ int main(int argc, char** argv)
       start= QuadCfg(cfg_start.x,cfg_start.y,cfg_start.z,cfg_start.theta);
       double x= end.x*cos(cfg_start.theta)-end.y*sin(cfg_start.theta);
       double y= end.x*sin(cfg_start.theta)+end.y*cos(cfg_start.theta);
+      std::cout<<"x: "<<x<<" y: "<<y<<std::endl;
       end= QuadCfg(x, y, cfg_start.z, end.theta+cfg_start.theta);
       //the dubin's curve
       db_3d= quadDubins3D(start,end,rho);
@@ -128,11 +135,20 @@ int main(int argc, char** argv)
       if( (idx_uav_state==3||idx_uav_state==7||idx_uav_state==4)
           && !if_reach && !if_joy )
       {
-        int result= parrot_exe.LineCommand(start,end,t_limit);
+	//std::cout << "fly phase"<<std::endl;
+	int result= parrot_exe.LineCommand(start,end,t_limit);
 	if(result==2)
+	{
 	  parrot_exe.sendLand();
+	  std::cout<<"end reached,yeah"<<std::endl;
+	}
+	if(result==0)
+          std::cout<<"time limit reached"<<std::endl;
+
 	if(result==0||result==2)
+	{
 	  if_reach== true;
+	}
       }//if
     }
     else if(option==1)

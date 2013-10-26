@@ -77,6 +77,7 @@ class ParrotExe{
    inline bool GetIfNewPath(){return this->if_new_path;}
    inline int GetUavStateIdx(){return this->uav_state_idx;}
    inline bool GetIfJoy(){return this->if_joy;}
+   inline double GetStartTimeSec(){return this->t_start.toSec();}
    int GetCurrentCfg(QuadCfg& cfg);
    //set init time
    inline void SetInitTime(ros::Time _t_now) {this->t_init= _t_now.toSec(); }
@@ -156,6 +157,7 @@ class ParrotExe{
    double t_init;
    //for logging trajectory
    std::ofstream log_file;
+   std::ofstream log_nav;
    //for controller
    Controller_MidLevelCnt& controlMid;
    //data
