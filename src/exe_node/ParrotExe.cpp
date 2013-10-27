@@ -132,7 +132,9 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    //position estimator:x,y ordometry; z altitude measurement but it should be kalman filetered
    //time
    tk = navdataPtr->header.stamp;
+   
    elapsed_time = tk - tkm1;
+   
    elapsed_time_dbl= elapsed_time.sec+ (double)elapsed_time.nsec/1E9;
    //velocity
    vxm_est = (double)navdataPtr->vx/1000.0; 
@@ -145,9 +147,12 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    x_est += elapsed_time_dbl * vx_est;
    y_est += elapsed_time_dbl * vy_est;
    z_mea = navdataPtr->altd/1000.;
-   log_nav<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<endl;
-   //which state the quad is
+      //which state the quad is
    uav_state_idx= navdataPtr->state;
+
+   tkm1= tk;
+   log_nav<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<" "<<uav_state_idx<<" "<<elapsed_time_dbl<<endl;
+
 }//navdataCb ends
 
 int ParrotExe::GetCurrentCfg(QuadCfg& cfg)
