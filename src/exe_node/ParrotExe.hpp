@@ -84,8 +84,14 @@ class ParrotExe{
    inline void SetInitTime(ros::Time _t_now) {this->t_init= _t_now.toSec(); }
    inline void SetStartTime(ros::Time _t_now){this->t_start= _t_now;}
    inline void SetYawInit(double _yaw){this->YawInit= _yaw;}
+   //set some basic elements
    inline void SetXEst(double _x){this->x_est= _x;}
    inline void SetYEst(double _y){this->y_est= _y;}
+   inline void SetPreXEst(double _x){this->x_pre= _x;}
+   inline void SetPreYEst(double _y){this->y_pre= _y;}
+   inline void SetPreZ(double _z){this->z_pre= _z;}
+   //
+   inline void SetCfgStart( QuadCfg _cfg){this->CfgStart= _cfg; }
    //set all restarts to default
    void SetRestartDefault();
    //to reset the controller
@@ -183,6 +189,7 @@ class ParrotExe{
    double YawInit;
    //when t_start
    ros::Time t_start;
+   QuadCfg CfgStart;//cfg when takeoff finished
    double x_start,y_start,z_start;
    double d_length;
 };

@@ -122,9 +122,15 @@ int main(int argc, char** argv)
       //set x_est,y_est
       double x_init_frame= cfg_start.x*cos(cfg_start.theta)-cfg_start.y*sin(cfg_start.theta);
       double y_init_frame= cfg_start.x*sin(cfg_start.theta)+cfg_start.y*cos(cfg_start.theta);
+      //set some
       parrot_exe.SetXEst(x_init_frame);
       parrot_exe.SetYEst(y_init_frame);
-      
+      parrot_exe.SetPreXEst(x_init_frame);
+      parrot_exe.SetPreYEst(y_init_frame);
+      parrot_exe.SetPreZ(cfg_start.z);
+      //set start config after transformation
+      parrot_exe.SetCfgStart( QuadCfg(x_init_frame,y_init_frame,cfg_start.z,0) );
+
       std::cout<<"x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
       //transform the start to the right frame is not needed
       /*

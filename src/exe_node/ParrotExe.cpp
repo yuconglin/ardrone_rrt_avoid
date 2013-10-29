@@ -94,7 +94,8 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid):controlMid(_controlMid
    tk = ros::Time::now();
    elapsed_time = tk - tkm1;
    elapsed_time_dbl = elapsed_time.sec + ( (double) elapsed_time.nsec)/1E9;
-   x_est = 0.0, y_est = 0.0;
+   x_est = 0.0, y_est = 0.0, z_mea = 0.;
+   x_pre = 0.0, y_pre = 0.0, z_pre = 0.;
    vxm_est = 0.0, vym_est = 0.0, vzm_est = 0.0, yaw_est = 0.0; // meter/s
    yawci = 0.0,  vxfi = 0.0, vyfi = 0.0, dzfi=0.; // meter/s
    pitchco = 0.0, rollco = 0.0, dyawco = 0.0, dzco = 0.0;
@@ -546,9 +547,12 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
    }
    //total length
    double t_len= sqrt(pow(start.x-end.x,2)+pow(start.y-end.y,2)+pow(start.z-end.z,2) );
+   //double t_len= sqrt( pow(CfgStart.x-end.x,2)+pow(CfgStart.y-end.y,2)+pow(CfgStart.z-end.z,2) );
    arma::colvec v_quad, v_end;
    //to calculate the length travelled along the seg
-   d_length+= sqrt(pow(x_pre-x_est,2)+pow(y_pre-y_est,2)+pow(z_pre-z_mea,2));
+   double d_len= sqrt(pow(x_pre-x_est,2)+pow(y_pre-y_est,2)+pow(z_pre-z_mea,2));
+   d_length+= d_len;
+   
    //assign previous coordinates
    x_pre= x_est;
    y_pre= y_est;
@@ -566,20 +570,23 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
    //if the end is reached?
    if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r
      ||dot(v_quad,v_end)<=0 && d_length> t_len 
-     ||d_length>1.5*t_len ) 
+     ||d_length>1.5*t_len 
+     )
    {
      seg_result= 2;
      if_restart_seg= true;
      cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<endl;
      if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r)
+     {
        cout<<"end reached"<< endl;
-     if( dot(v_quad,v_end)<=0 && d_length> t_len)
+     }
+     else if( dot(v_quad,v_end)<=0 && d_length> t_len)
      {
        cout<<"end length: "<<d_length << endl;
      }
      else
      {
-       cout<<"pure length: "<<d_length<< endl;
+       cout<<"pure length: "<<d_length<<" t_len: "<<t_len<< endl;
      }
      return seg_result;
    }
@@ -600,7 +607,9 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
    n_lat<<cos(phi)*sin(gam)<<sin(phi)*sin(gam)<<-cos(gam);
    
    double a_lon= n_lon(0)*(x_est-x_start)+n_lon(1)*(y_est-y_start)+n_lon(2)*(z_mea-z_start);
+   
    double a_lat= n_lat(0)*(x_est-x_start)+n_lat(1)*(y_est-y_start)+n_lat(2)*(z_mea-z_start);
+   
    //unnormailised velocity
    u = -K1*(a_lon*n_lon+a_lat*n_lat)+K2*cross(n_lat,n_lon);
    double u_mag= sqrt(u(0)*u(0)+u(1)*u(1)+u(2)*u(2));
@@ -611,7 +620,7 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
      u<< u(0)*cons<< u(1)*cons << u(2)*cons;
      //the desired yaw
      //double d_yaw= atan2(u(1),u(0) );
-     cout<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<" d_yaw: "<<d_yaw*180./M_PI<<endl;
+     cout<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<" d_yaw: "<<d_yaw*180./M_PI<<" d_len: "<<d_len<<endl;
      //reset the controller
      //controlMid.reset(); 
      yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
