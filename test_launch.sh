@@ -12,6 +12,8 @@ gnome-terminal  \
 						exec bash\""  \
         --tab --title "bottom_yc_img"	--command "bash -c \"
 						env sleep 5s ;
+					        #first:0--auto takeoff,1--manual takeoff.
+						#second:0--straight line,1--dubin's curve
 						rosrun ardrone_rrt_avoid exe_dubin 0 0 >record.txt;
 						exec bash\""  \
 

@@ -60,6 +60,7 @@ class ParrotExe{
    //to take off or land
    void sendLand();
    void sendTakeoff();
+   void sendStop();
    void sendEmergencyStop();
    //command the Parrot
    int CommandParrot(const double _t_limit);
@@ -82,8 +83,13 @@ class ParrotExe{
    //set init time
    inline void SetInitTime(ros::Time _t_now) {this->t_init= _t_now.toSec(); }
    inline void SetStartTime(ros::Time _t_now){this->t_start= _t_now;}
+   inline void SetYawInit(double _yaw){this->YawInit= _yaw;}
+   inline void SetXEst(double _x){this->x_est= _x;}
+   inline void SetYEst(double _y){this->y_est= _y;}
    //set all restarts to default
    void SetRestartDefault();
+   //to reset the controller
+   void ControllerReset();
  
  private:
    //index helps to command the parrot 
@@ -151,8 +157,8 @@ class ParrotExe{
    double end_r= 1.0*0.5;
    double speed;
    double rho;
-   arma::mat K1= 10*arma::eye<arma::mat>(3,3); 
-   arma::mat K2= 10*arma::eye<arma::mat>(3,3);
+   arma::mat K1= 0.1*arma::eye<arma::mat>(3,3); 
+   arma::mat K2= 0.1*arma::eye<arma::mat>(3,3);
    //time start the path
    double t_init;
    //for logging trajectory
@@ -174,6 +180,7 @@ class ParrotExe{
    double vx_est, vy_est;
    double yawci, vxfi, vyfi, dzfi;
    double pitchco, rollco, dyawco, dzco;
+   double YawInit;
    //when t_start
    ros::Time t_start;
    double x_start,y_start,z_start;

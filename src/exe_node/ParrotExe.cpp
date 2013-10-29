@@ -98,6 +98,7 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid):controlMid(_controlMid
    vxm_est = 0.0, vym_est = 0.0, vzm_est = 0.0, yaw_est = 0.0; // meter/s
    yawci = 0.0,  vxfi = 0.0, vyfi = 0.0, dzfi=0.; // meter/s
    pitchco = 0.0, rollco = 0.0, dyawco = 0.0, dzco = 0.0;
+   YawInit= 0.0;
    // For trajectory control
    //controlMid = _controlMid;
    controlMid.setControlMode(Controller_MidLevel_controlMode::SPEED_CONTROL);
@@ -141,6 +142,7 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    vym_est = (double)navdataPtr->vy/1000.0;
    vzm_est = (double)navdataPtr->vz/1000.0;
    yaw_est = (double)navdataPtr->rotZ*M_PI/180;
+   yaw_est -= YawInit;
    vx_est = vxm_est*cos(yaw_est) - vym_est*sin(yaw_est); 
    vy_est = vxm_est*sin(yaw_est) + vym_est*cos(yaw_est); 
    //position
@@ -151,7 +153,7 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    uav_state_idx= navdataPtr->state;
 
    tkm1= tk;
-   log_nav<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<" "<<uav_state_idx<<" "<<elapsed_time_dbl<<endl;
+   log_nav<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<" "<<elapsed_time_dbl<<" "<<uav_state_idx<<endl;
 
 }//navdataCb ends
 
@@ -263,6 +265,11 @@ void ParrotExe::sendTakeoff()
    //cout << "take off" << endl;
 }
 
+void ParrotExe::sendStop()
+{
+   SendControlToDrone( ControlCommand(0,0,0,0) ); 
+}
+
 void ParrotExe::sendEmergencyStop()
 {//send to emergency stop
    emergency_pub.publish(std_msgs::Empty() );
@@ -276,6 +283,11 @@ void ParrotExe::SetRestartDefault()
    idx_dubin= -1;
    idx_dubin_sub= -1;
 }//SetRestartDefault ends
+
+void ParrotExe::ControllerReset()
+{
+   controlMid.reset(); 
+}//ControllerReset() ends
 
 int ParrotExe::CommandParrot(const double _t_limit)
 {   //if no path, just stop and hover
@@ -547,7 +559,10 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
    //if the length reached?
    double end_dis=sqrt(pow(end.x-x_est,2)+pow(end.y-y_est,2)+pow(end.z-z_mea,2));
    //v_end
-   v_end<< end.x-x_est<< end.y-y_est<< end.z-z_mea;  
+   v_end<< end.x-x_est<< end.y-y_est<< end.z-z_mea; 
+   //d_yaw
+   double d_yaw= atan2(end.y-y_est,end.x-x_est);
+   
    //if the end is reached?
    if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r
      ||dot(v_quad,v_end)<=0 && d_length> t_len 
@@ -556,6 +571,14 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
      seg_result= 2;
      if_restart_seg= true;
      cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<endl;
+     if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r)
+       cout<<"end reached"<< endl;
+     if( dot(v_quad,v_end)<=0 && d_length> t_len)
+       cout<<"end length"<< endl;
+     else
+     {
+       cout<<"pure length: "<<d_length<< endl;
+     }
      return seg_result;
    }
    //the control part
@@ -584,16 +607,19 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
    {
      double cons= speed/u_mag;
      u<< u(0)*cons<< u(1)*cons << u(2)*cons;
-     cout<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<endl;
      //the desired yaw
-     double d_yaw= atan2(u(1),u(0) );
+     //double d_yaw= atan2(u(1),u(0) );
+     cout<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<" d_yaw: "<<d_yaw*180./M_PI<<endl;
      //reset the controller
-     controlMid.reset(); 
+     //controlMid.reset(); 
      yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
      controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
      controlMid.setReference( 0.0, 0.0, d_yaw, 0.0, u(0), u(1) );
+     //print and test
      controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
-     SendControlToDrone( ControlCommand( pitchco, rollco, u(2), dyawco ) );
+     cout<<pitchco<<" "<<rollco<<" "<<dzco<<" "<<dyawco<<endl;
+
+     SendControlToDrone( ControlCommand( pitchco, -rollco, u(2), dyawco ) );
      //last dt
      ros::Duration(dt).sleep();
 
@@ -767,7 +793,7 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
        //the desired yaw
        double d_yaw= atan2(u(1),u(0) );
        //reset the controller
-       controlMid.reset(); 
+       //controlMid.reset(); 
        yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
        controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
        controlMid.setReference( 0.0, 0.0, d_yaw, 0.0, u(0), u(1) );
@@ -808,7 +834,7 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
        //the desired yaw
        double d_yaw= atan2(u(1),u(0) );
        //reset the controller
-       controlMid.reset(); 
+       //controlMid.reset(); 
        yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
        controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
        controlMid.setReference( 0.0, 0.0, d_yaw, 0.0, u(0), u(1) );

@@ -40,12 +40,12 @@ int main(int argc, char** argv)
   //construct a dubin's path in 3D
   double x_s = 0;
   double y_s = 0;
-  double z_s = 0.5;
+  double z_s = 0.78;
   double the_s= 0.;
   QuadCfg start(x_s,y_s,z_s,the_s);
 
-  double x_e= x_s+ 10;
-  double y_e= y_s+ 5;
+  double x_e= x_s+ 1;
+  double y_e= y_s+ 0;
   double z_e= z_s+ 0;
   double the_e= 0.;
   QuadCfg end(x_e,y_e,z_e,the_e);
@@ -107,7 +107,7 @@ int main(int argc, char** argv)
     //to fix the start moment: takeoff---->hover
     if(pre_uav_state== 6 && idx_uav_state== 4)
     {
-	    std::cout<<"start start"<<std::endl;
+      std::cout<<"start start"<<std::endl;
       if_start= true;
      
       std::cout <<"time now: "<<ros::Time::now().toSec()<<std::endl;
@@ -117,16 +117,29 @@ int main(int argc, char** argv)
       //first in the local frame, then converted to the global reference frame
       //in the global frame, start is (0,0,z_m,0) and end is(10,5,z_m,0)
       parrot_exe.GetCurrentCfg(cfg_start);
+      //set YawInit
+      parrot_exe.SetYawInit( cfg_start.theta );
+      //set x_est,y_est
+      double x_init_frame= cfg_start.x*cos(cfg_start.theta)-cfg_start.y*sin(cfg_start.theta);
+      double y_init_frame= cfg_start.x*sin(cfg_start.theta)+cfg_start.y*cos(cfg_start.theta);
+      parrot_exe.SetXEst(x_init_frame);
+      parrot_exe.SetYEst(y_init_frame);
+      
+      std::cout<<"x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
+      //transform the start to the right frame is not needed
+      /*
       start= QuadCfg(cfg_start.x,cfg_start.y,cfg_start.z,cfg_start.theta);
       double x= end.x*cos(cfg_start.theta)-end.y*sin(cfg_start.theta);
       double y= end.x*sin(cfg_start.theta)+end.y*cos(cfg_start.theta);
-      std::cout<<"x: "<<x<<" y: "<<y<<std::endl;
+      std::cout<<"x: "<<x<<" y: "<<y<<" theta: "<< cfg_start.theta*180./M_PI<< std::endl;
       end= QuadCfg(x, y, cfg_start.z, end.theta+cfg_start.theta);
       //the dubin's curve
       db_3d= quadDubins3D(start,end,rho);
       db_seg.d_dubin= db_3d;
       db_seg.cfg_stop= db_3d.cfg_i1;
-
+      */
+      //controller reset
+      parrot_exe.ControllerReset();
     }
     //two options
     int option= atoi(argv[2]);
@@ -139,12 +152,15 @@ int main(int argc, char** argv)
 	int result= parrot_exe.LineCommand(start,end,t_limit);
 	if(result==2)
 	{
-	  parrot_exe.sendLand();
+	  //parrot_exe.sendLand();
+	  parrot_exe.sendStop();
 	  std::cout<<"end reached,yeah"<<std::endl;
 	}
 	if(result==0)
-          std::cout<<"time limit reached"<<std::endl;
-
+	{
+          parrot_exe.sendStop();
+	  std::cout<<"time limit reached"<<std::endl;
+	}
 	if(result==0||result==2)
 	{
 	  if_reach== true;
