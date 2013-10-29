@@ -163,7 +163,7 @@ int main(int argc, char** argv)
 	}
 	if(result==0||result==2)
 	{
-	  if_reach== true;
+	  if_reach= true;
 	}
       }//if
     }
@@ -183,6 +183,9 @@ int main(int argc, char** argv)
      std::runtime_error("wrong input. should be 0 or 1");
 
     pre_uav_state= idx_uav_state;
+    //let it lands
+    if(if_reach && idx_uav_state==4)
+      parrot_exe.sendLand();
     //don't forget to spin once
     ros::spinOnce();
 

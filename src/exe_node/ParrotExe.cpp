@@ -574,7 +574,9 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
      if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r)
        cout<<"end reached"<< endl;
      if( dot(v_quad,v_end)<=0 && d_length> t_len)
-       cout<<"end length"<< endl;
+     {
+       cout<<"end length: "<<d_length << endl;
+     }
      else
      {
        cout<<"pure length: "<<d_length<< endl;
