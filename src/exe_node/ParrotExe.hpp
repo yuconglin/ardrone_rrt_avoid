@@ -51,8 +51,6 @@ class ParrotExe{
    void newCallback(const std_msgs::Bool::ConstPtr& msg);
    void navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr);
    void joyCb(const sensor_msgs::JoyConstPtr joy_msg);
-   //void landCb(const std_msgs::EmptyConstPtr);
-   //void takeoffCb(const std_msgs::EmptyConstPtr);
    //to publish flags
    void PublishFlags();
    //to publish commands
@@ -63,9 +61,18 @@ class ParrotExe{
    void sendStop();
    void sendEmergencyStop();
    //command the Parrot
-   int CommandParrot(const double _t_limit);
+   //command to execute a whole path
+   int PathCommand(const double _t_limit);
+   //command to execute a dubin's curve
    int DubinCommand(DubinSeg& db_seg, const double _t_limit);
+   //command to execute a segment of dubin line/circle
    int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit);
+   //command a step with velocity input u,time interval dt
+   int StepCommand(const arma::vec::fixed<3> u, double dt);
+   //command to execute a line.
+   int LineStepCommand(const QuadCfg& start,const QuadCfg& end);
+   //command to execute a circle curve
+   int CircleStepCommand(const QuadCfg& start,const QuadCfg& end,int type,double rho);
    //for test
    int LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_limit); 
    //int CircleCommand(const QuadCfg& center,const double rho,double d_the,double _t_limit);
@@ -168,7 +175,7 @@ class ParrotExe{
    //time start the path
    double t_init;
    //for logging trajectory
-   std::ofstream log_file;
+   std::ofstream log_path;
    std::ofstream log_nav;
    //for controller
    Controller_MidLevelCnt& controlMid;
