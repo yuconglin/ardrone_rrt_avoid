@@ -640,11 +640,10 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
    return seg_result; 
 } //SegCommand ends
 
-int ParrotExe::StepCommand(const arma::vec::fixed<3> u, double dt)
+int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double d_yaw,double dt)
 {
-   double d_yaw= atan2(u(1),u(0) );
-   //cout<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<" d_yaw: "<<d_yaw*180./M_PI<<" d_len: "<<d_len<<endl;
-  
+   //double d_yaw= atan2(u(1),u(0) );
+   //cout<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<" d_yaw: "<<d_yaw*180./M_PI<<" d_len: "<<d_len<<endl; 
    yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
    controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
    controlMid.setReference( 0.0, 0.0, d_yaw, 0.0, u(0), u(1) );
@@ -729,8 +728,11 @@ int ParrotExe::LineStepCommand(const QuadCfg& cfg_start, const QuadCfg& cfg_end)
     double x_end= cfg_end.x;
     double y_end= cfg_end.y;
     double z_end= cfg_end.z;
+    
     double dis= sqrt(pow(x_start-x_end,2)+pow(y_start-y_end,2)+pow(z_start-z_end,2));
-	       
+    //d_yaw
+    double d_yaw= atan2(cfg_end.y-y_est,cfg_end.x-x_est);
+
     double phi= atan2(y_end-y_start,x_end-x_start);
     double gam= asin( (z_end-z_start)/dis );
 
@@ -749,7 +751,7 @@ int ParrotExe::LineStepCommand(const QuadCfg& cfg_start, const QuadCfg& cfg_end)
     {
       double cons= speed/u_mag;
       u<< u(0)*cons<< u(1)*cons << u(2)*cons;
-      StepCommand(u,dt);      
+      StepCommand(u,d_yaw,dt);      
     }//if u_mag ends
    
 }//LineStepCommand ends
@@ -793,9 +795,7 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
    double end_dis=sqrt(pow(end.x-x_est,2)+pow(end.y-y_est,2)+pow(end.z-z_mea,2));
    //v_end
    v_end<< end.x-x_est<< end.y-y_est<< end.z-z_mea; 
-   //d_yaw
-   //double d_yaw= atan2(end.y-y_est,end.x-x_est);
-   
+      
    //if the end is reached?
    if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r
      ||dot(v_quad,v_end)<=0 && d_length> t_len 
