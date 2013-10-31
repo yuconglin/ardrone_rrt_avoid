@@ -36,18 +36,19 @@ int main(int argc, char** argv)
     return 2;                 // signal error
   }
   double rho= v/yaw_rate;
+  std::cout<<"rho= "<<rho<<std::endl;
 
   //construct a dubin's path in 3D
   double x_s = 0;
   double y_s = 0;
   double z_s = 0.78;
-  double the_s= 0.;
+  double the_s= 0;
   QuadCfg start(x_s,y_s,z_s,the_s);
 
   double x_e= x_s+ rho;
-  double y_e= y_s+ rho;
+  double y_e= y_s- rho;
   double z_e= z_s+ 0;
-  double the_e= M_PI/2;
+  double the_e= -M_PI/2;
   QuadCfg end(x_e,y_e,z_e,the_e);
    
   double type= (the_e > the_s ? L_SEG : R_SEG ); 

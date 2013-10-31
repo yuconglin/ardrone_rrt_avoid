@@ -643,13 +643,8 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
 
 int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double d_yaw,double dt)
 {
-<<<<<<< HEAD
    double de_yaw= atan2(u(1),u(0) );
    //double de_yaw= d_yaw;
-=======
-   //double de_yaw= atan2(u(1),u(0) );
-   double de_yaw= d_yaw;
->>>>>>> 7c17633282feb4415adb3458084f4ae3e7cb9666
    //cout<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<" d_yaw: "<<d_yaw*180./M_PI<<" d_len: "<<d_len<<endl; 
    yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
    controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
@@ -725,15 +720,27 @@ int ParrotExe::CircleStepCommand(const QuadCfg& cfg_start,const QuadCfg& cfg_end
      << ac*pacpr[2]+ap*pappr[2];
    u2= -lambda_h*cross(fc1,fc2);
    u= -K1*u1+K2*u2;
-   double u_mag= sqrt(u(0)*u(0)+u(1)*u(1)+u(2)*u(2));
-
-   if( u_mag!=0. )
+   //double u_mag= sqrt(u(0)*u(0)+u(1)*u(1)+u(2)*u(2));
+   double uxy_mag= sqrt( u(0)*u(0)+u(1)*u(1) );
+   double uz_mag= fabs(u(2));
+   
+   if(uxy_mag!=0 && uz_mag!=0)
    {
-     double cons= speed/u_mag;
-     u<< u(0)*cons<< u(1)*cons << u(2)*cons;
-     StepCommand(u,d_yaw,dt);      
-   }//if u_mag ends
- 
+     double cons= min(this->v/uxy_mag,this->vz/uz_mag);
+     u<< u(0)*cons<< u(1)*cons << u(2)*cons;  
+   }
+   else if(uxy_mag==0 && uz_mag!=0)
+     u<<0.<<0.<<vz/uz_mag;
+   else if(uxy_mag!=0 && uz_mag==0)
+   {
+     double cons= this->v/uxy_mag;
+     u<< u(0)*cons<< u(1)*cons<< 0;
+   }
+   else 
+     u<<0.<<0.<<0.;
+   //step control
+   if(u(0)+u(1)+u(2)!=0 )
+     StepCommand(u,d_yaw,dt);  
 }//CircleStepCommand ends
 
 int ParrotExe::LineStepCommand(const QuadCfg& cfg_start, const QuadCfg& cfg_end)
@@ -761,15 +768,28 @@ int ParrotExe::LineStepCommand(const QuadCfg& cfg_start, const QuadCfg& cfg_end)
     double a_lat= n_lat(0)*(x_est-x_start)+n_lat(1)*(y_est-y_start)+n_lat(2)*(z_mea-z_start);
     //unnormailised velocity
     u = -K1*(a_lon*n_lon+a_lat*n_lat)+K2*cross(n_lat,n_lon);
-    double u_mag= sqrt(u(0)*u(0)+u(1)*u(1)+u(2)*u(2));
+    //double u_mag= sqrt(u(0)*u(0)+u(1)*u(1)+u(2)*u(2));
+    double uxy_mag= sqrt( u(0)*u(0)+u(1)*u(1) );
+    double uz_mag= fabs(u(2));
     
-    if( u_mag!=0. )
+    if(uxy_mag!=0 && uz_mag!=0)
     {
-      double cons= speed/u_mag;
-      u<< u(0)*cons<< u(1)*cons << u(2)*cons;
+      double cons= min(this->v/uxy_mag,this->vz/uz_mag);
+      u<< u(0)*cons<< u(1)*cons << u(2)*cons;  
+    }
+    else if(uxy_mag==0 && uz_mag!=0)
+      u<<0.<<0.<<vz/uz_mag;
+    else if(uxy_mag!=0 && uz_mag==0)
+    {
+      double cons= this->v/uxy_mag;
+      u<< u(0)*cons<< u(1)*cons<< 0;
+    }
+    else 
+      u<<0.<<0.<<0.;
+    //step control
+    if(u(0)+u(1)+u(2)!=0 )
       StepCommand(u,d_yaw,dt);      
-    }//if u_mag ends
-   
+      
 }//LineStepCommand ends
 
 int ParrotExe::CircleCommand(const QuadCfg& start,const QuadCfg& end,int type,double rho,double _t_limit)
@@ -820,7 +840,7 @@ int ParrotExe::CircleCommand(const QuadCfg& start,const QuadCfg& end,int type,do
     {
       seg_result= 2;
       if_restart_seg= true;
-      cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<endl;
+      cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<" yaw_est: "<<yaw_est*180/M_PI<<endl;
       if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r)
       {
 	cout<<"end reached"<< endl;
@@ -896,7 +916,7 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
    {
      seg_result= 2;
      if_restart_seg= true;
-     cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<endl;
+     cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<" yaw_est: "<<yaw_est*180/M_PI <<endl;
      if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r)
      {
        cout<<"end reached"<< endl;
