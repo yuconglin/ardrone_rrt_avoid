@@ -76,7 +76,7 @@ class ParrotExe{
    int CircleStepCommand(const QuadCfg& start,const QuadCfg& end,int type,double rho);
    //for test
    int LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_limit); 
-   //int CircleCommand(const QuadCfg& center,const double rho,double d_the,double _t_limit);
+   int CircleCommand(const QuadCfg& start,const QuadCfg& end,int type,double rho,double _t_limit);
    
    //to publish quad's state
    void PubQuadState();  

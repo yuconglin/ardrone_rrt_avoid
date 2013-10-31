@@ -642,16 +642,17 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
 
 int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double d_yaw,double dt)
 {
-   //double d_yaw= atan2(u(1),u(0) );
+   double de_yaw= atan2(u(1),u(0) );
+   //double de_yaw= d_yaw;
    //cout<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<" d_yaw: "<<d_yaw*180./M_PI<<" d_len: "<<d_len<<endl; 
    yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
    controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
-   controlMid.setReference( 0.0, 0.0, d_yaw, 0.0, u(0), u(1) );
+   controlMid.setReference( 0.0, 0.0, de_yaw, 0.0, u(0), u(1) );
    //print and test
    controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
    cout<<pitchco<<" "<<rollco<<" "<<dzco<<" "<<dyawco<<endl;
 
-   SendControlToDrone( ControlCommand( pitchco, -rollco, u(2), dyawco ) );
+   SendControlToDrone( ControlCommand( pitchco, -rollco, u(2), -dyawco ) );
    //last dt
    ros::Duration(dt).sleep();
    return 0;
@@ -764,6 +765,82 @@ int ParrotExe::LineStepCommand(const QuadCfg& cfg_start, const QuadCfg& cfg_end)
     }//if u_mag ends
    
 }//LineStepCommand ends
+
+int ParrotExe::CircleCommand(const QuadCfg& start,const QuadCfg& end,int type,double rho,double _t_limit)
+{
+   if(if_restart_seg)
+    {
+      if_restart_seg= false;
+      x_start= x_est;
+      y_start= y_est;
+      z_start= z_mea;
+      d_length= 0.0; 
+    }
+    int seg_result= -1;
+    //if time limit reached?
+    if( ros::Time::now()-t_start>= ros::Duration(_t_limit) ) 
+    { 
+       cout<<"now: "<<ros::Time::now().toSec()<<" t_start: "<<t_start.toSec()<<endl;
+       seg_result= 0;
+       if_restart_seg= true;
+       return seg_result;
+       //break;
+    }
+    //the total length
+    double t_len= fabs(end.theta-start.theta)*rho;
+    
+    arma::vec::fixed<3> v_quad, v_end;
+    //to calculate the length travelled along the seg
+    double d_len= sqrt(pow(x_pre-x_est,2)+pow(y_pre-y_est,2)+pow(z_pre-z_mea,2));
+    d_length+= d_len;
+    
+    //assign previous coordinates
+    x_pre= x_est;
+    y_pre= y_est;
+    z_pre= z_mea; 
+
+    //v_quad
+    v_quad<< vx_est<< vy_est<< vzm_est; 
+    //if the length reached?
+    double end_dis=sqrt(pow(end.x-x_est,2)+pow(end.y-y_est,2)+pow(end.z-z_mea,2));
+    //v_end
+    v_end<< end.x-x_est<< end.y-y_est<< end.z-z_mea; 
+       
+    //if the end is reached?
+    if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r
+      ||dot(v_quad,v_end)<=0 && d_length> t_len 
+      ||d_length>1.5*t_len 
+      )
+    {
+      seg_result= 2;
+      if_restart_seg= true;
+      cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<endl;
+      if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r)
+      {
+	cout<<"end reached"<< endl;
+      }
+      else if( dot(v_quad,v_end)<=0 && d_length> t_len)
+      {
+	cout<<"end length: "<<d_length << endl;
+      }
+      else
+      {
+	cout<<"pure length: "<<d_length<<" t_len: "<<t_len<< endl;
+      }
+      return seg_result;
+    }
+    //control part
+    CircleStepCommand(start,end,type,rho);
+    //if time limit reached?
+    if( ros::Time::now()-t_start>= ros::Duration(_t_limit) ) 
+    { 
+      seg_result= 0;
+      if_restart_seg= true;
+    }
+
+    return seg_result; 
+
+}//CircleCommand
 
 int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_limit)
 {
