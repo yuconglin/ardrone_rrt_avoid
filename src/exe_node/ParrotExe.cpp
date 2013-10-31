@@ -682,6 +682,15 @@ int ParrotExe::CircleStepCommand(const QuadCfg& cfg_start,const QuadCfg& cfg_end
    //std::cout<<"de_length= "<<de_length<<std::endl;
    double h_diff= cfg_end.z-cfg_start.z;
    double tan_gamma= h_diff/de_length;
+   //to calculate the desired yaw
+   //Rxy is the vector pointed to the current position from the center
+   //Vxy is the quad's velocity vector in xy plan
+   arma::vec::fixed<3> Rxy, Vxy, Dxy;
+   Rxy<< x_est-c_n << y_est-c_e << 0;
+   Vxy<< vx_est << vy_est << 0;
+   Dxy = cross(Vxy, Rxy);
+   Dxy = cross(Rxy, Dxy);
+   double d_yaw= atan2(Dxy(1), Dxy(0) );
    //vectors for calculation
    arma::vec::fixed<3> u, u1, u2, fc1, fc2;
    //calculate starts
@@ -715,7 +724,7 @@ int ParrotExe::CircleStepCommand(const QuadCfg& cfg_start,const QuadCfg& cfg_end
    {
      double cons= speed/u_mag;
      u<< u(0)*cons<< u(1)*cons << u(2)*cons;
-     StepCommand(u,dt);      
+     StepCommand(u,d_yaw,dt);      
    }//if u_mag ends
  
 }//CircleStepCommand ends
