@@ -446,6 +446,7 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
    if( sqrt(pow(x_est-cfg_stop.x,2)+pow(y_est-cfg_stop.y,2)+pow(z_mea-cfg_stop.z,2))<end_r )
    {
      if_restart_dubin= true;
+     std::cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<" yaw_est: "<<yaw_est/M_PI*180.<<std::endl;
      return 1;
    }
    //or see which segment the quad is closest to
@@ -453,6 +454,14 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
    if(if_restart_dubin)
    {
      if_restart_dubin= false;
+     
+     /***print the dubin******/
+     std::cout<<"start: "<<dubin_3d.cfg_start.x<<" "<<dubin_3d.cfg_start.y<<" "<<dubin_3d.cfg_start.z<<" "<<dubin_3d.cfg_start.theta*180./M_PI<<std::endl;
+     std::cout<<"i1: "<<dubin_3d.cfg_i1.x<<" "<<dubin_3d.cfg_i1.y<<" "<<dubin_3d.cfg_i1.z<<" "<<dubin_3d.cfg_i1.theta*180./M_PI<<std::endl;
+     std::cout<<"i2: "<<dubin_3d.cfg_i2.x<<" "<<dubin_3d.cfg_i2.y<<" "<<dubin_3d.cfg_i2.z<<" "<<dubin_3d.cfg_i2.theta*180./M_PI<<std::endl;
+     std::cout<<"end: "<<dubin_3d.cfg_end.x<<" "<<dubin_3d.cfg_end.y<<" "<<dubin_3d.cfg_end.z<<" "<<dubin_3d.cfg_end.theta*180./M_PI<<std::endl;
+     /***print ends******/
+     
      QuadCfg cfgs[]={dubin_3d.cfg_start,dubin_3d.cfg_i1,dubin_3d.cfg_i2,dubin_3d.cfg_end};
      double d[4];
     
@@ -608,10 +617,14 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
      ||dot(v_quad,v_target)<=0&&d_length>s_target-s_init
      ) 
    {
+      std::cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<" yaw_est: "<<yaw_est*180/M_PI<< std::endl;
+      
       if(dot(v_quad,v_target)<=0 && d_length>s_target-s_init)
       {
-         //std::cout<<"target length reached:circle"<<std::endl;
+         std::cout<<"target length reached"<<std::endl;
       }
+      else
+         std::cout<<"target just reached"<<std::endl;
       seg_result= 1;
       if_restart_seg= true;
       return seg_result;
@@ -625,6 +638,11 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
      ||dot(v_quad,v_end)<=0 && d_length> s_end-s_init 
      ||d_length>3*(s_end-s_init) ) 
    {
+     std::cout<<" end reached" <<std::endl;
+     std::cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<" yaw_est: "<<yaw_est*180/M_PI<< std::endl;
+     if(dot(v_quad,v_end)<=0&&end_dis<=3*end_r||end_dis<=end_r)
+       std::cout<<"end just reached"<<std::endl;
+
      seg_result= 2;
      if_restart_seg= true;
      return seg_result;
