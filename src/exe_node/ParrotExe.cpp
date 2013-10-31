@@ -88,7 +88,8 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid):controlMid(_controlMid
    //parameters
    rho= v/yaw_rate;
    speed= sqrt(v*v+vz*vz);
-   end_r= max(speed*dt,0.2);
+   //end_r= max(speed*dt,0.2);
+   end_r= speed*dt;
    //controller related
    tkm1 = ros::Time::now();
    tk = ros::Time::now();
@@ -642,16 +643,17 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
 
 int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double d_yaw,double dt)
 {
-   //double d_yaw= atan2(u(1),u(0) );
+   //double de_yaw= atan2(u(1),u(0) );
+   double de_yaw= d_yaw;
    //cout<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<" d_yaw: "<<d_yaw*180./M_PI<<" d_len: "<<d_len<<endl; 
    yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
    controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
-   controlMid.setReference( 0.0, 0.0, d_yaw, 0.0, u(0), u(1) );
+   controlMid.setReference( 0.0, 0.0, de_yaw, 0.0, u(0), u(1) );
    //print and test
    controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
    cout<<pitchco<<" "<<rollco<<" "<<dzco<<" "<<dyawco<<endl;
 
-   SendControlToDrone( ControlCommand( pitchco, -rollco, u(2), dyawco ) );
+   SendControlToDrone( ControlCommand( pitchco, -rollco, u(2), -dyawco ) );
    //last dt
    ros::Duration(dt).sleep();
    return 0;
