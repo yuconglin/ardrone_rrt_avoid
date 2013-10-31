@@ -45,10 +45,10 @@ int main(int argc, char** argv)
   double the_s= 0;
   QuadCfg start(x_s,y_s,z_s,the_s);
 
-  double x_e= x_s+ rho;
-  double y_e= y_s- rho;
+  double x_e= x_s+ 7*0.6096;
+  double y_e= y_s- 2*0.6096;
   double z_e= z_s+ 0;
-  double the_e= -M_PI/2;
+  double the_e= the_s;
   QuadCfg end(x_e,y_e,z_e,the_e);
    
   double type= (the_e > the_s ? L_SEG : R_SEG ); 

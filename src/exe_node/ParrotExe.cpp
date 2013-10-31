@@ -442,6 +442,7 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
    //if already at the target, just return
    QuadCfg cfg_stop= db_seg.cfg_stop;
    quadDubins3D dubin_3d= db_seg.d_dubin;
+   
    if( sqrt(pow(x_est-cfg_stop.x,2)+pow(y_est-cfg_stop.y,2)+pow(z_mea-cfg_stop.z,2))<end_r )
    {
      if_restart_dubin= true;
@@ -456,7 +457,7 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
      double d[4];
     
      int idx= -1,idx_seg;
-     double dis_temp = 1e8;
+     double dis_temp = 1e7;
      
      for(int i=0;i<4;++i)
      {
@@ -500,10 +501,17 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
    
    double t_limit = _t_limit;
    int db_result= SegCommand(db_seg,idx_dubin_sub,t_limit);
+   //time up
+   if(db_result==0)
+   {
+     if_restart_dubin= true;
+     std::cout<<"dubin time up"<<std::endl;
+   }
    //cfg_stop reached
    if(db_result==1)
    {
      if_restart_dubin= true;
+     std::cout<<"dubin stop point reached"<<std::endl;
      //return db_result;
    }
    //segment ends
@@ -513,6 +521,7 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
      {	//dubin ends actually
        if_restart_dubin= true;
        db_result=1;
+       std::cout<<"dubin end reached"<<std::endl;
 	//return db_result;
      }
      else
