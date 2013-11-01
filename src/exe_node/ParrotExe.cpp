@@ -611,6 +611,7 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
 
    //if cfg_stop reached?
    double target_dis=sqrt(pow(cfg_stop.x-x_est,2)+pow(cfg_stop.y-y_est,2)+pow(cfg_stop.z-z_mea,2));
+   
    v_target<<cfg_stop.x-x_est<<cfg_stop.y-y_est<<cfg_stop.z-z_mea;
 	    
    if( dot(v_quad,v_target)<=0&&target_dis<= 3*end_r ||target_dis<end_r
@@ -623,8 +624,11 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
       {
          std::cout<<"target length reached"<<std::endl;
       }
+      else if(dot(v_quad,v_target)<=0&&target_dis<= 3*end_r)
+         std::cout<<"target pass reached"<<std::endl;
       else
-         std::cout<<"target just reached"<<std::endl;
+	 std::cout<<"target just reached"<<std::endl;     
+
       seg_result= 1;
       if_restart_seg= true;
       return seg_result;
@@ -636,13 +640,20 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
    v_end<<cfg_end.x-x_est<<cfg_end.y-y_est<<cfg_end.z-z_mea;  
    if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r
      ||dot(v_quad,v_end)<=0 && d_length> s_end-s_init 
-     ||d_length>3*(s_end-s_init) ) 
+     ||d_length>1.5*(s_end-s_init) ) 
    {
      std::cout<<" end reached" <<std::endl;
      std::cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<" yaw_est: "<<yaw_est*180/M_PI<< std::endl;
-     if(dot(v_quad,v_end)<=0&&end_dis<=3*end_r||end_dis<=end_r)
+     
+     if(dot(v_quad,v_end)<=0&&end_dis<=3*end_r)
+       std::cout<<"end pass reached"<<std::endl;
+     else if( end_dis<=end_r )
        std::cout<<"end just reached"<<std::endl;
-
+     else if(dot(v_quad,v_end)<=0 && d_length> s_end-s_init)
+       std::cout<<"end length reached"<<std::endl;
+     else
+       std::cout<<"end length limited"<<std::endl;
+     
      seg_result= 2;
      if_restart_seg= true;
      return seg_result;
@@ -678,7 +689,7 @@ int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double d_yaw,double dt)
    controlMid.setReference( 0.0, 0.0, de_yaw, 0.0, u(0), u(1) );
    //print and test
    controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
-   cout<<pitchco<<" "<<rollco<<" "<<dzco<<" "<<dyawco<<endl;
+   //cout<<pitchco<<" "<<rollco<<" "<<dzco<<" "<<dyawco<<endl;
 
    SendControlToDrone( ControlCommand( pitchco, -rollco, u(2), -dyawco ) );
    //last dt

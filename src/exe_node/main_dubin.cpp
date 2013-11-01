@@ -45,12 +45,12 @@ int main(int argc, char** argv)
   double the_s= 0;
   QuadCfg start(x_s,y_s,z_s,the_s);
 
-  double x_e= x_s+ 7*0.6096;
-  double y_e= y_s+ 2*0.6096;
+  double x_e= x_s;
+  double y_e= y_s-3.;
   //double x_e= x_s+ rho;
   //double y_e= y_s+ rho;
   double z_e= z_s+ 0;
-  double the_e= the_s;
+  double the_e= the_s- M_PI;
   //double the_e= M_PI/2;
   QuadCfg end(x_e,y_e,z_e,the_e);
    
@@ -186,10 +186,19 @@ int main(int argc, char** argv)
       && !if_reach && !if_joy )
       {
         int result= parrot_exe.DubinCommand(db_seg,t_limit);
-        if(result==1) 
-	  parrot_exe.sendLand();
+        //if(result==1) 
+	//  parrot_exe.sendStop();
         if(result==1||result==2||result==0) 
+	{
 	  if_reach= true;
+	  parrot_exe.sendStop();
+	  if(result==0)
+	    std::cout<<"time up"<<std::endl;
+	  if(result==1)
+	    std::cout<<"target reached"<<std::endl;
+	  else
+            std::cout<<"end reached"<<std::endl;
+	}//if result ends
       }//if ends
     }
     else
