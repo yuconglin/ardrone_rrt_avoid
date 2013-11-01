@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.4.6)
+cake_minimum_required(VERSION 2.4.6)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 IF(CMAKE_COMPILER_IS_GNUCXX)
    SET(CMAKE_CXX_FLAGS "-g3 -ggdb -DTIXML_USE_TICPP") 
@@ -79,8 +79,14 @@ add_library(jesus_codes
 
 # END::: addon's for multirotor speed controller
 
+# all the utils functions
+include_directories("src/utils")
+add_library(lib_utils
+            src/utils/systemtime.cpp
+           )
+
 #the main part
 rosbuild_add_library(parrot_exe src/exe_node/ParrotExe.cpp)
 rosbuild_add_executable(exe_dubin src/exe_node/main_dubin.cpp)
-target_link_libraries(exe_dubin parrot_exe jesus_codes dubin lib_tinycpp ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES}) 
+target_link_libraries(exe_dubin parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES}) 
 #VirtualQuad outside, ticpp.h outside
