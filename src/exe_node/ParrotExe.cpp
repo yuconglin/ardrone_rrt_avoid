@@ -53,7 +53,7 @@ int ParrotExe::ParamFromXML(const char* pFilename)
    return 0;
 }//ParamFromXML ends
 
-ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid):controlMid(_controlMid),log_path("ardrone_path_rec.txt"),log_nav("ardrone_log_nav.txt")
+ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):controlMid(_controlMid),log_path("ardrone_path_rec.txt"),log_nav(file_nav)
 {
    cout<<"initialized"<<endl;
    //flags default
