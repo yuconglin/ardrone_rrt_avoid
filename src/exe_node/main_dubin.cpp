@@ -21,12 +21,12 @@ int main(int argc, char** argv)
   double the_s= 0;
   QuadCfg start(x_s,y_s,z_s,the_s);
 
-  double x_e= x_s;
-  double y_e= y_s-3.;
+  double x_e= x_s+3;
+  double y_e= y_s+1.4;
   //double x_e= x_s+ rho;
   //double y_e= y_s+ rho;
   double z_e= z_s+ 0;
-  double the_e= the_s- M_PI;
+  double the_e= the_s;
   //double the_e= M_PI/2;
   QuadCfg end(x_e,y_e,z_e,the_e);
    
@@ -94,6 +94,7 @@ int main(int argc, char** argv)
     if_joy= parrot_exe.GetIfJoy();
     //to fix the start moment: takeoff---->hover
     if(pre_uav_state== 6 && idx_uav_state== 4)
+    //if(pre_uav_state== -1 && idx_uav_state== 6)
     {
       std::cout<<"start start"<<std::endl;
       if_start= true;
@@ -123,8 +124,7 @@ int main(int argc, char** argv)
       //controller reset
       parrot_exe.ControllerReset();
     }
-    
-    
+       
     if(option==0)
     {//navigate along a straight line or a circle curve
       if( (idx_uav_state==3||idx_uav_state==7||idx_uav_state==4)
@@ -215,4 +215,6 @@ int GetRho(double& rho)
     std::cerr << "Error: " << error.m_details << std::endl;
     return 2;                 // signal error
   }
+  rho= v/yaw_rate;
+  return 0;
 }//GetRho ends
