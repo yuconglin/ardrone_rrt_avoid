@@ -44,7 +44,7 @@ class ParrotExe{
    };
 
    //constructor
-   ParrotExe(Controller_MidLevelCnt& _controlMid);
+   ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav="ardrone_log_nav.txt");
    //read basic params from xml file
    int ParamFromXML(const char* pFilename="/home/yucong/fuerte_workspace/sandbox/yucong_rrt_avoid/src/common/param.xml");
    //callback functions 

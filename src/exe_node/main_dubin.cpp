@@ -4,6 +4,7 @@
 #include "ticpp.h"
 #include "QuadCfg.h"
 #include "controller/midlevelCnt/Controller_MidLevelCnt.h"
+#include "systemtime.h"
 
 int GetRho(double& rho);
 
@@ -34,14 +35,11 @@ int main(int argc, char** argv)
   //two options
   int option= atoi(argv[2]);
   //instantiate a dubin_seg structure when needed
-  if(option== 1)
-  {
-    quadDubins3D db_3d(start,end,rho );
-    //to DubinSeg struct
-    ParrotExe::DubinSeg db_seg;
-    db_seg.d_dubin= db_3d;
-    db_seg.cfg_stop= end;
-  }
+  quadDubins3D db_3d(start,end,rho);
+  //to DubinSeg struct
+  ParrotExe::DubinSeg db_seg;
+  db_seg.d_dubin= db_3d;
+  db_seg.cfg_stop= end;
   
   //main part
   double if_process_start= false;
@@ -62,9 +60,21 @@ int main(int argc, char** argv)
   
   //the controller
   Controller_MidLevelCnt controlMid;
+  //get the system time
+  std::string str_time;
+  utils::getSystemTime(str_time);
+  
+  //file for navdata, and dubin log
+  char file_nav[256],file_dubin[256];
+  sprintf( file_nav, "%s:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),x_e,y_e,z_e,"nav");
+  if(option==1)
+  {
+    sprintf( file_dubin, "%s:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),x_e,y_e,z_e,"dubin");
+    db_3d.OutDubins(0.1,file_dubin);
+  }
   
   //ParrotExe initialization
-  ParrotExe parrot_exe(controlMid);
+  ParrotExe parrot_exe(controlMid,file_nav);
   std::cout<<"now init: "<<ros::Time::now().toSec()<<std::endl;
   ros::Duration(1.0).sleep();
   

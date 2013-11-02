@@ -1,4 +1,4 @@
-cake_minimum_required(VERSION 2.4.6)
+cmake_minimum_required(VERSION 2.4.6)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 IF(CMAKE_COMPILER_IS_GNUCXX)
    SET(CMAKE_CXX_FLAGS "-g3 -ggdb -DTIXML_USE_TICPP") 
