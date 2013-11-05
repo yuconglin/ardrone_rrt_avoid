@@ -146,7 +146,7 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    yaw_est = (double)navdataPtr->rotZ*M_PI/180;
    yaw_est -= YawInit;
    vx_est = vxm_est*cos(yaw_est) - vym_est*sin(yaw_est); 
-   vy_est = vxm_est*sin(yaw_est) + vym_est*cos(yaw_est); 
+   vy_est = vxm_est*sin(yaw_est) /+ vym_est*cos(yaw_est); 
    //position
    x_est += elapsed_time_dbl * vx_est;
    y_est += elapsed_time_dbl * vy_est;

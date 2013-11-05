@@ -101,7 +101,7 @@ int main(int argc, char** argv)
       //in the global frame, start is (0,0,z_m,0) and end is(10,5,z_m,0)
       parrot_exe.GetCurrentCfg(cfg_start);
       //set YawInit
-      parrot_exe.SetYawInit( cfg_start.theta );
+      //parrot_exe.SetYawInit( cfg_start.theta );
       //set x_est,y_est
       double x_init_frame= cfg_start.x*cos(cfg_start.theta)-cfg_start.y*sin(cfg_start.theta);
       double y_init_frame= cfg_start.x*sin(cfg_start.theta)+cfg_start.y*cos(cfg_start.theta);
@@ -110,9 +110,9 @@ int main(int argc, char** argv)
       parrot_exe.SetYEst(y_init_frame);
       parrot_exe.SetPreXEst(x_init_frame);
       parrot_exe.SetPreYEst(y_init_frame);
-      parrot_exe.SetPreZ(cfg_start.z);
+      //parrot_exe.SetPreZ(cfg_start.z);
       //set start config after transformation
-      parrot_exe.SetCfgStart( QuadCfg(x_init_frame,y_init_frame,cfg_start.z,0) );
+      //parrot_exe.SetCfgStart( QuadCfg(x_init_frame,y_init_frame,cfg_start.z,0) );
 
       std::cout<<"x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
       //controller reset
@@ -125,6 +125,11 @@ int main(int argc, char** argv)
       //if_start= true;
       //std::cout <<"time now: "<<ros::Time::now().toSec()<<std::endl;
       parrot_exe.SetStartTime(ros::Time::now() );
+      parrot_exe.GetCurrentCfg(cfg_start);
+      //set YawInit
+      parrot_exe.SetYawInit( cfg_start.theta );
+
+      parrot_exe.SetPreZ(cfg_start.z);
       //std::cout<<"t_start in secs: "<<parrot_exe.GetStartTimeSec()<<std::endl;
       //controller reset
       parrot_exe.ControllerReset();
