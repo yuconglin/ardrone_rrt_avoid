@@ -1,7 +1,7 @@
 close all;
 %regular
-%reg_dubin =fopen('../../20131102-015141:3.0:1.4:0.8:dubin.txt','r');
-reg_dubin =fopen('../../20131102-015451:3.0:1.4:0.8:dubin.txt','r')
+reg_dubin =fopen('../../20131102-015141:3.0:1.4:0.8:dubin.txt','r');
+%reg_dubin =fopen('../../20131102-015451:3.0:1.4:0.8:dubin.txt','r')
 if reg_dubin == -1
      error('File dubins regular could not be opened, check name or path.')
 end
@@ -18,8 +18,8 @@ while ischar(reg_line)
 end
 
 %executed log
-%exe_dubin =fopen('../../20131102-015141:3.0:1.4:0.8:nav.txt','r');
-exe_dubin =fopen('../../20131102-015451:3.0:1.4:0.8:nav.txt','r');
+exe_dubin =fopen('../../20131102-015141:3.0:1.4:0.8:nav.txt','r');
+%exe_dubin =fopen('../../20131102-015451:3.0:1.4:0.8:nav.txt','r');
 if exe_dubin == -1
      error('File dubins execute could not be opened, check name or path.')
 end
