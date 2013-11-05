@@ -175,11 +175,18 @@ void ParrotExe::joyCb(const sensor_msgs::JoyConstPtr joy_msg)
     // Avoid crashes if non-ps3 joystick is being used
     short unsigned int L1 = 4;
     short unsigned int R1 = 5;
+    /*previous set. European mode
     int YAW = 3;
     int GAZ = 4;
     int ROLL = 0;
     int PITCH = 1;
-    
+    */
+    //current set. U.S. mode
+    int YAW= 0;
+    int GAZ= 1;
+    int ROLL= 3;
+    int PITCH= 4;
+
     if( joy_msg->buttons.at(2) )
 	if_joy = false;
 
@@ -529,24 +536,28 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
      if(idx_dubin_sub==2) 
      {	//dubin ends actually
        if_restart_dubin= true;
-       db_result=1;
+       //db_result=1;
        std::cout<<"dubin end reached"<<std::endl;
 	//return db_result;
      }
      else
      {
-	//we need to start from a new segment
        ++idx_dubin_sub;
-       db_result= SegCommand(db_seg,idx_dubin_sub,t_limit);
+       //we need to start from a new nonzero segment
+       while(idx_dubin_sub<3 && dubin_3d.seg_param[idx_dubin_sub]==0)
+          ++idx_dubin_sub;
+       std::cout<<"idx_dubin_sub: "<<idx_dubin_sub<<std::endl;
+       //while ends
+       if(idx_dubin_sub <3) 
+         db_result= SegCommand(db_seg,idx_dubin_sub,t_limit);
      }
    }
    return db_result;
    //0:time up, 1:cfg_stop reached, 2: seg end reached, -1: still ongoing
 }//DubinCommand ends
 
-
 int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
-{ //-1:
+{ //-1: on the fly, 0:time up, 1:target reached, 2:length reached
    if(if_restart_seg) 
    {
      if_restart_seg= false;
@@ -642,7 +653,7 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
      ||dot(v_quad,v_end)<=0 && d_length> s_end-s_init 
      ||d_length>1.5*(s_end-s_init) ) 
    {
-     std::cout<<" end reached" <<std::endl;
+     //std::cout<<" end reached" <<std::endl;
      std::cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<" yaw_est: "<<yaw_est*180/M_PI<< std::endl;
      
      if(dot(v_quad,v_end)<=0&&end_dis<=3*end_r)
@@ -881,7 +892,7 @@ int ParrotExe::CircleCommand(const QuadCfg& start,const QuadCfg& end,int type,do
       cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<" yaw_est: "<<yaw_est*180/M_PI<<endl;
       if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r)
       {
-	cout<<"end reached"<< endl;
+	cout<<"circle end reached"<< endl;
       }
       else if( dot(v_quad,v_end)<=0 && d_length> t_len)
       {
@@ -957,7 +968,7 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
      cout<<"x_est: "<<x_est<<" y_est: "<<y_est<<" z_mea: "<<z_mea<<" yaw_est: "<<yaw_est*180/M_PI <<endl;
      if( dot(v_quad,v_end)<=0&&end_dis<= 3*end_r || end_dis<=end_r)
      {
-       cout<<"end reached"<< endl;
+       cout<<"line end reached"<< endl;
      }
      else if( dot(v_quad,v_end)<=0 && d_length> t_len)
      {
