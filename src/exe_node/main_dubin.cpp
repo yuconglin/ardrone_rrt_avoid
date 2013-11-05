@@ -21,11 +21,11 @@ int main(int argc, char** argv)
   double the_s= 0;
   QuadCfg start(x_s,y_s,z_s,the_s);
 
-  double x_e= x_s+2.5;
-  double y_e= y_s+2.5;
+  double x_e= x_s+1.;
+  double y_e= y_s+0.;
   //double x_e= x_s+ rho;
   //double y_e= y_s+ rho;
-  double z_e= z_s+ 0.5;
+  double z_e= z_s+ 0.;
   double the_e= the_s;
   //double the_e= the_s+ M_PI/2;
   QuadCfg end(x_e,y_e,z_e,the_e);
@@ -66,10 +66,10 @@ int main(int argc, char** argv)
   
   //file for navdata, and dubin log
   char file_nav[256],file_dubin[256];
-  sprintf( file_nav, "%s:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),x_e,y_e,z_e,"nav");
+  sprintf( file_nav, "data/%s:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),x_e,y_e,z_e,"nav");
   if(option==1)
   {
-    sprintf( file_dubin, "%s:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),x_e,y_e,z_e,"dubin");
+    sprintf( file_dubin, "data/%s:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),x_e,y_e,z_e,"dubin");
     db_3d.OutDubins(0.1,file_dubin);
   }
   
