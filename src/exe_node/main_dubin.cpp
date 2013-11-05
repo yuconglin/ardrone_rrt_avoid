@@ -93,15 +93,9 @@ int main(int argc, char** argv)
     idx_uav_state= parrot_exe.GetUavStateIdx();
     if_joy= parrot_exe.GetIfJoy();
     //to fix the start moment: takeoff---->hover
-    if(pre_uav_state== 6 && idx_uav_state== 4)
-    //if(pre_uav_state== -1 && idx_uav_state== 6)
+    //if(pre_uav_state== 6 && idx_uav_state== 4)
+    if(pre_uav_state== -1 && idx_uav_state== 6)
     {
-      std::cout<<"start start"<<std::endl;
-      if_start= true;
-     
-      std::cout <<"time now: "<<ros::Time::now().toSec()<<std::endl;
-      parrot_exe.SetStartTime(ros::Time::now() );
-      std::cout<<"t_start in secs: "<<parrot_exe.GetStartTimeSec()<<std::endl;
       //get the dubin providing segs
       //first in the local frame, then converted to the global reference frame
       //in the global frame, start is (0,0,z_m,0) and end is(10,5,z_m,0)
@@ -124,6 +118,17 @@ int main(int argc, char** argv)
       //controller reset
       parrot_exe.ControllerReset();
     }
+    //time to start to follow when takeoff-->hover
+    if(pre_uav_state==6&&idx_uav_state==4)
+    {
+      std::cout<<"start start"<<std::endl;
+      //if_start= true;
+      //std::cout <<"time now: "<<ros::Time::now().toSec()<<std::endl;
+      parrot_exe.SetStartTime(ros::Time::now() );
+      //std::cout<<"t_start in secs: "<<parrot_exe.GetStartTimeSec()<<std::endl;
+      //controller reset
+      parrot_exe.ControllerReset();
+    }//if ends
        
     if(option==0)
     {//navigate along a straight line or a circle curve

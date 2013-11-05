@@ -1,7 +1,35 @@
 close all;
 %regular
-reg_dubin =fopen('../../20131102-015141:3.0:1.4:0.8:dubin.txt','r');
+%reg_dubin =fopen('../../20131102-015141:3.0:1.4:0.8:dubin.txt','r');
 %reg_dubin =fopen('../../20131102-015451:3.0:1.4:0.8:dubin.txt','r')
+%reg_dubin =fopen('../data../data131102-015141:3.0:1.4:0.8:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-181815:2.5:2.5:1.3:dubin.txt','r');
+%reg_dubin =fopen('../data/20131102-015451:3.0:1.4:0.8:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-163711:3.0:3.0:0.8:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-164045:2.0:2.0:0.8:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-165247:2.0:2.0:0.8:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-165407:2.0:2.0:0.8:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-172749:2.0:2.0:0.8:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-173357:2.0:2.0:0.8:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-173748:2.0:2.0:0.8:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-174126:2.0:2.0:0.8:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-174309:2.0:2.0:1.3:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-174438:2.0:2.0:1.3:dubin.txt','r');
+reg_dubin =fopen('../data/20131104-174709:2.0:2.0:1.3:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-175529:2.0:2.0:1.3:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-175720:2.5:2.5:1.3:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-175823:2.5:2.5:1.3:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-175926:2.5:2.5:1.3:dubin.txt','r');
+%reg_dubin =fopen('../data/20131104-180046:2.5:2.5:1.3:dubin.txt','r');
+
+%reg_dubin =fopen('../data/20131104-180336:2.5:0.0:1.3:dubin.txt','r');%straight line
+%reg_dubin =fopen('../data/20131104-180457:2.5:0.0:1.3:dubin.txt','r');%straight line
+%reg_dubin =fopen('../data/20131104-181320:1.0:1.0:1.3:dubin.txt','r'); %quater circle
+%reg_dubin =fopen('../data/20131104-181208:1.0:1.0:1.3:dubin.txt','r');%quater circle
+%reg_dubin =fopen('../data/20131104-181055:1.0:1.0:1.3:dubin.txt','r');%quater circle
+%reg_dubin =fopen('../data/20131104-180706:2.5:0.0:1.3:dubin.txt','r');%straight line
+%reg_dubin =fopen('../data/20131104-180541:2.5:0.0:1.3:dubin.txt','r');%straight line
+
 if reg_dubin == -1
      error('File dubins regular could not be opened, check name or path.')
 end
@@ -18,8 +46,37 @@ while ischar(reg_line)
 end
 
 %executed log
-exe_dubin =fopen('../../20131102-015141:3.0:1.4:0.8:nav.txt','r');
+
+%exe_dubin =fopen('../../20131102-015141:3.0:1.4:0.8:nav.txt','r');
 %exe_dubin =fopen('../../20131102-015451:3.0:1.4:0.8:nav.txt','r');
+%exe_dubin =fopen('../data/20131102-015141:3.0:1.4:0.8:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-181815:2.5:2.5:1.3:nav.txt','r');
+%exe_dubin =fopen('../data/20131102-015451:3.0:1.4:0.8:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-163711:3.0:3.0:0.8:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-164045:2.0:2.0:0.8:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-165247:2.0:2.0:0.8:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-165407:2.0:2.0:0.8:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-172749:2.0:2.0:0.8:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-173357:2.0:2.0:0.8:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-173748:2.0:2.0:0.8:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-174126:2.0:2.0:0.8:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-174309:2.0:2.0:1.3:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-174438:2.0:2.0:1.3:nav.txt','r');
+exe_dubin =fopen('../data/20131104-174709:2.0:2.0:1.3:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-175529:2.0:2.0:1.3:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-175720:2.5:2.5:1.3:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-175823:2.5:2.5:1.3:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-175926:2.5:2.5:1.3:nav.txt','r');
+%exe_dubin =fopen('../data/20131104-180046:2.5:2.5:1.3:nav.txt','r');
+
+%exe_dubin =fopen('../data/20131104-180336:2.5:0.0:1.3:nav.txt','r');%straight line
+%exe_dubin =fopen('../data/20131104-180457:2.5:0.0:1.3:nav.txt','r');%straight line
+%exe_dubin =fopen('../data/20131104-181320:1.0:1.0:1.3:nav.txt','r'); %quater circle
+%exe_dubin =fopen('../data/20131104-181208:1.0:1.0:1.3:nav.txt','r');%quater circle
+%exe_dubin =fopen('../data/20131104-181055:1.0:1.0:1.3:nav.txt','r');%quater circle
+%exe_dubin =fopen('../data/20131104-180706:2.5:0.0:1.3:nav.txt','r');%straight line
+%exe_dubin =fopen('../data/20131104-180541:2.5:0.0:1.3:nav.txt','r');%straight line
+
 if exe_dubin == -1
      error('File dubins execute could not be opened, check name or path.')
 end
@@ -40,7 +97,7 @@ while ischar(exe_line)
    end
    pre_state= state;
    
-   if(if_log== 1 && state ~= 2 && state ~= 8)
+   if(if_log== 1 && state ~= 2 && state ~= 8 && state ~=0 && state ~=7 && state~=6 && state~=4)
       exe= [exe; [x,y,z] ]; 
    end
    exe_line= fgetl(exe_dubin);
@@ -51,7 +108,8 @@ figure;
 hold on;
 axis auto;
 grid on;
-zlim([0 0.9]);
+zlim([0 4]);
+%ylim([-1 1]);
 %axis([ 0, 300, 0, 300, 0, 25 ]);
 title('plot');
 xlabel('Easting(km)');
