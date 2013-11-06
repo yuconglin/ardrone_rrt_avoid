@@ -103,7 +103,6 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
    pitchco = 0.0, rollco = 0.0, dyawco = 0.0, dzco = 0.0;
    YawInit= 0.0;
    // For trajectory control
-   //controlMid = _controlMid;
    controlMid.setControlMode(Controller_MidLevel_controlMode::SPEED_CONTROL);
 }
 
@@ -156,7 +155,7 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    uav_state_idx= navdataPtr->state;
 
    tkm1= tk;
-   log_nav<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<" "<<elapsed_time_dbl<<" "<<uav_state_idx<<endl;
+   log_nav<<tk<<" "<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<" "<<elapsed_time_dbl<<" "<<uav_state_idx<<endl;
 
 }//navdataCb ends
 
@@ -256,12 +255,18 @@ void ParrotExe::SendControlToDrone(ControlCommand cmd)
 {
    // TODO: check converstion (!)
    geometry_msgs::Twist cmdT;
-   cmdT.angular.z = -cmd.yaw;
+   cmdT.angular.z = cmd.yaw;
    cmdT.linear.z = cmd.gaz;
    cmdT.linear.x = -cmd.pitch;
-   cmdT.linear.y = -cmd.roll;
+   cmdT.linear.y = cmd.roll;
    pub_vel.publish(cmdT);
 }
+
+//for test from outside
+void ParrotExe::SendCommand(double cx,double cy,double cz,double cw)
+{
+   SendControlToDrone( ControlCommand(-cx,cy,cz,cw) );
+}//SendCommand ends
 
 void ParrotExe::sendLand()
 {
@@ -703,7 +708,7 @@ int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double d_yaw,double dt)
    controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
    //cout<<pitchco<<" "<<rollco<<" "<<dzco<<" "<<dyawco<<endl;
 
-   SendControlToDrone( ControlCommand( pitchco, -rollco, u(2), -dyawco ) );
+   SendControlToDrone( ControlCommand( pitchco, rollco, u(2), dyawco ) );
    //last dt
    ros::Duration(dt).sleep();
    return 0;

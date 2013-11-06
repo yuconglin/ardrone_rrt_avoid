@@ -1,18 +1,18 @@
 #include "ParrotExe.hpp"
 #include "ros/ros.h"
 #include "quadDubins3D.h"
-#include "ticpp.h"
+//#include "ticpp.h"
 #include "QuadCfg.h"
 #include "controller/midlevelCnt/Controller_MidLevelCnt.h"
 #include "systemtime.h"
+#include "GetRho.h"
 
 using namespace Ardrone_rrt_avoid;
-int GetRho(double& rho);
 
 int main(int argc, char** argv)
 { //first to get the rho
   double rho= 0;
-  GetRho(rho);
+  utils::GetRho(rho);
   std::cout<<"rho= "<<rho<<std::endl;
 
   //construct a dubin's path in 3D
@@ -43,13 +43,12 @@ int main(int argc, char** argv)
   db_seg.cfg_stop= end;
   
   //main part
-  double if_process_start= false;
   int idx_uav_state = -1;
   int pre_uav_state = -1;
   double t_limit= 1e7;
   bool if_reach= false;
   bool if_joy= false;
-  bool if_start= false;
+ 
   //the start config when switch from takeoff to hover
   QuadCfg cfg_start;
   
@@ -177,37 +176,3 @@ int main(int argc, char** argv)
   }//while ends
  
 }//main ends
-
-int GetRho(double& rho)
-{
-  double v,yaw_rate;
-  try
-  {
-    const char* pFilename="/home/yucong/.ros/param.xml";
-    ticpp::Document doc(pFilename);
-    // actually load the information
-    doc.LoadFile();
-    //the element to start
-    ticpp::Element *child= doc.FirstChildElement("quadrotor_param")->FirstChildElement();
-    //an iterator
-    ticpp::Iterator<ticpp::Element> iter(child);
-    for( iter=iter; iter!=iter.end(); ++iter )
-    {
-       std::string strName;
-       iter->GetValue(&strName);
-       //
-       if( strName== "velocity_xy" )
-	 v= atof(iter->GetText().c_str() );
-       if( strName== "yaw_rate")
-	 yaw_rate= atof(iter->GetText().c_str() );
-    }//for child ends
-
-  }
-  catch(ticpp::Exception& error)
-  {
-    std::cerr << "Error: " << error.m_details << std::endl;
-    return 2;                 // signal error
-  }
-  rho= v/yaw_rate;
-  return 0;
-}//GetRho ends

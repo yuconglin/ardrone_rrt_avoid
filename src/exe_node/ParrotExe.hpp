@@ -57,6 +57,7 @@ class ParrotExe{
    void PublishFlags();
    //to publish commands
    void SendControlToDrone(ControlCommand cmd);
+   void SendCommand(double cx,double cy,double cz,double cw);
    //to take off or land
    void sendLand();
    void sendTakeoff();
