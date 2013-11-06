@@ -17,6 +17,7 @@
 #include "std_msgs/Empty.h"
 
 using namespace std;
+namespace Ardrone_rrt_avoid{
 
 int ParrotExe::ParamFromXML(const char* pFilename)
 {
@@ -993,3 +994,5 @@ int ParrotExe::LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_li
    return seg_result; 
 
 }//LineCommand ends
+
+};//namespace ends

@@ -21,6 +21,7 @@
 //declaration of classes used
 class Controller_MidLevelCnt;
 
+namespace Ardrone_rrt_avoid{ 
 class ParrotExe{
    //struct 
    struct ControlCommand
@@ -202,5 +203,5 @@ class ParrotExe{
    double d_length;
 };
 
-
+};//end namespace
 #endif

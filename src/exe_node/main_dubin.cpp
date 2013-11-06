@@ -6,6 +6,7 @@
 #include "controller/midlevelCnt/Controller_MidLevelCnt.h"
 #include "systemtime.h"
 
+using namespace Ardrone_rrt_avoid;
 int GetRho(double& rho);
 
 int main(int argc, char** argv)
