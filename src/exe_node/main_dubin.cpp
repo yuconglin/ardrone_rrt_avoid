@@ -93,15 +93,16 @@ int main(int argc, char** argv)
     idx_uav_state= parrot_exe.GetUavStateIdx();
     if_joy= parrot_exe.GetIfJoy();
     //to fix the start moment: takeoff---->hover
-    //if(pre_uav_state== 6 && idx_uav_state== 4)
-    if(pre_uav_state== -1 && idx_uav_state== 6)
+    if(pre_uav_state== 6 && idx_uav_state== 4)
+    //if(pre_uav_state== -1 && idx_uav_state== 6)
     {
       //get the dubin providing segs
       //first in the local frame, then converted to the global reference frame
       //in the global frame, start is (0,0,z_m,0) and end is(10,5,z_m,0)
       parrot_exe.GetCurrentCfg(cfg_start);
+      parrot_exe.SetStartTime(ros::Time::now() );
       //set YawInit
-      //parrot_exe.SetYawInit( cfg_start.theta );
+      parrot_exe.SetYawInit( cfg_start.theta );
       //set x_est,y_est
       double x_init_frame= cfg_start.x*cos(cfg_start.theta)-cfg_start.y*sin(cfg_start.theta);
       double y_init_frame= cfg_start.x*sin(cfg_start.theta)+cfg_start.y*cos(cfg_start.theta);
@@ -110,31 +111,13 @@ int main(int argc, char** argv)
       parrot_exe.SetYEst(y_init_frame);
       parrot_exe.SetPreXEst(x_init_frame);
       parrot_exe.SetPreYEst(y_init_frame);
-      //parrot_exe.SetPreZ(cfg_start.z);
-      //set start config after transformation
-      //parrot_exe.SetCfgStart( QuadCfg(x_init_frame,y_init_frame,cfg_start.z,0) );
-
+      parrot_exe.SetPreZ(cfg_start.z);
+      
       std::cout<<"x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
       //controller reset
       parrot_exe.ControllerReset();
     }
-    //time to start to follow when takeoff-->hover
-    if(pre_uav_state==6&&idx_uav_state==4)
-    {
-      std::cout<<"start start"<<std::endl;
-      //if_start= true;
-      //std::cout <<"time now: "<<ros::Time::now().toSec()<<std::endl;
-      parrot_exe.SetStartTime(ros::Time::now() );
-      parrot_exe.GetCurrentCfg(cfg_start);
-      //set YawInit
-      parrot_exe.SetYawInit( cfg_start.theta );
-
-      parrot_exe.SetPreZ(cfg_start.z);
-      //std::cout<<"t_start in secs: "<<parrot_exe.GetStartTimeSec()<<std::endl;
-      //controller reset
-      parrot_exe.ControllerReset();
-    }//if ends
-       
+    
     if(option==0)
     {//navigate along a straight line or a circle curve
       if( (idx_uav_state==3||idx_uav_state==7||idx_uav_state==4)
@@ -191,8 +174,7 @@ int main(int argc, char** argv)
     ros::spinOnce();
 
   }//while ends
-
-  
+ 
 }//main ends
 
 int GetRho(double& rho)
