@@ -83,10 +83,16 @@ add_library(jesus_codes
 include_directories("src/utils")
 add_library(lib_utils
             src/utils/systemtime.cpp
+	    src/utils/GetRho.cpp
            )
 
 #the main part
+#execute of line,circle and a dubin's curve
 rosbuild_add_library(parrot_exe src/exe_node/ParrotExe.cpp)
 rosbuild_add_executable(exe_dubin src/exe_node/main_dubin.cpp)
 target_link_libraries(exe_dubin parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES}) 
+#command reaction test
+rosbuild_add_executable(exe_test src/exe_node/main_test.cpp)
+target_link_libraries(exe_test parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES}) 
+
 #VirtualQuad outside, ticpp.h outside
