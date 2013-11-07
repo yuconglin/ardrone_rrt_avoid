@@ -83,6 +83,10 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
    sub_if_new= nh.subscribe("if_new_path",1, &ParrotExe::newCallback,this);
    joy_sub= nh.subscribe(nh.resolveName("joy"), 1, &ParrotExe::joyCb, this);
    nav_sub= nh.subscribe("ardrone/navdata", 1, &ParrotExe::navdataCb, this);
+
+   //services
+   flattrim_srv= nh.serviceClient<std_srvs::Empty>(nh.resolveName("ardrone/flattrim"),1);
+
    //specify some parameters of the quad
    if(ParamFromXML("/home/yucong/.ros/param.xml")!=0)
      std::runtime_error("ParamFromXML error");
@@ -288,6 +292,11 @@ void ParrotExe::sendStop()
 void ParrotExe::sendEmergencyStop()
 {//send to emergency stop
    emergency_pub.publish(std_msgs::Empty() );
+}
+
+void ParrotExe::sendFlattrim()
+{
+   flattrim_srv.call(flattrim_srv_srvs);
 }
 
 void ParrotExe::SetRestartDefault()
@@ -704,6 +713,8 @@ int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double d_yaw,double dt)
    yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
    controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
    controlMid.setReference( 0.0, 0.0, de_yaw, 0.0, u(0), u(1) );
+   //double v= sqrt( u(0)*u(0)+u(1)*u(1) );
+   //controlMid.setReference(0.0,0.0,de_yaw,0.0,v,0.0);
    //print and test
    controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
    //cout<<pitchco<<" "<<rollco<<" "<<dzco<<" "<<dyawco<<endl;

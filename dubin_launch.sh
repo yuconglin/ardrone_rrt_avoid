@@ -11,8 +11,10 @@ gnome-terminal  \
 	                                        env sleep 3s ;
 						rosrun joy joy_node;
 						exec bash\""  \
-        --tab --title "run_test"	--command "bash -c \"
+        --tab --title "run_dubin"	--command "bash -c \"
 						env sleep 5s ;
-					        rosrun ardrone_rrt_avoid exe_test >record.txt;
+					        #first:0--auto takeoff,1--manual takeoff.
+						#second:0--straight line,1--dubin's curve
+						rosrun ardrone_rrt_avoid exe_dubin 0 0 >record.txt;
 						exec bash\""  \
 
