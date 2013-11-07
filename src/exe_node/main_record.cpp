@@ -67,6 +67,7 @@ int main(int argc, char** argv)
       pub_start.publish(start_msg);
 
       pre_uav_state= idx_uav_state;
+      
       if(idx_uav_state== 4 && if_arrive)
 	parrot_exe.sendLand();
       
