@@ -10,6 +10,7 @@ int main(int argc, char** argv)
    //boolean variables to indicate if start or land
    bool if_start= false;
    bool if_arrive= false;
+   bool if_fly= false;
    //ros init
    ros::init(argc,argv,"fly");
    //basically, we received a singnal, start, when done, send a singal to another node
@@ -32,10 +33,12 @@ int main(int argc, char** argv)
    //while
    while(ros::ok() )
    {
-     if(if_start){
+     if(if_start && !if_fly){
+       if_fly= true;
        pub_twist.publish(twist);
        ros::Duration(dur).sleep();
        if_arrive= true;
+
      }//if_start ends
 
      if(if_arrive)
