@@ -83,6 +83,10 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
    sub_if_new= nh.subscribe("if_new_path",1, &ParrotExe::newCallback,this);
    joy_sub= nh.subscribe(nh.resolveName("joy"), 1, &ParrotExe::joyCb, this);
    nav_sub= nh.subscribe("ardrone/navdata", 1, &ParrotExe::navdataCb, this);
+
+   //services
+   flattrim_srv= nh_.serviceClient<std_srvs::Empty>(nh_.resolveName("ardrone/flattrim"),1);
+
    //specify some parameters of the quad
    if(ParamFromXML("/home/yucong/.ros/param.xml")!=0)
      std::runtime_error("ParamFromXML error");
@@ -288,6 +292,11 @@ void ParrotExe::sendStop()
 void ParrotExe::sendEmergencyStop()
 {//send to emergency stop
    emergency_pub.publish(std_msgs::Empty() );
+}
+
+void ParrotExe::sendFlattrim()
+{
+   flattrim_srv.call(flattrim_srv_srvs);
 }
 
 void ParrotExe::SetRestartDefault()

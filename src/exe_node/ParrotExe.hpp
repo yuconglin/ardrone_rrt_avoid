@@ -8,6 +8,7 @@
 #include "std_msgs/Bool.h"
 #include "std_msgs/Int16.h"
 #include <geometry_msgs/Twist.h>
+#include "std_srvs/Empty.h"
 
 #include "quadDubins3D.h"
 #include "QuadCfg.h"
@@ -63,6 +64,7 @@ class ParrotExe{
    void sendTakeoff();
    void sendStop();
    void sendEmergencyStop();
+   void sendFlattrim();
    //command the Parrot
    //command to execute a whole path
    int PathCommand(const double _t_limit);
@@ -150,6 +152,11 @@ class ParrotExe{
    ros::Subscriber sub_if_new;//subscribe to see if a new path is generated
    ros::Subscriber joy_sub;//subscribe to joystick command
    ros::Subscriber nav_sub;//subscribe to navdateCb
+
+   //services
+   ros::ServiceClient flattrim_srv;
+   std_srvs::Empty flattrim_srv_srvs;
+
    //msgs
    //if a dubins curve is received
    std_msgs::Bool rec_msg;
