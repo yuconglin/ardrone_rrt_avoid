@@ -47,6 +47,10 @@ int main(int argc, char** argv)
    ros::Publisher pub_start =nh_pt->advertise<std_msgs::Bool>("if_start",1);
    //subscriber
    ros::Subscriber sub_arrive =nh_pt->subscribe<std_msgs::Bool>("if_arrive",1,boost::bind(arriveCb,_1,boost::ref(if_arrive) ) );
+    
+   //flat trim
+   parrot_exe.sendFlattrim();
+
    //takeoff
    parrot_exe.sendTakeoff();
 

@@ -85,7 +85,7 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
    nav_sub= nh.subscribe("ardrone/navdata", 1, &ParrotExe::navdataCb, this);
 
    //services
-   flattrim_srv= nh_.serviceClient<std_srvs::Empty>(nh_.resolveName("ardrone/flattrim"),1);
+   flattrim_srv= nh.serviceClient<std_srvs::Empty>(nh.resolveName("ardrone/flattrim"),1);
 
    //specify some parameters of the quad
    if(ParamFromXML("/home/yucong/.ros/param.xml")!=0)

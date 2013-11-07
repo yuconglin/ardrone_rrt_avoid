@@ -78,6 +78,9 @@ int main(int argc, char** argv)
   std::cout<<"now init: "<<ros::Time::now().toSec()<<std::endl;
   ros::Duration(1.0).sleep();
   
+  //flat trim
+  parrot_exe.sendFlattrim();
+
   //take off
   int if_manual= atoi(argv[1]);
   if(if_manual== 0)
