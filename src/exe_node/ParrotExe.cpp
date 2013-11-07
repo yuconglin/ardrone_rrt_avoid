@@ -704,6 +704,8 @@ int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double d_yaw,double dt)
    yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
    controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
    controlMid.setReference( 0.0, 0.0, de_yaw, 0.0, u(0), u(1) );
+   //double v= sqrt( u(0)*u(0)+u(1)*u(1) );
+   //controlMid.setReference(0.0,0.0,de_yaw,0.0,v,0.0);
    //print and test
    controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
    //cout<<pitchco<<" "<<rollco<<" "<<dzco<<" "<<dyawco<<endl;

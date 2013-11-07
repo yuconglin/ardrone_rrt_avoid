@@ -22,13 +22,13 @@ int main(int argc, char** argv)
   double the_s= 0;
   QuadCfg start(x_s,y_s,z_s,the_s);
 
-  double x_e= x_s+1.;
-  double y_e= y_s+0.;
-  //double x_e= x_s+ rho;
-  //double y_e= y_s+ rho;
+  //double x_e= x_s+1.;
+  //double y_e= y_s+0.;
+  double x_e= x_s+ rho;
+  double y_e= y_s+ rho;
   double z_e= z_s+ 0.;
-  double the_e= the_s;
-  //double the_e= the_s+ M_PI/2;
+  //double the_e= the_s;
+  double the_e= the_s+ M_PI/2;
   QuadCfg end(x_e,y_e,z_e,the_e);
    
   double type= (the_e > the_s ? L_SEG : R_SEG ); 
@@ -124,8 +124,8 @@ int main(int argc, char** argv)
           && !if_reach && !if_joy )
       {
 	//std::cout << "fly phase"<<std::endl;
-	int result= parrot_exe.LineCommand(start,end,t_limit);
-	//int result= parrot_exe.CircleCommand(start,end,type,rho,t_limit);
+	//int result= parrot_exe.LineCommand(start,end,t_limit);
+	int result= parrot_exe.CircleCommand(start,end,type,rho,t_limit);
 	if(result==2)
 	{ 
 	  parrot_exe.sendStop();

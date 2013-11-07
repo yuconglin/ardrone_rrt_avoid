@@ -50,9 +50,12 @@ int main(int argc, char** argv)
         if_reach= true; 
      }//if ends
 
-     if(if_reach) 
+     if(if_reach)
+     {
        parrot_exe.sendStop();
-
+       ros::Duration(0.5).sleep();
+     }
+     
      pre_uav_state= idx_uav_state;
      //let it lands
      if(if_reach && idx_uav_state==4)
