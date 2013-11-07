@@ -92,7 +92,13 @@ rosbuild_add_library(parrot_exe src/exe_node/ParrotExe.cpp)
 rosbuild_add_executable(exe_dubin src/exe_node/main_dubin.cpp)
 target_link_libraries(exe_dubin parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 #the command test
-rosbuild_add_executable(exe_test src/exe_node/main_test.cpp)
-target_link_libraries(exe_test parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
+#rosbuild_add_executable(exe_test src/exe_node/main_test.cpp)
+#target_link_libraries(exe_test parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
+
+#fly
+rosbuild_add_executable(exe_fly src/exe_node/main_fly.cpp)
+#record
+rosbuild_add_executable(exe_record src/exe_node/main_record.cpp)
+target_link_libraries(exe_record parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 
 #VirtualQuad outside, ticpp.h outside

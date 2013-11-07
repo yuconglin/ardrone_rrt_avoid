@@ -90,6 +90,7 @@ class ParrotExe{
    inline bool GetIfJoy(){return this->if_joy;}
    inline double GetStartTimeSec(){return this->t_start.toSec();}
    int GetCurrentCfg(QuadCfg& cfg);
+   inline ros::NodeHandle* GetHandlePt(){return &nh;} 
    //set init time
    inline void SetInitTime(ros::Time _t_now) {this->t_init= _t_now.toSec(); }
    inline void SetStartTime(ros::Time _t_now){this->t_start= _t_now;}
