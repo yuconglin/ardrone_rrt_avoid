@@ -174,11 +174,11 @@ class ParrotExe{
    //path to execute
    std::vector<DubinSeg> dubin_segs;
    //some parameters;
-   double v= 1.0;//forward speed
-   double vz= 1.0;//rise speed
-   double dt= 0.1;//control period
-   double yaw_rate= 45./180.*M_PI; 
-   double end_r= 1.0*0.5;
+   double v;//forward speed
+   double vz;//rise speed
+   double dt;//control period
+   double yaw_rate; 
+   double end_r;
    double speed;
    double rho;
    arma::mat K1= 0.1*arma::eye<arma::mat>(3,3); 
@@ -197,9 +197,10 @@ class ParrotExe{
    
    double elapsed_time_dbl;
    double x_est, y_est, z_mea;
-   double x_pre, y_pre, z_pre;
+   double x_pre, y_pre, z_pre, yaw_pre;
    //in body frame
    double vxm_est , vym_est , yaw_est, vzm_est;
+   double wz_est;
    //in global frome
    double vx_est, vy_est;
    double yawci, vxfi, vyfi, dzfi;

@@ -101,7 +101,7 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
    elapsed_time = tk - tkm1;
    elapsed_time_dbl = elapsed_time.sec + ( (double) elapsed_time.nsec)/1E9;
    x_est = 0.0, y_est = 0.0, z_mea = 0.;
-   x_pre = 0.0, y_pre = 0.0, z_pre = 0.;
+   x_pre = 0.0, y_pre = 0.0, z_pre = 0., yaw_pre = 0.;
    vxm_est = 0.0, vym_est = 0.0, vzm_est = 0.0, yaw_est = 0.0; // meter/s
    yawci = 0.0,  vxfi = 0.0, vyfi = 0.0, dzfi=0.; // meter/s
    pitchco = 0.0, rollco = 0.0, dyawco = 0.0, dzco = 0.0;
@@ -150,7 +150,9 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    yaw_est = (double)navdataPtr->rotZ*M_PI/180;
    yaw_est -= YawInit;
    vx_est = vxm_est*cos(yaw_est) - vym_est*sin(yaw_est); 
-   vy_est = vxm_est*sin(yaw_est) + vym_est*cos(yaw_est); 
+   vy_est = vxm_est*sin(yaw_est) + vym_est*cos(yaw_est);
+   //yaw rate
+   wz_est = (yaw_est-yaw_pre)/elapsed_time_dbl;
    //position
    x_est += elapsed_time_dbl * vx_est;
    y_est += elapsed_time_dbl * vy_est;
@@ -159,7 +161,9 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    uav_state_idx= navdataPtr->state;
 
    tkm1= tk;
-   log_nav<<tk<<" "<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<" "<<elapsed_time_dbl<<" "<<uav_state_idx<<endl;
+   yaw_pre= yaw_est;
+   //log
+   log_nav<<tk<<" "<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<" "<<" "<<vzm_est<<" "<<wz_est<<" "<<uav_state_idx<<endl;
 
 }//navdataCb ends
 
