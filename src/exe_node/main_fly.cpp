@@ -23,7 +23,7 @@ int main(int argc, char** argv)
    ros::Publisher pub_arrive =nh.advertise<std_msgs::Bool>("if_arrive", 1); 
    //command to send
    geometry_msgs::Twist twist;
-   twist.linear.x= 1.;
+   twist.linear.x= 0.5;
    twist.linear.y= 0.;
    twist.linear.z= 0.;
    twist.angular.z= 0.;
