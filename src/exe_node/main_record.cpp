@@ -34,9 +34,10 @@ int main(int argc, char** argv)
    //msgs
    std_msgs::Bool start_msg;
 
+   double c_vx= 1.0, c_vy= 0., c_vz= 0., c_wz= 0.;
    //file for navdata, and dubin log
    char file_nav[256];
-   sprintf( file_nav, "data/%s:%s.txt",str_time.c_str(),"test");
+   sprintf( file_nav, "data/%s:%.1f:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),c_vx,c_vy,c_vz,c_wz,"test");
    
    //ParrotExe initialization
    ParrotExe parrot_exe(controlMid,file_nav);
@@ -47,6 +48,7 @@ int main(int argc, char** argv)
    ros::NodeHandle* nh_pt= parrot_exe.GetHandlePt();
    //publisher
    ros::Publisher pub_start =nh_pt->advertise<std_msgs::Bool>("if_start",1);
+   ros::Publisher pub_command= nh_pt->advertise<geometry_msgs::Twist>("command",1);
    //subscriber
    ros::Subscriber sub_arrive =nh_pt->subscribe<std_msgs::Bool>("if_arrive",1,boost::bind(arriveCb,_1,boost::ref(if_arrive) ) );
     
@@ -62,6 +64,11 @@ int main(int argc, char** argv)
    else
      std::runtime_error("wrong input. should be 0 or 1");
 
+   geometry_msgs::Twist c_twist;
+   c_twist.linear.x= c_vx;
+   c_twist.linear.y= c_vy;
+   c_twist.linear.z= c_vz;
+   c_twist.angular.z= c_wz;
    //while
    while(ros::ok() )
    {
@@ -80,8 +87,10 @@ int main(int argc, char** argv)
 	//set some
 	parrot_exe.SetXEst(x_init_frame);
 	parrot_exe.SetYEst(y_init_frame);
-
+        
 	if_start= true; 
+        //deliver command to fly node
+	pub_command.publish(c_twist);
       }//if ends
 
       //publish

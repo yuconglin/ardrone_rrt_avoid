@@ -4,6 +4,7 @@
 #include "boost/bind.hpp"
 
 void startCb(const std_msgs::Bool::ConstPtr& msg,bool& IfStart);
+void cmdCb(const geometry_msgs::Twist::ConstPtr& msg, geometry_msgs::Twist& c_twist);
 
 int main(int argc, char** argv)
 {//just fly. send command and execute
@@ -11,6 +12,9 @@ int main(int argc, char** argv)
    bool if_start= false;
    bool if_arrive= false;
    bool if_fly= false;
+   //command to send
+   geometry_msgs::Twist c_twist;
+
    //ros init
    ros::init(argc,argv,"fly");
    //basically, we received a singnal, start, when done, send a singal to another node
@@ -18,24 +22,20 @@ int main(int argc, char** argv)
    ros::NodeHandle nh;
    //subscribers
    ros::Subscriber sub_start =nh.subscribe<std_msgs::Bool>("if_start",1,boost::bind(startCb,_1,boost::ref(if_start) ) );
+   ros::Subscriber sub_command= nh.subscribe<geometry_msgs::Twist>("command",1,boost::bind(cmdCb,_1,boost::ref(c_twist) ) );
+   
    //publishers
    ros::Publisher pub_twist =nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
    ros::Publisher pub_arrive =nh.advertise<std_msgs::Bool>("if_arrive", 1); 
-   //command to send
-   geometry_msgs::Twist twist;
-   twist.linear.x= 0.5;
-   twist.linear.y= 0.;
-   twist.linear.z= 0.;
-   twist.angular.z= 0.;
    //msgs
    std_msgs::Bool arrive_msg;
-   double dur= 1.0;
+   double dur= 2.0;
    //while
    while(ros::ok() )
    {
      if(if_start && !if_fly){
        if_fly= true;
-       pub_twist.publish(twist);
+       pub_twist.publish(c_twist);
        ros::Duration(dur).sleep();
        if_arrive= true;
 
@@ -59,3 +59,8 @@ void startCb(const std_msgs::Bool::ConstPtr& msg,bool& IfStart)
 {
    IfStart= msg->data; 
 }//startCb ends
+
+void cmdCb(const geometry_msgs::Twist::ConstPtr& msg, geometry_msgs::Twist& c_twist)
+{
+   c_twist= *msg;
+}//cmdCb ends
