@@ -12,9 +12,9 @@ gnome-terminal  \
 						exec bash\""  \
         --tab --title "exe_record"	--command "bash -c \"
 						env sleep 3s ;
-					        rosrun ardrone_rrt_avoid exe_record;
+					        rosrun ardrone_rrt_avoid exe_record 0;
 						exec bash\""  \
-        --tab --title "exe_record"	--command "bash -c \"
+        --tab --title "exe_fly"	--command "bash -c \"
 						env sleep 3s ;
 					        rosrun ardrone_rrt_avoid exe_fly;
 						exec bash\""  \

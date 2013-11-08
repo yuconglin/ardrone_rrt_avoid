@@ -107,6 +107,5 @@ rosbuild_add_executable(exe_fly src/exe_node/main_fly.cpp)
 #record
 rosbuild_add_executable(exe_record src/exe_node/main_record.cpp)
 target_link_libraries(exe_record parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
->>>>>>> 1cf0b363b0cbf21c38d705879274dc545855a1ae
 
 #VirtualQuad outside, ticpp.h outside

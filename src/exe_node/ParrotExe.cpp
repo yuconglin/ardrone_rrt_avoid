@@ -212,7 +212,7 @@ void ParrotExe::joyCb(const sensor_msgs::JoyConstPtr joy_msg)
  	ControlCommand c;
 	c.yaw = joy_msg->axes[YAW];
 	c.gaz = joy_msg->axes[GAZ];
-	c.roll = -joy_msg->axes[ROLL];
+	c.roll = joy_msg->axes[ROLL];
 	c.pitch = -joy_msg->axes[PITCH];
 
 	SendControlToDrone(c);

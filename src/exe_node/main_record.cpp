@@ -4,6 +4,7 @@
 #include "systemtime.h"
 #include "std_msgs/Bool.h"
 #include "boost/bind.hpp"
+#include "QuadCfg.h"
 
 void arriveCb(const std_msgs::Bool::ConstPtr& msg,bool& IfArrive)
 {
@@ -21,7 +22,8 @@ int main(int argc, char** argv)
    //get the system time
    std::string str_time;
    utils::getSystemTime(str_time);
-   
+   //config at the start moment
+   QuadCfg cfg_start;
    //parameters setup
    int idx_uav_state = -1;
    int pre_uav_state = -1;
@@ -52,7 +54,13 @@ int main(int argc, char** argv)
    parrot_exe.sendFlattrim();
 
    //takeoff
-   parrot_exe.sendTakeoff();
+   int takeoff_opt= atoi(argv[1]);
+   if(takeoff_opt== 0)
+     parrot_exe.sendTakeoff();
+   else if(takeoff_opt== 1)
+     std::cout<<"manual takeoff please!"<<std::endl;
+   else
+     std::runtime_error("wrong input. should be 0 or 1");
 
    //while
    while(ros::ok() )
@@ -61,8 +69,18 @@ int main(int argc, char** argv)
       if_joy= parrot_exe.GetIfJoy();
       
       //time to send start signal
-      if(pre_uav_state== 6 && idx_uav_state== 4 )
+      if(pre_uav_state== 6 && idx_uav_state== 4 && !if_joy )
       {
+	parrot_exe.GetCurrentCfg(cfg_start);
+	//set YawInit
+	parrot_exe.SetYawInit( cfg_start.theta );
+	//set x_est,y_est
+	double x_init_frame= cfg_start.x*cos(cfg_start.theta)-cfg_start.y*sin(cfg_start.theta);
+	double y_init_frame= cfg_start.x*sin(cfg_start.theta)+cfg_start.y*cos(cfg_start.theta);
+	//set some
+	parrot_exe.SetXEst(x_init_frame);
+	parrot_exe.SetYEst(y_init_frame);
+
 	if_start= true; 
       }//if ends
 
@@ -72,7 +90,7 @@ int main(int argc, char** argv)
 
       pre_uav_state= idx_uav_state;
       
-      if(idx_uav_state== 4 && if_arrive)
+      if(idx_uav_state== 4 && if_arrive && !if_joy)
 	parrot_exe.sendLand();
       
       ros::spinOnce();
