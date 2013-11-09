@@ -714,12 +714,11 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
    return seg_result; 
 } //SegCommand ends
 
-int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double d_yaw,double dt)
+int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double dt)
 {
    double de_yaw= atan2(u(1),u(0) );
-   //double de_yaw= d_yaw;
    //cout<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<" d_yaw: "<<d_yaw*180./M_PI<<" d_len: "<<d_len<<endl; 
-   yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, d_yaw);
+   yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, de_yaw);
    controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
    controlMid.setReference( 0.0, 0.0, de_yaw, 0.0, u(0), u(1) );
    //double v= sqrt( u(0)*u(0)+u(1)*u(1) );
@@ -767,7 +766,7 @@ int ParrotExe::CircleStepCommand(const QuadCfg& cfg_start,const QuadCfg& cfg_end
    Vxy<< vx_est << vy_est << 0;
    Dxy = cross(Vxy, Rxy);
    Dxy = cross(Rxy, Dxy);
-   double d_yaw= atan2(Dxy(1), Dxy(0) );
+   //double d_yaw= atan2(Dxy(1), Dxy(0) );
    //vectors for calculation
    arma::vec::fixed<3> u, u1, u2, fc1, fc2;
    //calculate starts
@@ -815,7 +814,7 @@ int ParrotExe::CircleStepCommand(const QuadCfg& cfg_start,const QuadCfg& cfg_end
      u<<0.<<0.<<0.;
    //step control
    if(u(0)+u(1)+u(2)!=0 )
-     StepCommand(u,d_yaw,dt);  
+     StepCommand(u,dt);  
 }//CircleStepCommand ends
 
 int ParrotExe::LineStepCommand(const QuadCfg& cfg_start, const QuadCfg& cfg_end)
@@ -829,7 +828,7 @@ int ParrotExe::LineStepCommand(const QuadCfg& cfg_start, const QuadCfg& cfg_end)
     
     double dis= sqrt(pow(x_start-x_end,2)+pow(y_start-y_end,2)+pow(z_start-z_end,2));
     //d_yaw
-    double d_yaw= atan2(cfg_end.y-y_est,cfg_end.x-x_est);
+    //double d_yaw= atan2(cfg_end.y-y_est,cfg_end.x-x_est);
 
     double phi= atan2(y_end-y_start,x_end-x_start);
     double gam= asin( (z_end-z_start)/dis );
@@ -863,7 +862,7 @@ int ParrotExe::LineStepCommand(const QuadCfg& cfg_start, const QuadCfg& cfg_end)
       u<<0.<<0.<<0.;
     //step control
     if(u(0)+u(1)+u(2)!=0 )
-      StepCommand(u,d_yaw,dt);      
+      StepCommand(u,dt);      
       
 }//LineStepCommand ends
 

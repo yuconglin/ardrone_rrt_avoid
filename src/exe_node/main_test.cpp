@@ -2,6 +2,8 @@
 #include "ros/ros.h"
 #include "controller/midlevelCnt/Controller_MidLevelCnt.h"
 #include "systemtime.h"
+#include "armadillo"
+#include "QuadCfg.h"
 
 using namespace Ardrone_rrt_avoid;
 
@@ -18,12 +20,20 @@ int main(int argc, char** argv)
    int idx_uav_state = -1;
    int pre_uav_state = -1;
    bool if_reach= false;
-   bool if_joy= false;
-  
+   bool if_joy= false;  
+ 
+   double cx= 1.;
+   double cy= 0.;
+   double cz= 0.;
+   double wz= 0.;
+   arma::vec::fixed<3> u_c;
+   u_c<< cx<< cy<< cz;
+
    //file for navdata, and dubin log
    char file_nav[256];
-   sprintf( file_nav, "data/%s:%s.txt",str_time.c_str(),"test");
-   
+   sprintf( file_nav, "data/%s:%.1f:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),"u");
+   //duration
+   double dur= 1.0,dt= 0.1;
    //ParrotExe initialization
    ParrotExe parrot_exe(controlMid,file_nav);
    ros::Duration(1.0).sleep();
@@ -32,11 +42,10 @@ int main(int argc, char** argv)
 
    //takeoff
    parrot_exe.sendTakeoff();
+     //flag to show if it is ok to start
+   bool if_start= false;
+   QuadCfg cfg_start;
    
-   double cx= 1.;
-   double cy= 0.;
-   double cz= 0.;
-   double wz= 0.;
    //while
    while(ros::ok())
    {
@@ -45,10 +54,26 @@ int main(int argc, char** argv)
      //to fix the start moment: takeoff---->hover
      if(pre_uav_state== 6 && idx_uav_state== 4 )
      {
-        parrot_exe.SendCommand(cx,cy,cz,wz);
-	ros::Duration(1.0).sleep();
-        if_reach= true; 
+       parrot_exe.GetCurrentCfg(cfg_start);
+       //set YawInit
+       parrot_exe.SetYawInit( cfg_start.theta );
+       //set x_est,y_est
+       double x_init_frame= cfg_start.x*cos(cfg_start.theta)-cfg_start.y*sin(cfg_start.theta);
+       double y_init_frame= cfg_start.x*sin(cfg_start.theta)+cfg_start.y*cos(cfg_start.theta);
+       //set some
+       parrot_exe.SetXEst(x_init_frame);
+       parrot_exe.SetYEst(y_init_frame);
+
+       if_start= true;
      }//if ends
+     
+     //sending command
+     if(if_start) 
+     {
+       parrot_exe.StepCommand(u_c,dt);
+       dur-= dt;
+       if(dur<= 0) if_reach= true;
+     }
 
      if(if_reach)
      {

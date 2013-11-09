@@ -73,7 +73,7 @@ class ParrotExe{
    //command to execute a segment of dubin line/circle
    int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit);
    //command a step with velocity input u,time interval dt
-   int StepCommand(const arma::vec::fixed<3> u,double d_yaw,double dt);
+   int StepCommand(const arma::vec::fixed<3> u,double dt);
    //command to execute a line.
    int LineStepCommand(const QuadCfg& start,const QuadCfg& end);
    //command to execute a circle curve
