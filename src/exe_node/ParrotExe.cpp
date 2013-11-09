@@ -733,6 +733,22 @@ int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double dt)
    return 0;
 }//StepCommand ends
 
+int ParrotExe::StepResponse(const arma::vec::fixed<3> u, geometry_msgs::Twist& c_twist)
+{
+    double de_yaw= atan2(u(1),u(0) );
+    yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, de_yaw);
+    controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
+    controlMid.setReference( 0.0, 0.0, de_yaw, 0.0, u(0), u(1) );
+    controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
+    //assign
+    c_twist = geometry_msgs::Twist();
+    c_twist.linear.x= -pitchco;
+    c_twist.linear.y= rollco;
+    c_twist.linear.z= u(2);
+    c_twist.angular.z= dyawco;
+    return 0;
+}//StepResponse ends
+
 int ParrotExe::CircleStepCommand(const QuadCfg& cfg_start,const QuadCfg& cfg_end,int type,double rho)
 {
    double lambda_h = 1.;

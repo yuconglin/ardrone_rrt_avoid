@@ -5,6 +5,7 @@
 #include "std_msgs/Bool.h"
 #include "boost/bind.hpp"
 #include "QuadCfg.h"
+#include "armadillo"
 
 void arriveCb(const std_msgs::Bool::ConstPtr& msg,bool& IfArrive)
 {
@@ -34,10 +35,13 @@ int main(int argc, char** argv)
    //msgs
    std_msgs::Bool start_msg;
 
-   double c_vx= 0.2, c_vy= 0., c_vz= 0., c_wz= 0.;
+   double c_ux= 0.2, c_uy= 0., c_uz= 0.;
+   arma::vec::fixed<3> u_c;
+   u_c<< c_ux<< c_uy<< c_uz;
+
    //file for navdata, and dubin log
    char file_nav[256];
-   sprintf( file_nav, "data/%s:%.1f:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),c_vx,c_vy,c_vz,c_wz,"test");
+   sprintf( file_nav, "data/%s:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),c_ux,c_uy,c_uz,"test");
    
    //ParrotExe initialization
    ParrotExe parrot_exe(controlMid,file_nav);
@@ -65,10 +69,12 @@ int main(int argc, char** argv)
      std::runtime_error("wrong input. should be 0 or 1");
 
    geometry_msgs::Twist c_twist;
+   /*
    c_twist.linear.x= c_vx;
    c_twist.linear.y= c_vy;
    c_twist.linear.z= c_vz;
    c_twist.angular.z= c_wz;
+   */
    //while
    while(ros::ok() )
    {
@@ -97,6 +103,8 @@ int main(int argc, char** argv)
       start_msg.data= if_start;
       pub_start.publish(start_msg);
       //deliver command to fly node
+      //it is based on current velocity
+      parrot_exe.StepResponse( u_c, c_twist );
       pub_command.publish(c_twist);
 
       pre_uav_state= idx_uav_state;
