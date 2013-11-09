@@ -1,6 +1,6 @@
 close all;
 
-log_data =fopen('../../data/20131108-172838:0.2:0.0:0.0:0.0:test.txt','r');
+log_data =fopen('../../data/20131109-011716:0.0:1.0:0.0:test.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -18,6 +18,7 @@ while ischar(log_line)
    vy = log_reg{7};
    vz = log_reg{8};
    vw = log_reg{9};
+   yaw = log_reg{5};
    state = log_reg{10};
   
    log_line= fgetl(log_data);
@@ -31,7 +32,7 @@ while ischar(log_line)
    
    if(if_log== 1 && state ~= 2 && state ~= 8 && state ~=0 && state~=6 && state~=4)
       t= t-t0;
-      reg= [reg; [t,z,vx,vy,vz,vw,state] ]; 
+      reg= [reg; [t,z,vx,vy,vz,vw,yaw,state] ]; 
    end
    
 end
@@ -45,3 +46,11 @@ hold on;
 plot( reg(:,1), reg(:,4), '--g' );
 plot( reg(:,1), reg(:,5), '--b' );
 legend('vx','vy','vz');
+
+figure;
+%ind= find( reg(:,6)>0 );
+hold on;
+ylim([-90 90]);
+plot( reg(:,1), reg(:,6)*180/pi, '--k' );
+plot( reg(:,1), reg(:,7), '--r' );
+legend('wz','yaw');

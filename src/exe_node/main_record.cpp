@@ -35,7 +35,7 @@ int main(int argc, char** argv)
    //msgs
    std_msgs::Bool start_msg;
 
-   double c_ux= 1., c_uy= 0., c_uz= 0.;
+   double c_ux= 0.0, c_uy= 1, c_uz= 0.;
    arma::vec::fixed<3> u_c;
    u_c<< c_ux<< c_uy<< c_uz;
 

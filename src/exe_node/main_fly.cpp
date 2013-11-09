@@ -29,7 +29,7 @@ int main(int argc, char** argv)
    ros::Publisher pub_arrive =nh.advertise<std_msgs::Bool>("if_arrive", 1); 
    //msgs
    std_msgs::Bool arrive_msg;
-   double dur= 1.0, dt= 0.1;
+   double dur= 3.0, dt= 0.1;
    //while
    while(ros::ok() )
    {

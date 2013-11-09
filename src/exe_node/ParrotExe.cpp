@@ -151,6 +151,13 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    //vzm_est = (double)navdataPtr->vz/1000.0;
    yaw_est = (double)navdataPtr->rotZ*M_PI/180;
    yaw_est -= YawInit;
+
+   if(yaw_est> M_PI) 
+     yaw_est-= 2*M_PI;
+   else if(yaw_est< -M_PI) 
+     yaw_est+= 2*M_PI;
+   else ;//do nothing
+   
    vx_est = vxm_est*cos(yaw_est) - vym_est*sin(yaw_est); 
    vy_est = vxm_est*sin(yaw_est) + vym_est*cos(yaw_est);
    //yaw rate
