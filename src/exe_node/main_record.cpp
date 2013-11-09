@@ -35,7 +35,7 @@ int main(int argc, char** argv)
    //msgs
    std_msgs::Bool start_msg;
 
-   double c_ux= 0.2, c_uy= 0., c_uz= 0.;
+   double c_ux= 1., c_uy= 0., c_uz= 0.;
    arma::vec::fixed<3> u_c;
    u_c<< c_ux<< c_uy<< c_uz;
 
@@ -104,8 +104,11 @@ int main(int argc, char** argv)
       pub_start.publish(start_msg);
       //deliver command to fly node
       //it is based on current velocity
-      parrot_exe.StepResponse( u_c, c_twist );
-      pub_command.publish(c_twist);
+      if(if_start)
+      {
+        parrot_exe.StepResponse( u_c, c_twist );
+        pub_command.publish(c_twist);
+      }
 
       pre_uav_state= idx_uav_state;
       

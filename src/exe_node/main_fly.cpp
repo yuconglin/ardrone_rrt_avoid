@@ -13,8 +13,8 @@ int main(int argc, char** argv)
    bool if_arrive= false;
    bool if_fly= false;
    //command to send
-   geometry_msgs::Twist c_twist;
-
+   geometry_msgs::Twist c_twist= geometry_msgs::Twist();
+   geometry_msgs::Twist pre_twist= c_twist;
    //ros init
    ros::init(argc,argv,"fly");
    //basically, we received a singnal, start, when done, send a singal to another node
@@ -33,12 +33,24 @@ int main(int argc, char** argv)
    //while
    while(ros::ok() )
    {
-     if(if_start && !if_fly)
+     //if(if_start && !if_fly)
+     if(if_start)
      {
-       if_fly= true;
-       if(c_twist.linear.x!=0||c_twist.linear.y!=0||c_twist.linear.z!=0||c_twist.angular.z!=0 )
+       //if_fly= true;
+       if( c_twist.linear.x!= pre_twist.linear.x
+         ||c_twist.linear.y!= pre_twist.linear.y
+	 ||c_twist.linear.z!= pre_twist.linear.z
+	 ||c_twist.angular.z!= pre_twist.angular.z 
+	 )
        {
-         pub_twist.publish(c_twist);
+	 std::cout<<"tuba tuba"<<std::endl;
+	 std::cout<< c_twist.linear.x<<" "
+		  << c_twist.linear.y<<" "
+		  << c_twist.linear.z<<" "
+                  << c_twist.angular.z<< std::endl;
+
+	 pub_twist.publish(c_twist);
+	 pre_twist= c_twist;
          ros::Duration(dt).sleep();
          dur-= dt;
 	 //if_arrive= true;
