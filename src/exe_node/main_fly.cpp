@@ -29,7 +29,7 @@ int main(int argc, char** argv)
    ros::Publisher pub_arrive =nh.advertise<std_msgs::Bool>("if_arrive", 1); 
    //msgs
    std_msgs::Bool arrive_msg;
-   double dur= 2.0, dt= 0.1;
+   double dur= 1.0, dt= 0.1;
    //while
    while(ros::ok() )
    {
@@ -41,6 +41,8 @@ int main(int argc, char** argv)
          ||c_twist.linear.y!= pre_twist.linear.y
 	 ||c_twist.linear.z!= pre_twist.linear.z
 	 ||c_twist.angular.z!= pre_twist.angular.z 
+	 &&c_twist.linear.x>0||c_twist.linear.y>0
+	 ||c_twist.linear.z>0
 	 )
        {
 	 std::cout<<"tuba tuba"<<std::endl;

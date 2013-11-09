@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 
    //file for navdata, and dubin log
    char file_nav[256];
-   sprintf( file_nav, "data/%s:%.1f:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),"u");
+   sprintf( file_nav, "data/%s:%.1f:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),cx,cy,cz,wz,"u");
    //duration
    double dur= 1.0,dt= 0.1;
    //ParrotExe initialization
