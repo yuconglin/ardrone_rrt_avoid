@@ -33,12 +33,15 @@ int main(int argc, char** argv)
    //while
    while(ros::ok() )
    {
-     if(if_start && !if_fly){
+     if(if_start && !if_fly)
+     {
        if_fly= true;
-       pub_twist.publish(c_twist);
-       ros::Duration(dur).sleep();
-       if_arrive= true;
-
+       if(c_twist.linear.x!=0||c_twist.linear.y!=0||c_twist.linear.z!=0||c_twist.angular.z!=0 )
+       {
+         pub_twist.publish(c_twist);
+         ros::Duration(dur).sleep();
+         if_arrive= true;
+       }
      }//if_start ends
 
      if(if_arrive)

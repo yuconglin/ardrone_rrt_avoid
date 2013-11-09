@@ -34,7 +34,7 @@ int main(int argc, char** argv)
    //msgs
    std_msgs::Bool start_msg;
 
-   double c_vx= 1.0, c_vy= 0., c_vz= 0., c_wz= 0.;
+   double c_vx= 0.2, c_vy= 0., c_vz= 0., c_wz= 0.;
    //file for navdata, and dubin log
    char file_nav[256];
    sprintf( file_nav, "data/%s:%.1f:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),c_vx,c_vy,c_vz,c_wz,"test");
@@ -90,12 +90,14 @@ int main(int argc, char** argv)
         
 	if_start= true; 
         //deliver command to fly node
-	pub_command.publish(c_twist);
+	//pub_command.publish(c_twist);
       }//if ends
 
       //publish
       start_msg.data= if_start;
       pub_start.publish(start_msg);
+      //deliver command to fly node
+      pub_command.publish(c_twist);
 
       pre_uav_state= idx_uav_state;
       
