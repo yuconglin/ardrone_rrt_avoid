@@ -21,7 +21,9 @@ endif()
 rosbuild_init()
 
 #set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+#set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/build)
+
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
@@ -108,4 +110,10 @@ rosbuild_add_executable(exe_fly src/exe_node/main_fly.cpp)
 rosbuild_add_executable(exe_record src/exe_node/main_record.cpp)
 target_link_libraries(exe_record parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 
-#VirtualQuad outside, ticpp.h outside
+#uav state update test
+include_directories("src/UavState")
+add_library(lib_state
+            src/UavState/QuadState.cpp
+           )
+rosbuild_add_executable(test_update src/UavState/test_update.cpp)
+target_link_libraries(test_update lib_state ${ARMADILLO_LIBRARIES})
