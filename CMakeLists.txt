@@ -99,8 +99,8 @@ target_link_libraries(exe_test parrot_exe jesus_codes dubin lib_tinycpp lib_util
 
 target_link_libraries(exe_dubin parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 #the command test
-#rosbuild_add_executable(exe_test src/exe_node/main_test.cpp)
-#target_link_libraries(exe_test parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
+rosbuild_add_executable(exe_test src/exe_node/main_test.cpp)
+target_link_libraries(exe_test parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 
 #fly
 rosbuild_add_executable(exe_fly src/exe_node/main_fly.cpp)
