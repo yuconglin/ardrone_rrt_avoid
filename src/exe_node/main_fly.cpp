@@ -11,7 +11,7 @@ int main(int argc, char** argv)
    //boolean variables to indicate if start or land
    bool if_start= false;
    bool if_arrive= false;
-   bool if_fly= false;
+   //bool if_fly= false;
    //command to send
    geometry_msgs::Twist c_twist= geometry_msgs::Twist();
    geometry_msgs::Twist pre_twist= c_twist;
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
    ros::Publisher pub_arrive =nh.advertise<std_msgs::Bool>("if_arrive", 1); 
    //msgs
    std_msgs::Bool arrive_msg;
-   double dur= 3.0, dt= 0.1;
+   double dur= 2.0, dt= 0.1;
    //while
    while(ros::ok() )
    {
@@ -37,12 +37,12 @@ int main(int argc, char** argv)
      if(if_start)
      {
        //if_fly= true;
-       if( c_twist.linear.x!= pre_twist.linear.x
+       if( (c_twist.linear.x!= pre_twist.linear.x
          ||c_twist.linear.y!= pre_twist.linear.y
 	 ||c_twist.linear.z!= pre_twist.linear.z
-	 ||c_twist.angular.z!= pre_twist.angular.z 
-	 &&c_twist.linear.x>0||c_twist.linear.y>0
-	 ||c_twist.linear.z>0
+	 ||c_twist.angular.z!= pre_twist.angular.z) 
+	 && (c_twist.linear.x>0||c_twist.linear.y>0
+	 ||c_twist.linear.z>0)
 	 )
        {
 	 std::cout<<"tuba tuba"<<std::endl;

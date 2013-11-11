@@ -35,7 +35,7 @@ int main(int argc, char** argv)
    //msgs
    std_msgs::Bool start_msg;
 
-   double c_ux= 0.0, c_uy= 1, c_uz= 0.;
+   double c_ux= 1.0, c_uy= 0., c_uz= 0.;
    arma::vec::fixed<3> u_c;
    u_c<< c_ux<< c_uy<< c_uz;
 
@@ -76,6 +76,8 @@ int main(int argc, char** argv)
    c_twist.angular.z= c_wz;
    */
    //while
+   //int count_go= 0;
+
    while(ros::ok() )
    {
       idx_uav_state= parrot_exe.GetUavStateIdx();
@@ -106,8 +108,12 @@ int main(int argc, char** argv)
       //it is based on current velocity
       if(if_start)
       {
-        parrot_exe.StepResponse( u_c, c_twist );
-        pub_command.publish(c_twist);
+	parrot_exe.StepResponse( u_c, c_twist );
+        
+	if( u_c(0)*c_twist.linear.x>= 0
+          &&u_c(1)*c_twist.linear.y>=0
+	  )
+	  pub_command.publish(c_twist);
       }
 
       pre_uav_state= idx_uav_state;
