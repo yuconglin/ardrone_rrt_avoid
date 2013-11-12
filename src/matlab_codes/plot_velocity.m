@@ -1,6 +1,6 @@
 close all;
 
-log_data =fopen('../../data/20131109-005751:1.0:0.0:0.0:test.txt','r');
+log_data =fopen('../../data/20131111-142239:1.0:0.0:0.0:test.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -45,29 +45,29 @@ while ischar(log_line)
    
 end
 
-%plot
-figure;
-plot( reg(:,1), reg(:,9), '--r' );
-hold on;
-plot( reg(:,1), reg(:,10), '--g' );
-legend('vx_b','vy_b');
-
-figure;
-%hold;
-%ind = find( record1(:,2) > 0);
-plot( reg(:,1), reg(:,3), '--r' );
-hold on;
-plot( reg(:,1), reg(:,4), '--g' );
-plot( reg(:,1), reg(:,5), '--b' );
-legend('vx','vy','vz');
-
-figure;
-%ind= find( reg(:,6)>0 );
-hold on;
-ylim([-90 90]);
-plot( reg(:,1), reg(:,6)*180/pi, '--k' );
-plot( reg(:,1), reg(:,7), '--r' );
-legend('wz','yaw');
+% %plot
+% figure;
+% plot( reg(:,1), reg(:,9), '--r' );
+% hold on;
+% plot( reg(:,1), reg(:,10), '--g' );
+% legend('vx_b','vy_b');
+% 
+% figure;
+% %hold;
+% %ind = find( record1(:,2) > 0);
+% plot( reg(:,1), reg(:,3), '--r' );
+% hold on;
+% plot( reg(:,1), reg(:,4), '--g' );
+% plot( reg(:,1), reg(:,5), '--b' );
+% legend('vx','vy','vz');
+% 
+% figure;
+% %ind= find( reg(:,6)>0 );
+% hold on;
+% ylim([-90 90]);
+% plot( reg(:,1), reg(:,6)*180/pi, '--k' );
+% plot( reg(:,1), reg(:,7), '--r' );
+% legend('wz','yaw');
 
 compare_data= fopen('../../data/update_rec.txt','r');
 if compare_data == -1
@@ -95,19 +95,26 @@ while ischar(log_line)
    
 end
 
+%plot velocity compare
 figure;
-plot( reg_c(:,1), reg_c(:,6), '--r' );
 hold on;
-plot( reg_c(:,1), reg_c(:,7), '--g' );
-plot( reg_c(:,1), reg_c(:,8), '--b' );
-legend('vx','vy','vz');
+plot( reg_c(:,1), reg_c(:,6), '*r' );
+plot( reg_c(:,1), reg_c(:,7), '*g' );
+plot( reg_c(:,1), reg_c(:,8), '*b' );
+plot( reg(:,1), reg(:,3), '--r' );
+plot( reg(:,1), reg(:,4), '--g' );
+plot( reg(:,1), reg(:,5), '--b' );
+legend('vx_c','vy_c','vz_c','vx','vy','vz');
 
+%plot angular
 figure;
 hold on;
 ylim([-90 90]);
-plot( reg_c(:,1), reg_c(:,9)*180/pi, '--k' );
-plot( reg_c(:,1), reg_c(:,5), '--r' );
-legend('yaw_rate','yaw');
+plot( reg_c(:,1), reg_c(:,9)*180/pi, '*k' );
+plot( reg_c(:,1), reg_c(:,5), '*b' );
+plot( reg(:,1), reg(:,6)*180/pi, '--k' );
+plot( reg(:,1), reg(:,7), '--r' );
+legend('yaw\_rate_c','yaw_c','yaw_rate','yaw');
 
 figure;
 hold on;
