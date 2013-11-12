@@ -35,7 +35,7 @@ int main(int argc, char** argv)
    //msgs
    std_msgs::Bool start_msg;
 
-   double c_ux= 1.0, c_uy= 0., c_uz= 0.;
+   double c_ux= 0.5, c_uy= 0., c_uz= 0.;
    arma::vec::fixed<3> u_c;
    u_c<< c_ux<< c_uy<< c_uz;
 
@@ -110,10 +110,10 @@ int main(int argc, char** argv)
       {
 	parrot_exe.StepResponse( u_c, c_twist );
         
-	if( u_c(0)*c_twist.linear.x>= 0
-          &&u_c(1)*c_twist.linear.y>=0
-	  )
-	  pub_command.publish(c_twist);
+	//if( u_c(0)*c_twist.linear.x>= 0
+        //  &&u_c(1)*c_twist.linear.y>=0
+	//  )
+	pub_command.publish(c_twist);
       }
 
       pre_uav_state= idx_uav_state;
