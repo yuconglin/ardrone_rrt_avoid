@@ -1,9 +1,7 @@
 #include "armadillo"
 #include "QuadState.h"
-//controller
-//#include "controller/midlevelCnt/Controller_MidLevelCnt.h"
-//#include "controller/midlevelCnt/Controller_MidLevel_controlModes.h"
-//#include "Other/jesus_library.h"
+//controller gains
+#include "controller/config/parrot/config_controller_Parrot.h"
 
 namespace Ardrone_rrt_avoid{
 
@@ -16,7 +14,10 @@ namespace Ardrone_rrt_avoid{
       double vy_b= -vx*sin(yaw)+ vy*cos(yaw);
       
       double ratio= 1.;
-      double kp_vxy= 0.3*7.1521;
+      double kp_vx= MULTIROTOR_SPEEDCONTROLLER_VX_KP;
+      double kp_vy= MULTIROTOR_SPEEDCONTROLLER_VY_KP;
+      double kp_yaw= MULTIROTOR_SPEEDCONTROLLER_YAW_KP;
+      double kp_vz= -1*MULTIROTOR_SPEEDCONTROLLER_Z_KP;
       double vxy_max= 2.0;
       
       double vx_d,vy_d;
@@ -26,7 +27,7 @@ namespace Ardrone_rrt_avoid{
       else 
 	vx_d= ux;
       vx_d*= ratio;
-      double ax= kp_vxy*(vx_d- vx_b)/1.;
+      double ax= kp_vx*(vx_d- vx_b)/1.;
       vx_b= vx_b+ax*dt;
       //x= x+ vx*dt+ 0.5*ax*dt*dt;
       double dx= vx_b*dt+ 0.5*ax*dt*dt;
@@ -37,14 +38,13 @@ namespace Ardrone_rrt_avoid{
       else 
 	vy_d= uy;
       vy_d*= ratio;
-      double ay= kp_vxy*(vy_d- vy_b)/1.;
+      double ay= kp_vy*(vy_d- vy_b)/1.;
       vy_b= vy_b+ay*dt;
       //y= y+ vy*dt+ 0.5*ay*dt*dt;
       double dy= vy_b*dt+ 0.5*ay*dt*dt;
 
       //yaw
       double yaw_d= atan2( u(1),u(0) );
-      double kp_yaw= 0.1*5.6;
       double yaw_rate_max= 70./180*M_PI;
       double dyaw= kp_yaw*(yaw_d-yaw);
       //std::cout<<"yaw= "<< yaw<< std::endl;
@@ -59,7 +59,6 @@ namespace Ardrone_rrt_avoid{
       x+= dx*cos(yaw)- dy*sin(yaw);
       y+= dx*sin(yaw)+ dy*cos(yaw);
       //z
-      double kp_vz= 0.5*1.3339;
       double vz_max= 1.0;
       double vz_d= 0.;
       

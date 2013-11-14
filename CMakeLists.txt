@@ -89,6 +89,8 @@ add_library(lib_utils
            )
 
 #the main part
+
+#****************the execution node************************#
 #execute of line,circle and a dubin's curve
 rosbuild_add_library(parrot_exe src/exe_node/ParrotExe.cpp)
 #the dubin test
@@ -117,3 +119,6 @@ add_library(lib_state
            )
 rosbuild_add_executable(test_update src/UavState/test_update.cpp)
 target_link_libraries(test_update lib_state ${ARMADILLO_LIBRARIES})
+
+#the planner
+include_directories("src/tree")
