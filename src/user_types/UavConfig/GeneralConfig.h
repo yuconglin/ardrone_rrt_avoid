@@ -5,8 +5,9 @@ namespace user_types{
      
      double dt;
      double speed;//that is total speed just for planning
+     double rho;//turning radius
 
-     GeneralConfig():dt(0.),speed(0.);
+     GeneralConfig():dt(0.),speed(0.),rho(0.);
      //get para from xml
      virtual int ParafromXML(const char* pFilename)= 0;
      virtual double MaxAscend()= 0;

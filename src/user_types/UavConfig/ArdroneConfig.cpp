@@ -29,6 +29,7 @@ namespace user_types{
  	       this->yaw_rate= atof(iter->GetText().c_str() );
         }//for child ends
 	speed= sqrt(v*v+vz*vz);
+	rho= v/yaw_rate;
 
       }
       catch(ticpp::Exception& error)

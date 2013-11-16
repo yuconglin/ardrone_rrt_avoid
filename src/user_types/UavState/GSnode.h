@@ -1,4 +1,4 @@
-#pragma once
+pragma once
 //tree node for general state
 #include "GeneralState.h"
 
