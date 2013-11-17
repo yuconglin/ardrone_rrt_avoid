@@ -46,7 +46,7 @@ rosbuild_add_boost_directories()
 #target_link_libraries(example ${PROJECT_NAME})
 set(TINYCPP_DIR src/tinycpp/)
 include_directories( ${TINYCPP_DIR} )
-add_library(lib_tinycpp
+add_library(lib_ticpp
             ${TINYCPP_DIR}/ticpp.cpp  
 	    ${TINYCPP_DIR}/tinyxml.cpp
 	    ${TINYCPP_DIR}/tinyxmlerror.cpp
@@ -54,8 +54,8 @@ add_library(lib_tinycpp
 	    ${TINYCPP_DIR}/tinystr.cpp
 	   )
 
-rosbuild_add_library(QuadConfig src/QuadConfig/QuadConfig.cpp)
-include_directories(src/QuadConfig)
+	 #rosbuild_add_library(QuadConfig src/QuadConfig/QuadConfig.cpp)
+	 #include_directories(src/QuadConfig)
 
 # BEGIN: addon's for multirotor speed controller
 
@@ -82,10 +82,13 @@ add_library(jesus_codes
 # END::: addon's for multirotor speed controller
 
 # all the utils functions
+include_directories("src/user_types")
 include_directories("src/utils")
-add_library(lib_utils
+add_library(lib_utils          
+            src/utils/GetRho.cpp
+            src/utils/NotInRadius.cpp
+            src/utils/PointInPoly.cpp
             src/utils/systemtime.cpp
-	    src/utils/GetRho.cpp
            )
 
 #the main part
@@ -96,31 +99,45 @@ rosbuild_add_library(parrot_exe src/exe_node/ParrotExe.cpp)
 #the dubin test
 rosbuild_add_executable(exe_dubin src/exe_node/main_dubin.cpp)
 
-target_link_libraries(exe_dubin parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES}) 
+target_link_libraries(exe_dubin parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES}) 
 #command reaction test
 rosbuild_add_executable(exe_test src/exe_node/main_test.cpp)
-target_link_libraries(exe_test parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES}) 
+target_link_libraries(exe_test parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES}) 
 
-target_link_libraries(exe_dubin parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
+target_link_libraries(exe_dubin parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 #the command test
 rosbuild_add_executable(exe_test src/exe_node/main_test.cpp)
-target_link_libraries(exe_test parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
+target_link_libraries(exe_test parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 
 #fly
 rosbuild_add_executable(exe_fly src/exe_node/main_fly.cpp)
 #record
 rosbuild_add_executable(exe_record src/exe_node/main_record.cpp)
-target_link_libraries(exe_record parrot_exe jesus_codes dubin lib_tinycpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
+target_link_libraries(exe_record parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 
 #the planner
 include_directories("src/tree")
-#structs
-include_directories("src/user_types")
 
 #uav state update test
 add_library(lib_state
-            src/user_types/UavState/QuadState.cpp
+            src/user_types/UavState/ArdroneState.cpp
            )
 rosbuild_add_executable(test_update src/user_types/UavState/test_update.cpp)
-target_link_libraries(test_update lib_state ${ARMADILLO_LIBRARIES})
+target_link_libraries(test_update lib_state ${ARMADILLO_LIBRARIES} )
+  
+#user_types
+add_library(lib_user_types
+            src/user_types/Sampler3D/Sampler3D.cpp
+            src/user_types/UavBehavior/ArdroneBehavior.cpp
+            src/user_types/UavConfig/ArdroneConfig.cpp
+            src/user_types/UavState/ArdroneState.cpp
+           )
 
+#rrt planner
+include_directories("src")
+add_library(lib_clrrt
+     src/YlClRRT/YlClRRT.cpp
+  )
+
+rosbuild_add_executable(test_sample src/YlClRRT/main_test.cpp)
+target_link_libraries(test_sample lib_clrrt lib_user_types lib_utils lib_ticpp dubin ${ARMADILLO_LIBRARIES} )

@@ -3,7 +3,7 @@
 //controller gains
 #include "controller/config/parrot/config_controller_Parrot.h"
 
-namespace Ardrone_rrt_avoid{
+namespace user_types{
 
    int ArdroneState::Update(const arma::vec::fixed<3> u, double dt)
    { //first world reference to local reference

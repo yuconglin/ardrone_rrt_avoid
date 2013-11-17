@@ -1,5 +1,6 @@
 #include "ArdroneConfig.h"
 #include "ticpp.h"
+#include <cmath>
 
 namespace user_types{
 
@@ -34,19 +35,19 @@ namespace user_types{
       }
       catch(ticpp::Exception& error)
       {
-        cerr << "Error: " << error.m_details << endl;
+	std::cerr << "Error: " << error.m_details << std::endl;
         return 2;                 // signal error
       }
       return 0; 
    }//ParamfromXML ends
 
-   ArdroneConfig::MaxAscend()
+   double ArdroneConfig::MaxAscend()
    {
       double vz_max= vz;
       return atan2(vz_max,v);
    }//MaxAscend() ends
 
-   ArdroneConfig::Ascend()
+   double ArdroneConfig::Ascend()
    {
       return atan2(vz,v);
    }

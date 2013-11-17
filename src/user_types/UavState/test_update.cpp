@@ -3,7 +3,8 @@
 #include "armadillo"
 
 using namespace std;
-using namespace Ardrone_rrt_avoid;
+//using namespace Ardrone_rrt_avoid;
+using namespace user_types;
 
 int main(int argc, char** argv)
 {

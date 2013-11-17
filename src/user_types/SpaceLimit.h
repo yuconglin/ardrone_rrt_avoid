@@ -1,3 +1,5 @@
+#pragma once
+
 #include "PointInPoly.h"
 #include "point2D.h"  
 
@@ -11,7 +13,7 @@ namespace user_types{
      std::vector<point2D> vertex;
      //constructor
      SpaceLimit():h_upper(0.),h_lower(0.){};
-     
+     ~SpaceLimit(){};
      SpaceLimit(double _h_upper,double _h_lower,const std::vector<point2D> _vertex)
      :h_upper(_h_upper),h_lower(_h_lower),vertex(_vertex){};//SpaceLimit ends
      //to judge if a point is within the SpaceLimit

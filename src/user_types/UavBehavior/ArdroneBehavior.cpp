@@ -3,7 +3,7 @@
 
 namespace user_types{
 
-    ArdroneBehavior::InitState(double x_a,double y_a,double z_a,double _t,double _yaw)
+    GeneralState* ArdroneBehavior::InitState(double x_a,double y_a,double z_a,double _t,double _yaw)
     {
         return new ArdroneState(x_a,y_a,z_a,_t,_yaw);
     }

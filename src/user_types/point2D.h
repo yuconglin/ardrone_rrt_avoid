@@ -1,3 +1,4 @@
+#pragma once
 namespace user_types{
     
      struct point2D {

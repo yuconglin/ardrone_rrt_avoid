@@ -1,4 +1,7 @@
+#include "UavState/GeneralState.h"
+
 namespace user_types {
+  
   class Sampler3D{
     
     public:
@@ -6,11 +9,11 @@ namespace user_types {
       Sampler3D(double _x0,double _y0,double _z0,double _r0,double _sigr,double _th0, double _sigth, double _ga0, double _sigga);
       inline void SetSigmaGa(double _sigma_ga){this->sigma_ga=_sigma_ga;}
       //set params from root and goal
-      SetParams(double x_root,double y_root,double z_root,double x_goal,double y_goal,double z_goal);
+      void SetParams(double x_root,double y_root,double z_root,double x_goal,double y_goal,double z_goal);
       //GetSample
-      GetSample(double& x_a, double& y_a, double& z_a);
+      void GetSample(double& x_a,double& y_a,double& z_a,GeneralState* root_state_pt,GeneralState* goal_state_pt);
       //set sampling method
-      SetSampleMethod(int _method);
+      void SetSampleMethod(int _method);
     
     private:
       //parameters
@@ -28,7 +31,7 @@ namespace user_types {
       //uav config
       //GeneralConfig* config_pt;
       //space limit
-      SpaceLimit* splimit_pt;
-  }//Sampler3D ends
+      //user_types::SpaceLimit* splimit_pt;
+  };//Sampler3D ends
 
 };//namespace user_types ends

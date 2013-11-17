@@ -1,4 +1,7 @@
+#include "Sampler3D.hpp"
 #include "UavConfig/GeneralConfig.h"
+#include <boost/random.hpp>
+#include <ctime>
 
 namespace user_types{
 
@@ -6,22 +9,23 @@ namespace user_types{
 
    Sampler3D::Sampler3D(double _x0,double _y0,double _z0,double _r0,double _sigr,double _th0, double _sigth, double _ga0, double _sigga):x0(_x0),y0(_y0),z0(_z0),r0(_r0),sigma_r(_sigr),theta0(_th0),sigma_theta(_sigth),ga0(_ga0),sigma_ga(_sigga){ };
   
-   Sampler3D::SetParams(double x_root,double y_root,double z_root,double x_goal,double y_goal,double z_goal)
+   void Sampler3D::SetParams(double x_root,double y_root,double z_root,double x_goal,double y_goal,double z_goal)
    { 
      double Dx= x_goal-x_root;
      double Dy= y_goal-y_root;
      double Dz= z_goal-z_root;
      double theta0= atan2(Dy,Dx);
      
+     double r0,gamma0;
      if(sample_method ==0)
      {
-       double r0= sqrt(Dx*Dx+Dy*Dy+Dz*Dz);
-       double gamma0= asin(Dz/r0);
+       r0= sqrt(Dx*Dx+Dy*Dy+Dz*Dz);
+       gamma0= asin(Dz/r0);
      }
      else if(sample_method ==1)
      {
-       double r0= sqrt(Dx*Dx+Dy*Dy);
-       double gamma0= atan2(Dz,r0);
+       r0= sqrt(Dx*Dx+Dy*Dy);
+       gamma0= atan2(Dz,r0);
      }
      else {;}
     
@@ -38,21 +42,21 @@ namespace user_types{
     
    };//SetParams ends
 
-   Sampler3D::GetSample(double& x_a,double& y_a,double& z_a,GeneralState* root_state_pt,GeneralState* goal_state_pt)
+   void Sampler3D::GetSample(double& x_a,double& y_a,double& z_a,GeneralState* root_state_pt,GeneralState* goal_state_pt)
    {
       boost::mt19937 generator;
       static unsigned int seed = 0;
       generator.seed(static_cast<unsigned int>(std::time(0))+(++seed));
-      boost::normal_distribution<> r_distribution(my_sampleparas.r0,my_sampleparas.sigma_r);
+      boost::normal_distribution<> r_distribution(r0,sigma_r);
       boost::variate_generator<boost::mt19937&,boost::normal_distribution<> > r_nor(generator, r_distribution);  
       double r= r_nor();
 	      
-      boost::uniform_real<> the_uniform(my_sampleparas.theta0-M_PI/2.0, my_sampleparas.theta0+M_PI/2.0);
+      boost::uniform_real<> the_uniform(theta0-M_PI/2.0, theta0+M_PI/2.0);
       boost::variate_generator<boost::mt19937&,boost::uniform_real<> > the_nor(generator, the_uniform);
       double theta= the_nor();
       if(sample_method == 0)
       {
-	boost::normal_distribution<> ga_distribution(my_sampleparas.ga0, my_sampleparas.sigma_ga);
+	boost::normal_distribution<> ga_distribution(ga0, sigma_ga);
 	boost::variate_generator<boost::mt19937&,boost::normal_distribution<> > ga_nor(generator, ga_distribution); 
 	double ga= ga_nor();
 
@@ -83,7 +87,7 @@ namespace user_types{
       }
    }//GetSample ends
    
-   Sampler3D::SetSampleMethod(int _method)
+   void Sampler3D::SetSampleMethod(int _method)
    {
      if( _method!=0&& _method!=1)
      {
