@@ -1,6 +1,7 @@
 #include "ArdroneConfig.h"
 #include "ticpp.h"
 #include <cmath>
+#include "armadillo"
 
 namespace user_types{
 
@@ -51,5 +52,26 @@ namespace user_types{
    {
       return atan2(vz,v);
    }
+
+   void NormalizeU(arma::vec::fixed<3>& u)
+   {
+      double uxy_mag= sqrt( u(0)*u(0)+u(1)*u(1) );
+      double uz_mag= fabs(u(2));
+   
+      if(uxy_mag!=0 && uz_mag!=0)
+      {
+        double cons= min(this->v/uxy_mag,this->vz/uz_mag);
+        u<< u(0)*cons<< u(1)*cons << u(2)*cons;  
+      }
+      else if(uxy_mag==0 && uz_mag!=0)
+      u<<0.<<0.<<vz/uz_mag;
+      else if(uxy_mag!=0 && uz_mag==0)
+      {
+        double cons= this->v/uxy_mag;
+        u<< u(0)*cons<< u(1)*cons<< 0;
+      }
+      else 
+        u<<0.<<0.<<0.;
+   }//NormalizeU ends
 
 };
