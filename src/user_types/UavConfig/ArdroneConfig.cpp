@@ -31,7 +31,7 @@ namespace user_types{
         }//for child ends
 	speed= sqrt(v*v+vz*vz);
 	rho= v/yaw_rate;
-
+        //end_r= max(speed*dt,0.15);
       }
       catch(ticpp::Exception& error)
       {

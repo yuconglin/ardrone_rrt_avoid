@@ -17,6 +17,7 @@ int main(int argc, char** argv)
    //set config
    yc_rrt.SetConfig( new ArdroneConfig() );
    yc_rrt.ConfigFill("/home/yucong/.ros/param.xml");
+   yc_rrt.SetCheckParas();
    //seg geo fence
    vector<point2D> vec_rect;
    vec_rect.push_back(point2D(0,-3) );

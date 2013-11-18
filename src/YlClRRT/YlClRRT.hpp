@@ -25,28 +25,31 @@ namespace Ardrone_rrt_avoid{
        //about config
        YlClRRT();
        //~YlClRRT();
+       //config
        inline void SetConfig(user_types::GeneralConfig* _config_pt){this->config_pt= _config_pt;}
-       void ConfigFill(const char* pFilename);
-       
+       void ConfigFill(const char* pFilename); 
+       //about set dubins collision parameters
+       void SetCheckParas();
        //about geo-fencing
        void SetGeoFence(user_types::SpaceLimit* _space_pt);
-
        //set root and goal node
        void SetRoot( user_types::GeneralState* state_pt );
        void SetGoal( user_types::GeneralState* state_pt );
        void SetBehavior(user_types::GeneralBehavior* _behavior_pt );
- 
+       //about sample
        void SetSampleParas();
        void SampleNode();
-
+       //check all necesarry flags
        void CheckFlagsSet();
-
+       //expand trees
+       void ExpandTree();
      private:
        //user defined times
        user_types::Sampler3D sampler;
        user_types::SpaceLimit* spaceLimit_pt;
        user_types::GeneralConfig* config_pt;
        user_types::GeneralBehavior* behavior_pt;
+       user_types::checkParas checkparas;
        //root and goal nodes
        user_types::GSnode goal_node;
        user_types::GSnode root_node;
@@ -60,6 +63,7 @@ namespace Ardrone_rrt_avoid{
        bool if_config_set;
        bool if_spacelimit_set;
        bool if_behavior_set;
+       bool if_checkparas_set;
        //check for flags
        void CheckGoalSet();
        void CheckRootSet();
@@ -68,7 +72,8 @@ namespace Ardrone_rrt_avoid{
        void CheckConfigSet();
        void CheckSpaceLimitSet();
        void CheckBehaviorSet();
-       
+       void CheckParasSet();
+
    };//class YlClRRT ends
 
 

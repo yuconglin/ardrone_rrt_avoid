@@ -6,6 +6,7 @@ namespace user_types{
      double dt;
      double speed;//that is total speed just for planning
      double rho;//turning radius
+     //double end_r;
 
      GeneralConfig():dt(0.),speed(0.),rho(0.){};
      ~GeneralConfig(){};

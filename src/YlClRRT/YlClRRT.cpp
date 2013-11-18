@@ -47,6 +47,14 @@ namespace Ardrone_rrt_avoid{
      if_config_set= true;
    }//ConfigFill ends
 
+   void YlClRRT::SetCheckParas()
+   {
+      CheckConfigSet();
+      checkParas.end_r= max( config_pt->speed*config_pt->dt,0.15 );
+      checkParas.ds_check= config_pt->speed*config_pt->dt;
+      checkParas.ds_insert= 5*checkParas.ds_check;
+   }//CheckParasSet ends
+
    void YlClRRT::SetGeoFence(user_types::SpaceLimit* _space_pt)
    {
      spaceLimit_pt= _space_pt;
@@ -224,6 +232,20 @@ namespace Ardrone_rrt_avoid{
      }
 
    }//CheckBehaviorSet() ends
+
+   void YlClRRT::CheckParasSet()
+   {
+      if(!if_checkparas_set){
+        try {
+	     throw std::runtime_error ("paras for check dubins not set");
+        }
+        catch (std::runtime_error &e) {
+	   std::cout<< "Caught a runtime_error exception: "
+	            << e.what () << '\n';
+        } 
+      }  
+
+   }//CheckParasSet() ends
    
    void YlClRRT::CheckFlagsSet()
    {
