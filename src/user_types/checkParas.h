@@ -1,6 +1,6 @@
 #pragma once
 //a collection of parameters used in dubins check
-namespace user_type{
+namespace user_types{
   
   struct checkParas{
        double end_r;

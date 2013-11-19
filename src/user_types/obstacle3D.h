@@ -2,7 +2,20 @@
 
 namespace user_types{
   
-    struct obstacle3D{
+     struct obs3D {
+            double x;
+	    double y;
+	    double z;
+	    double r;
+	    obs3D( ):x(0),y(0),z(0),r(1)
+	    {
+	    }
+	    obs3D(double _x,double _y,double _z,double _r):x(_x),y(_y),z(_z),r(_r)
+	    {
+	    }
+     };
+
+     struct obstacle3D{
             double x1,x2,x3;
 	    double heading;
 	    double speed;
@@ -36,18 +49,5 @@ namespace user_types{
 	    }
 
     };//struct ends
-
-    struct obs3D {
-            double x;
-	    double y;
-	    double z;
-	    double r;
-	    obs3D( ):x(0),y(0),z(0),r(1)
-	    {
-	    }
-	    obs3D(double _x,double _y,double _z,double _r):x(_x),y(_y),z(_z),r(_r)
-	    {
-	    }
-     };
 
 };//namespaces ends

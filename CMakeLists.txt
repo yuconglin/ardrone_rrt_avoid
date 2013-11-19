@@ -85,10 +85,15 @@ add_library(jesus_codes
 include_directories("src/user_types")
 include_directories("src/utils")
 add_library(lib_utils          
-            src/utils/GetRho.cpp
-            src/utils/NotInRadius.cpp
-            src/utils/PointInPoly.cpp
-            src/utils/systemtime.cpp
+src/utils/CircleVelocity.cpp
+src/utils/DubinsSubCheck.cpp
+src/utils/DubinsTotalCheck.cpp
+src/utils/GetRho.cpp
+src/utils/LineVelocity.cpp
+src/utils/NotInRadius.cpp
+src/utils/PointInPoly.cpp
+src/utils/SingleCheck.cpp
+src/utils/systemtime.cpp
            )
 
 #the main part

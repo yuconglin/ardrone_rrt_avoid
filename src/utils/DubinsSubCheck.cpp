@@ -3,7 +3,7 @@
 #include "quadDubins3D.h"
 #include "QuadCfg.h"
 //utils
-#include "ColliCheck.h"
+#include "SingleCheck.h"
 #include "LineVelocity.h"
 #include "CircleVelocity.h"
 //user defined types
@@ -13,21 +13,23 @@
 #include "UavConfig/GeneralConfig.h"
 //other libraries
 #include "armadillo"
+//std lib
+#include <vector>
 
 using namespace user_types;
 
 namespace utils{
 
-    int DubinsSubCheck(quadDubins3D& db_3d.//the dubins curve
+    int DubinsSubCheck(quadDubins3D& db_3d,//the dubins curve
                      user_types::GeneralState* st_init,//initial actual state
 		     user_types::GeneralState* st_final,//final state
-		     QuadCfg cfg_target,//stop quad state
-		     const vector<obstacle3D>& obstacles;
-		     const user_types::checkParas check_paras;
-		     user_types::GeneralConfig* config_pt;
+		     QuadCfg& cfg_target,//stop quad state
+		     const std::vector<user_types::obstacle3D>& obstacles,
+		     const user_types::checkParas& check_paras,
+		     user_types::GeneralConfig* config_pt,
 		     std::vector<user_types::GeneralState*> path_sub,//path for log
 		     double& sub_length,//actual length tranversed
-		     int idx_seg;//which segment: 0,1,2
+		     int idx_seg//which segment: 0,1,2
      )//don't forget to delete if needed
      {
         if(!(idx_seg==0||idx_seg==1||idx_seg==2) ){
@@ -79,7 +81,7 @@ namespace utils{
         double s_end= db_3d.CloseLength(cfg2.x,cfg2.y,cfg2.z);
 
 	GeneralState* st_now= st_init->copy();
-        int n_seg= floor(length_sub/check_paras.ds_check);
+        int n_seg= floor(sub_length/check_paras.ds_check);
         arma::vec::fixed<3> u, v_target, v_end;
 	
 	//the while loop

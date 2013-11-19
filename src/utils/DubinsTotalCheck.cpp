@@ -16,9 +16,9 @@ namespace utils{
                          user_types::GeneralState* st_init->//initial actual state
 			 user_types::GeneralState* st_final,//final state
 			 QuadCfg cfg_target,//stop quad state
-			 const vector<obstacle3D>& obstacles;
-                         const user_types::checkParas check_paras;
-			 user_types::GeneralConfig* config_pt;
+			 const vector<user_types::obstacle3D>& obstacles,
+                         const user_types::checkParas check_paras,
+			 user_types::GeneralConfig* config_pt,
 			 std::vector<user_types::GeneralState*> path_log,//path for log
 			 double& actual_length//actual length tranversed
 			 )

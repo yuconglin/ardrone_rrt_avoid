@@ -33,15 +33,7 @@ namespace utils{
 	double de_length= fabs(cfg_end.theta-cfg_start.theta)*rho;
 	double h_diff= cfg_end.z-cfg_start.z;
 	double tan_gamma= h_diff/de_length;
-	//to calculate the desired yaw
-	//Rxy is the vector pointed to the current position from the center
-	//Vxy is the quad's velocity vector in xy plan
-	arma::vec::fixed<3> Rxy, Vxy, Dxy;
-	Rxy<< x_est-c_n << y_est-c_e << 0;
-	Vxy<< vx_est << vy_est << 0;
-	Dxy = cross(Vxy, Rxy);
-	Dxy = cross(Rxy, Dxy);
-	//vectors for calculation
+        //vectors for calculation
 	arma::vec::fixed<3> u1, u2, fc1, fc2;
 	//calculate starts
 	double r_n= x_a; 
