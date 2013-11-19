@@ -1,11 +1,11 @@
 #include "armadillo"
-#include "QuadState.h"
+#include "ArdroneState.h"
 //controller gains
 #include "controller/config/parrot/config_controller_Parrot.h"
 
-namespace Ardrone_rrt_avoid{
+namespace user_types{
 
-   int QuadState::Update(const arma::vec::fixed<3> u, double dt)
+   int ArdroneState::Update(const arma::vec::fixed<3> u, double dt)
    { //first world reference to local reference
       double ux= u(0)*cos(yaw)+ u(1)*sin(yaw);
       double uy= -u(0)*sin(yaw)+ u(1)*cos(yaw);
@@ -76,7 +76,7 @@ namespace Ardrone_rrt_avoid{
       return 0;
    }//Update ends
 
-   void QuadState::LogData(std::ofstream& file)
+   void ArdroneState::LogData(std::ofstream& file)
    {
       if(!file.is_open() )
       {
@@ -92,5 +92,9 @@ namespace Ardrone_rrt_avoid{
       file<< t<< " "<< x<<" "<< y<<" "<< z<<" "<< yaw<<" "
 	  << vx<<" "<< vy<<" "<< vz<<" "<< yaw_rate<< std::endl;
    }//LogData ends
-
+   
+   void GeneralState* ArdroneState::copy()
+   {  //potential memory link
+      return new ArdroneState(x,y,z,t,yaw,vx,vy,vz,yaw_rate);
+   }
 };//namespace ends

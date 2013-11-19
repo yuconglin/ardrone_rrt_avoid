@@ -1,6 +1,10 @@
 close all;
 
+<<<<<<< HEAD
 log_data =fopen('../../data/20131111-160035:0.5:0.0:0.0:test.txt','r');
+=======
+log_data =fopen('../../data/20131111-142239:1.0:0.0:0.0:test.txt','r');
+>>>>>>> 025624cadf7cae967175f5b6b2712c1f5a80e0fa
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -51,30 +55,31 @@ while ischar(log_line)
    
 end
 
-%plot
-figure;
-plot( reg(:,1), reg(:,9), '--r' );
-hold on;
-plot( reg(:,1), reg(:,10), '--g' );
-legend('vx_b','vy_b');
+% %plot
+% figure;
+% plot( reg(:,1), reg(:,9), '--r' );
+% hold on;
+% plot( reg(:,1), reg(:,10), '--g' );
+% legend('vx_b','vy_b');
+% 
+% figure;
+% %hold;
+% %ind = find( record1(:,2) > 0);
+% plot( reg(:,1), reg(:,3), '--r' );
+% hold on;
+% plot( reg(:,1), reg(:,4), '--g' );
+% plot( reg(:,1), reg(:,5), '--b' );
+% legend('vx','vy','vz');
+% 
+% figure;
+% %ind= find( reg(:,6)>0 );
+% hold on;
+% ylim([-90 90]);
+% plot( reg(:,1), reg(:,6)*180/pi, '--k' );
+% plot( reg(:,1), reg(:,7), '--r' );
+% legend('wz','yaw');
 
-figure;
-%hold;
-%ind = find( record1(:,2) > 0);
-plot( reg(:,1), reg(:,3), '--r' );
-hold on;
-plot( reg(:,1), reg(:,4), '--g' );
-plot( reg(:,1), reg(:,5), '--b' );
-legend('vx','vy','vz');
-
-figure;
-%ind= find( reg(:,6)>0 );
-hold on;
-ylim([-90 90]);
-plot( reg(:,1), reg(:,6)*180/pi, '--k' );
-plot( reg(:,1), reg(:,7), '--r' );
-legend('wz','yaw');
-
+<<<<<<< HEAD
 % compare_data= fopen('../../data/update_rec.txt','r');
 % if compare_data == -1
 %      error('File compare_data could not be opened, check name or path.')
@@ -124,3 +129,61 @@ legend('wz','yaw');
 % plot( reg(:,1), reg(:,12), '-g' );
 % plot( reg(:,1), reg(:,2), '-b' );
 % legend('x_c','y_c','z_c','x','y','z');
+=======
+compare_data= fopen('../../data/update_rec.txt','r');
+if compare_data == -1
+     error('File compare_data could not be opened, check name or path.')
+end
+log_line= fgetl(compare_data);
+reg_c = [];
+
+while ischar(log_line)
+    %0.1 0.0160922 0 1 0 0.107281 0 0 0
+   log_reg = textscan(log_line,'%f %f %f %f %f %f %f %f %f');
+   t = log_reg{1};
+   x = log_reg{2};
+   y = log_reg{3};
+   z = log_reg{4};
+   yaw = log_reg{5};
+   vx = log_reg{6};
+   vy = log_reg{7};
+   vz = log_reg{8};
+   v_yaw = log_reg{9};
+     
+   log_line= fgetl(compare_data);
+   
+   reg_c= [reg_c; [t,x,y,z,yaw,vx,vy,vz,v_yaw] ]; 
+   
+end
+
+%plot velocity compare
+figure;
+hold on;
+plot( reg_c(:,1), reg_c(:,6), '*r' );
+plot( reg_c(:,1), reg_c(:,7), '*g' );
+plot( reg_c(:,1), reg_c(:,8), '*b' );
+plot( reg(:,1), reg(:,3), '--r' );
+plot( reg(:,1), reg(:,4), '--g' );
+plot( reg(:,1), reg(:,5), '--b' );
+legend('vx_c','vy_c','vz_c','vx','vy','vz');
+
+%plot angular
+figure;
+hold on;
+ylim([-90 90]);
+plot( reg_c(:,1), reg_c(:,9)*180/pi, '*k' );
+plot( reg_c(:,1), reg_c(:,5), '*b' );
+plot( reg(:,1), reg(:,6)*180/pi, '--k' );
+plot( reg(:,1), reg(:,7), '--r' );
+legend('yaw\_rate_c','yaw_c','yaw_rate','yaw');
+
+figure;
+hold on;
+plot( reg_c(:,1), reg_c(:,2), '*r' );
+plot( reg_c(:,1), reg_c(:,3), '*g' );
+plot( reg_c(:,1), reg_c(:,4), '*b' );
+plot( reg(:,1), reg(:,11), '-r' );
+plot( reg(:,1), reg(:,12), '-g' );
+plot( reg(:,1), reg(:,2), '-b' );
+legend('x_c','y_c','z_c','x','y','z');
+>>>>>>> 025624cadf7cae967175f5b6b2712c1f5a80e0fa

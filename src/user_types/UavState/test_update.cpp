@@ -1,13 +1,14 @@
 #include <fstream>
-#include "QuadState.h"
+#include "ArdroneState.h"
 #include "armadillo"
 
 using namespace std;
-using namespace Ardrone_rrt_avoid;
+//using namespace Ardrone_rrt_avoid;
+using namespace user_types;
 
 int main(int argc, char** argv)
 {
-   QuadState quad_state;
+   ArdroneState quad_state;
    quad_state.z= 0.8;
    double dt= 0.1;
    double t_limit= 4.0;
