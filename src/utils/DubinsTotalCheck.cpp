@@ -3,7 +3,7 @@
 #include "quadDubins3D.h"
 #include "QuadCfg.h"
 //utils
-#include "ColliCheck.h"
+#include "SingleCheck.h"
 //user defined types
 #include "UavState/GeneralState.h"
 #include "obstacle3D.h"
@@ -26,7 +26,7 @@ namespace utils{
       if(sqrt(pow(st_init->>x-cfg_target.x,2)+pow(st_init->>y-cfg_target.y,2)+pow(st_init->>z-cfg_target.z,2))< check_paras.end_r )
       {
          std::cout <<"already there"<<std::endl;
-         st_next= st_init->copy();
+         st_final= st_init;
          return 1;
       }
       //set actual_length and path_log to default
@@ -78,7 +78,7 @@ namespace utils{
       //check ends
       //collision check for each segment of the dubins curve
       int result, colli= 1;
-      user_types::GeneralState* st_first= st_init->copy();
+      user_types::GeneralState* st_first= st_init->copy(),st_next;
  
       for(int i= idx_seg;i!= 3;++i)
       {
@@ -109,7 +109,10 @@ namespace utils{
          else {;}//nothing
 
       }//for int i ends
-      st_final= st_next;
+      
+      st_final= st_next->copy();
+      delete st_next;
+      delete st_first;
       return colli;
    }//DubinsTotalCheck ends
 

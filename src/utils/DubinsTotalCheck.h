@@ -1,15 +1,17 @@
 #pragma once
 
-//quad releated
-#include "quadDubins3D.h"
-#include "QuadCfg.h"
-//utils
-#include "ColliCheck.h"
-//user defined types
-#include "UavState/GeneralState.h"
-#include "obstacle3D.h"
-#include "checkParas.h"
-#include "UavConfig/GeneralConfig.h"
+#include <vector>
+//forward declaration
+struct quadDubins3D;
+struct QuadCfg;
+struct obstacle3D;
+
+namespace user_types{
+  struct GeneralState;
+  struct checkParas;
+  struct GeneralConfig;
+  struct obstacle3D;
+}
 
 namespace utils{
     

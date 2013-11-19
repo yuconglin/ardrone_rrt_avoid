@@ -89,22 +89,22 @@ namespace utils{
 	{  //get u
            if(type== L_SEG||type== R_SEG)
            {
-	     CircleVelocity(st_now->x,st_now->y,st_now->z,cfg_start,cfg_end,type,config_pt,u );
+	     CircleVelocity(st_now->x,st_now->y,st_now->z,cfg1,cfg2,type,config_pt,u );
 	   }//if type==L_SEG or R_SEG ends
 	   else //type== S_SEG
 	   { 
-	     LineVelocity(st_now->x,st_now->y,st_now->z,cfg_start,cfg_end,config_pt,u);
+	     LineVelocity(st_now->x,st_now->y,st_now->z,cfg1,cfg1,config_pt,u);
 	   }//else ends
            //normalize u
 	   config_pt->NormalizeU(u);
 	   //state update
 	   GeneralState* st_pre= st_now->copy();
-	   st_now.Update(u,dt);
+	   st_now->Update(u,config_pt->dt);
            sub_length+= sqrt(pow(st_now->x - st_pre->x,2)+pow(st_now->y - st_pre->y,2)+pow(st_now->z - st_pre->z,2) ); 
 	   delete st_pre;
            
 	   //collision check
-           if( floor(sub_length/ds_check)> n_seg )
+           if( floor(sub_length/check_paras.ds_check)> n_seg )
 	   {
 	     if( SingleCheck(st_now,obstacles) )
 	     {
@@ -116,7 +116,7 @@ namespace utils{
 	   
 	   GeneralState* st_temp= st_now->copy();
 	   path_sub.push_back(st_temp);
-	   n_seg= floor(sub_length/ds_check);
+	   n_seg= floor(sub_length/check_paras.ds_check);
 
 	   //end conditions
            double target_dis=sqrt(pow(cfg_target.x-st_now->x,2)+pow(cfg_target.y-st_now->y,2)+pow(cfg_target.z-st_now->z,2));
