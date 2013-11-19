@@ -32,6 +32,10 @@ namespace Ardrone_rrt_avoid{
        void SetCheckParas();
        //about geo-fencing
        void SetGeoFence(user_types::SpaceLimit* _space_pt);
+       //access
+       inline double GetRho(){return config_pt->rho;}
+       inline user_types::checkParas* GetCheckParasPt(){return &checkParas;}
+       inline user_types::GeneralConfig* GetConfigPt(){return config_pt;}
        //set root and goal node
        void SetRoot( user_types::GeneralState* state_pt );
        void SetGoal( user_types::GeneralState* state_pt );
