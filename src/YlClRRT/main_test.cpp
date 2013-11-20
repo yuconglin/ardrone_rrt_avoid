@@ -65,8 +65,10 @@ int main(int argc, char** argv)
    user_types::GeneralState* st_final= new ArdroneState();
    user_types::GeneralState* st_init= new ArdroneState(x_root+0.4,y_root-0.4,z_root+0.2,0.,yaw_root);
    utils::DubinsTotalCheck(db_3d,st_init,st_final,end,obstacles,yc_rrt.GetCheckParasPt(),yc_rrt.GetConfigPt(),path_log,length);
-   cout<<"length after: "<< length<< endl;
    
+   cout<<"length after: "<< length<< endl;
+   cout<<"path_log size: "<< path_log.size()<< endl; 
+
    ofstream myfile("dubin_log.txt");
    for(int i=0;i!= path_log.size();++i)
    {
@@ -75,5 +77,6 @@ int main(int argc, char** argv)
      delete st_pt;
    }//for ends
    myfile.close();
- 
+   delete st_final;
+   delete st_init;
 }//main ends

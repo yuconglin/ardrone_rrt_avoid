@@ -20,7 +20,7 @@ namespace utils{
 			 std::vector<user_types::obstacle3D>& obstacles,
                          user_types::checkParas* checkparas_pt,
 			 user_types::GeneralConfig* config_pt,
-			 std::vector<user_types::GeneralState*> path_log,//path for log
+			 std::vector<user_types::GeneralState*>& path_log,//path for log
 			 double& actual_length//actual length tranversed
 			 )
    {  //don't forget to delete if needed 
@@ -80,8 +80,7 @@ namespace utils{
       //check ends
       //collision check for each segment of the dubins curve
       int result, colli= 1;
-      user_types::GeneralState* st_first= st_init->copy();
-      user_types::GeneralState* st_next= st_init->copy();
+      user_types::GeneralState* st_first= st_init->copy(), *st_next= st_init->copy();
  
       for(int i= idx_seg;i!= 3;++i)
       {
@@ -91,8 +90,9 @@ namespace utils{
          //modify total length
 	 actual_length+= length_sub;
 	 //update logged path
+	 std::cout<< "path_sub size: "<< path_sub.size()<< std::endl;
 	 path_log.insert( path_log.end(),path_sub.begin(),path_sub.end() ); 
-
+         
 	 if(result==-1)
          {//collision
          if( actual_length>= 0.5*(db_3d.seg_param[0]+db_3d.seg_param[1]+db_3d.seg_param[2]) )
@@ -107,16 +107,18 @@ namespace utils{
          }
          else if(result== 0)//target not reached,no collision
          {
-	   std::cout<< "st_next: "<<st_next->x <<" "<< st_next->y << " " <<st_next->z << std::endl;
-	   st_first= st_next->copy();
+	   //st_first= st_next->copy();
+	   *st_first= *st_next;
          }
          else {;}//nothing
+      
+         std::cout<< "st_next: "<<st_next->x <<" "<< st_next->y << " " <<st_next->z << std::endl;
 
       }//for int i ends
       
-      st_final= st_next->copy();
-      delete st_next;
+      *st_final= *st_next;
       delete st_first;
+      delete st_next;
       return colli;
    }//DubinsTotalCheck ends
 

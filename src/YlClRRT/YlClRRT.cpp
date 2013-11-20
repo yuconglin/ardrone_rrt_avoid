@@ -30,10 +30,10 @@ namespace Ardrone_rrt_avoid{
      if_sampler_para_set= false;
      if_config_set= false;
      if_spacelimit_set= false;
-
+     if_behavior_set= false;
+     if_checkparas_set= false;
    }//YlClRRT() ends
-
-   /*
+ 
    YlClRRT::~YlClRRT()
    {
      if(if_spacelimit_set)
@@ -42,8 +42,16 @@ namespace Ardrone_rrt_avoid{
        delete config_pt;
      if(if_behavior_set)
        delete behavior_pt;
+     if(if_sampler_para_set)
+       delete sampler_pt;
+     if(if_checkparas_set)
+       delete checkparas_pt;
+     //root and goal
+     goal_node.free_point();
+     root_node.free_point();
+     sample_node.free_point();
      //delete the whole tree's pointer
-   }*/  //~YlClRRT() ends  
+   }  //~YlClRRT() ends  
 
    void YlClRRT::ConfigFill(const char* pFilename)
    {
@@ -58,6 +66,7 @@ namespace Ardrone_rrt_avoid{
       checkparas_pt->end_r= std::max( config_pt->speed*config_pt->dt,0.15 );
       checkparas_pt->ds_check= config_pt->speed*config_pt->dt;
       checkparas_pt->ds_insert= 5*checkparas_pt->ds_check;
+      if_checkparas_set= true;
    }//CheckParasSet ends
 
    void YlClRRT::SetGeoFence(user_types::SpaceLimit* _space_pt)

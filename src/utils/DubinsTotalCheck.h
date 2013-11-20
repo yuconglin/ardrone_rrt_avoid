@@ -22,7 +22,7 @@ namespace utils{
 			 std::vector<user_types::obstacle3D>& obstacles,
                          user_types::checkParas* checkparas_pt,
 			 user_types::GeneralConfig* config_pt,
-			 std::vector<user_types::GeneralState*> path_log,//path for log
+			 std::vector<user_types::GeneralState*>& path_log,//path for log
 			 double& actual_length//actual length tranversed
 			 );
 

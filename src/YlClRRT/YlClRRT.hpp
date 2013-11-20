@@ -34,7 +34,7 @@ namespace Ardrone_rrt_avoid{
      public:
        //about config
        YlClRRT();
-       //~YlClRRT();
+       ~YlClRRT();
        //config
        inline void SetConfig(user_types::GeneralConfig* _config_pt){this->config_pt= _config_pt;}
        void ConfigFill(const char* pFilename); 

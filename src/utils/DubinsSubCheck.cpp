@@ -27,7 +27,7 @@ namespace utils{
 		     std::vector<user_types::obstacle3D>& obstacles,
 		     user_types::checkParas* checkparas_pt,
 		     user_types::GeneralConfig* config_pt,
-		     std::vector<user_types::GeneralState*> path_sub,//path for log
+		     std::vector<user_types::GeneralState*>& path_sub,//path for log
 		     double& sub_length,//actual length tranversed
 		     int idx_seg//which segment: 0,1,2
      )//don't forget to delete if needed
@@ -93,7 +93,7 @@ namespace utils{
 	   }//if type==L_SEG or R_SEG ends
 	   else //type== S_SEG
 	   { 
-	     LineVelocity(st_now->x,st_now->y,st_now->z,cfg1,cfg1,config_pt,u);
+	     LineVelocity(st_now->x,st_now->y,st_now->z,cfg1,cfg2,config_pt,u);
 	   }//else ends
            //normalize u
 	   config_pt->NormalizeU(u);
@@ -141,7 +141,8 @@ namespace utils{
 
 	}//while ends
         std::cout<<"st_now: "<< st_now->x << " "<< st_now->y <<" "<< st_now->z<< std::endl; 
-	st_final= st_now->copy();
+	//st_final= st_now->copy();
+	*st_final= *st_now;
 	std::cout<<"st_final: "<<st_final->x<<" "<<st_final->y<<" "<<st_final->z << std::endl;
 	delete st_now;
         if(if_colli) result= -1;
