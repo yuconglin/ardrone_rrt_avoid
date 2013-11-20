@@ -16,7 +16,7 @@ namespace user_types{
        K1= 10*arma::eye<arma::mat>(3,3); 
        K2= 10*arma::eye<arma::mat>(3,3);  	
      }
-     ~GeneralConfig(){};
+     virtual ~GeneralConfig(){};
      //get para from xml
      virtual int ParamfromXML(const char* pFilename)= 0;
      virtual double MaxAscend()= 0;

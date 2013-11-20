@@ -80,7 +80,8 @@ namespace utils{
       //check ends
       //collision check for each segment of the dubins curve
       int result, colli= 1;
-      user_types::GeneralState* st_first= st_init->copy(),*st_next;
+      user_types::GeneralState* st_first= st_init->copy();
+      user_types::GeneralState* st_next= st_init->copy();
  
       for(int i= idx_seg;i!= 3;++i)
       {
@@ -106,7 +107,8 @@ namespace utils{
          }
          else if(result== 0)//target not reached,no collision
          {
-           st_first= st_next->copy();
+	   std::cout<< "st_next: "<<st_next->x <<" "<< st_next->y << " " <<st_next->z << std::endl;
+	   st_first= st_next->copy();
          }
          else {;}//nothing
 

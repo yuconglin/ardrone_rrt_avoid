@@ -140,8 +140,9 @@ namespace utils{
 	     break;
 
 	}//while ends
-        
+        std::cout<<"st_now: "<< st_now->x << " "<< st_now->y <<" "<< st_now->z<< std::endl; 
 	st_final= st_now->copy();
+	std::cout<<"st_final: "<<st_final->x<<" "<<st_final->y<<" "<<st_final->z << std::endl;
 	delete st_now;
         if(if_colli) result= -1;
         return result;

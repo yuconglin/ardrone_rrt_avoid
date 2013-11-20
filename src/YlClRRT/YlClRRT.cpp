@@ -66,10 +66,10 @@ namespace Ardrone_rrt_avoid{
      if_spacelimit_set= true;
    }
    
-   inline double YlClRRT::GetRho()
+   double YlClRRT::GetRho()
    {
      return config_pt->rho;
-   }
+   } 
    
    //set root and goal node
    void YlClRRT::SetRoot( GeneralState* state_pt )

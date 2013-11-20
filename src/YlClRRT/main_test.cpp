@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 
    double length= 0.;
    vector<user_types::GeneralState*> path_log;
-   user_types::GeneralState* st_final= NULL;
+   user_types::GeneralState* st_final= new ArdroneState();
    user_types::GeneralState* st_init= new ArdroneState(x_root+0.4,y_root-0.4,z_root+0.2,0.,yaw_root);
    utils::DubinsTotalCheck(db_3d,st_init,st_final,end,obstacles,yc_rrt.GetCheckParasPt(),yc_rrt.GetConfigPt(),path_log,length);
    cout<<"length after: "<< length<< endl;
