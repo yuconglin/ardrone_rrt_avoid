@@ -2,18 +2,28 @@
 //generic tree 
 #include "tree.hh"
 //uav state
-#include "UavState/GeneralState.h"
+//#include "UavState/GeneralState.h"
 //tree node
 #include "UavState/GSnode.h"
 //used structs
 //not everyone needs to be an object, some can just be pointers
 //list for cpp funcions to include
-#include "Sampler3D/Sampler3D.hpp"
+//#include "Sampler3D/Sampler3D.hpp"
 //user types
-#include "UavBehavior/GeneralBehavior.hpp"
-#include "UavConfig/GeneralConfig.h"
-#include "UavState/GeneralState.h"
-#include "SpaceLimit.h"
+//#include "UavBehavior/GeneralBehavior.hpp"
+//#include "UavConfig/GeneralConfig.h"
+//#include "UavState/GeneralState.h"
+//#include "SpaceLimit.h"
+
+//forward declaration
+namespace user_types{
+   struct GeneralState;
+   class Sampler3D;
+   struct GeneralBehavior;
+   struct GeneralConfig;
+   struct SpaceLimit;
+   struct checkParas;
+}
 
 typedef tree<user_types::GSnode>::iterator TREEIter;
 
@@ -30,16 +40,18 @@ namespace Ardrone_rrt_avoid{
        void ConfigFill(const char* pFilename); 
        //about set dubins collision parameters
        void SetCheckParas();
+        //set user-defined types
+       void SetBehavior(user_types::GeneralBehavior* _behavior_pt );
+       void SetSampler(user_types::Sampler3D* _sampler_pt );
        //about geo-fencing
        void SetGeoFence(user_types::SpaceLimit* _space_pt);
        //access
-       inline double GetRho(){return config_pt->rho;}
-       inline user_types::checkParas* GetCheckParasPt(){return &checkParas;}
+       inline double GetRho();
+       inline user_types::checkParas* GetCheckParasPt(){return this->checkparas_pt;}
        inline user_types::GeneralConfig* GetConfigPt(){return config_pt;}
        //set root and goal node
        void SetRoot( user_types::GeneralState* state_pt );
        void SetGoal( user_types::GeneralState* state_pt );
-       void SetBehavior(user_types::GeneralBehavior* _behavior_pt );
        //about sample
        void SetSampleParas();
        void SampleNode();
@@ -49,11 +61,11 @@ namespace Ardrone_rrt_avoid{
        void ExpandTree();
      private:
        //user defined times
-       user_types::Sampler3D sampler;
+       user_types::Sampler3D* sampler_pt;
        user_types::SpaceLimit* spaceLimit_pt;
        user_types::GeneralConfig* config_pt;
        user_types::GeneralBehavior* behavior_pt;
-       user_types::checkParas checkparas;
+       user_types::checkParas* checkparas_pt;
        //root and goal nodes
        user_types::GSnode goal_node;
        user_types::GSnode root_node;

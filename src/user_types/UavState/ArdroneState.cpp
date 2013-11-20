@@ -93,7 +93,7 @@ namespace user_types{
 	  << vx<<" "<< vy<<" "<< vz<<" "<< yaw_rate<< std::endl;
    }//LogData ends
    
-   void GeneralState* ArdroneState::copy()
+   GeneralState* ArdroneState::copy()
    {  //potential memory link
       return new ArdroneState(x,y,z,t,yaw,vx,vy,vz,yaw_rate);
    }

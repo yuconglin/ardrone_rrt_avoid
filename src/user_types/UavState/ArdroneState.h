@@ -23,7 +23,7 @@ namespace user_types{
     //virtual function: state update
     int Update(const arma::vec::fixed<3> u, double dt); 
     void LogData(std::ofstream& file);
-    void GeneralState* copy();
+    GeneralState* copy();
 
   };//ArdroneState ends
 

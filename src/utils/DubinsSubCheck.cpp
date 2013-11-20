@@ -24,8 +24,8 @@ namespace utils{
                      user_types::GeneralState* st_init,//initial actual state
 		     user_types::GeneralState* st_final,//final state
 		     QuadCfg& cfg_target,//stop quad state
-		     const std::vector<user_types::obstacle3D>& obstacles,
-		     const user_types::checkParas& check_paras,
+		     std::vector<user_types::obstacle3D>& obstacles,
+		     user_types::checkParas* checkparas_pt,
 		     user_types::GeneralConfig* config_pt,
 		     std::vector<user_types::GeneralState*> path_sub,//path for log
 		     double& sub_length,//actual length tranversed
@@ -81,7 +81,7 @@ namespace utils{
         double s_end= db_3d.CloseLength(cfg2.x,cfg2.y,cfg2.z);
 
 	GeneralState* st_now= st_init->copy();
-        int n_seg= floor(sub_length/check_paras.ds_check);
+        int n_seg= floor(sub_length/checkparas_pt->ds_check);
         arma::vec::fixed<3> u, v_target, v_end;
 	
 	//the while loop
@@ -104,7 +104,7 @@ namespace utils{
 	   delete st_pre;
            
 	   //collision check
-           if( floor(sub_length/check_paras.ds_check)> n_seg )
+           if( floor(sub_length/checkparas_pt->ds_check)> n_seg )
 	   {
 	     if( SingleCheck(st_now,obstacles) )
 	     {
@@ -116,13 +116,13 @@ namespace utils{
 	   
 	   GeneralState* st_temp= st_now->copy();
 	   path_sub.push_back(st_temp);
-	   n_seg= floor(sub_length/check_paras.ds_check);
+	   n_seg= floor(sub_length/checkparas_pt->ds_check);
 
 	   //end conditions
            double target_dis=sqrt(pow(cfg_target.x-st_now->x,2)+pow(cfg_target.y-st_now->y,2)+pow(cfg_target.z-st_now->z,2));
 	   v_target<< cfg_target.x-st_now->x << cfg_target.y-st_now->y << cfg_target.z-st_now->z;
 	   
-	   if(  dot(u,v_target)<=0&&target_dis<= 3*check_paras.end_r ||target_dis< check_paras.end_r 
+	   if(  dot(u,v_target)<=0&&target_dis<= 3*checkparas_pt->end_r ||target_dis< checkparas_pt->end_r 
 	      ||dot(u,v_target)<=0&& sub_length> s_target-s_init		    
 	     ) 
 	   {
@@ -133,7 +133,7 @@ namespace utils{
 	   double end_dis=sqrt(pow(cfg2.x-st_now->x,2)+pow(cfg2.y-st_now->y,2)+pow(cfg2.z-st_now->z,2));
 	   v_end<< cfg2.x-st_now->x<< cfg2.y-st_now->y<< cfg2.z-st_now->z;  
 	    
-	   if( dot(u,v_end)<=0&& end_dis<= 3*check_paras.end_r || end_dis<= check_paras.end_r
+	   if( dot(u,v_end)<=0&& end_dis<= 3*checkparas_pt->end_r || end_dis<= checkparas_pt->end_r
 	     ||dot(u,v_end)<=0 && sub_length> s_end-s_init
 	     ||sub_length> 3*(s_end-s_init) 
 	     ) 

@@ -1,4 +1,5 @@
 #include "DubinsTotalCheck.h"
+#include "DubinsSubCheck.h"
 //quad releated
 #include "quadDubins3D.h"
 #include "QuadCfg.h"
@@ -13,17 +14,17 @@
 namespace utils{
 
    int DubinsTotalCheck(quadDubins3D& db_3d,//the dubins curve
-                         user_types::GeneralState* st_init->//initial actual state
+                         user_types::GeneralState* st_init,//initial actual state
 			 user_types::GeneralState* st_final,//final state
-			 QuadCfg cfg_target,//stop quad state
-			 const vector<user_types::obstacle3D>& obstacles,
-                         const user_types::checkParas check_paras,
+			 QuadCfg& cfg_target,//stop quad state
+			 std::vector<user_types::obstacle3D>& obstacles,
+                         user_types::checkParas* checkparas_pt,
 			 user_types::GeneralConfig* config_pt,
 			 std::vector<user_types::GeneralState*> path_log,//path for log
 			 double& actual_length//actual length tranversed
 			 )
    {  //don't forget to delete if needed 
-      if(sqrt(pow(st_init->>x-cfg_target.x,2)+pow(st_init->>y-cfg_target.y,2)+pow(st_init->>z-cfg_target.z,2))< check_paras.end_r )
+      if(sqrt(pow(st_init->x-cfg_target.x,2)+pow(st_init->y-cfg_target.y,2)+pow(st_init->z-cfg_target.z,2))< checkparas_pt->end_r )
       {
          std::cout <<"already there"<<std::endl;
          st_final= st_init;
@@ -53,7 +54,8 @@ namespace utils{
 	    idx= i;
 	  }//if dis ends
       }//for int i ends
-     	
+     
+      int idx_seg= -1;
       if(idx==1||idx==2)
       {
 	  if( d[idx-1]/(db_3d.seg_param[idx-1]+1e-10)<d[idx+1]/(db_3d.seg_param[idx]+1e-10) )
@@ -78,13 +80,13 @@ namespace utils{
       //check ends
       //collision check for each segment of the dubins curve
       int result, colli= 1;
-      user_types::GeneralState* st_first= st_init->copy(),st_next;
+      user_types::GeneralState* st_first= st_init->copy(),*st_next;
  
       for(int i= idx_seg;i!= 3;++i)
       {
-         vector<GeneralState*> path_sub;
+	 std::vector<user_types::GeneralState*> path_sub;
 	 double length_sub= 0.;
-         result= DubinsSubCheck(db_3d,st_first,st_next,cfg_target,obstacles,check_paras,config_pt,path_sub,length_sub,i);
+         result= DubinsSubCheck(db_3d,st_first,st_next,cfg_target,obstacles,checkparas_pt,config_pt,path_sub,length_sub,i);
          //modify total length
 	 actual_length+= length_sub;
 	 //update logged path

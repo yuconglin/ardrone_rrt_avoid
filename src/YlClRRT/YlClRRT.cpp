@@ -8,6 +8,10 @@
 #include "UavConfig/GeneralConfig.h"
 #include "UavState/GeneralState.h"
 #include "SpaceLimit.h"
+#include "Sampler3D/Sampler3D.hpp"
+#include "checkParas.h"
+//std lib
+#include <cmath>
 
 using namespace user_types;
 
@@ -50,9 +54,10 @@ namespace Ardrone_rrt_avoid{
    void YlClRRT::SetCheckParas()
    {
       CheckConfigSet();
-      checkParas.end_r= max( config_pt->speed*config_pt->dt,0.15 );
-      checkParas.ds_check= config_pt->speed*config_pt->dt;
-      checkParas.ds_insert= 5*checkParas.ds_check;
+      checkparas_pt= new checkParas();
+      checkparas_pt->end_r= std::max( config_pt->speed*config_pt->dt,0.15 );
+      checkparas_pt->ds_check= config_pt->speed*config_pt->dt;
+      checkparas_pt->ds_insert= 5*checkparas_pt->ds_check;
    }//CheckParasSet ends
 
    void YlClRRT::SetGeoFence(user_types::SpaceLimit* _space_pt)
@@ -60,7 +65,12 @@ namespace Ardrone_rrt_avoid{
      spaceLimit_pt= _space_pt;
      if_spacelimit_set= true;
    }
-
+   
+   inline double YlClRRT::GetRho()
+   {
+     return config_pt->rho;
+   }
+   
    //set root and goal node
    void YlClRRT::SetRoot( GeneralState* state_pt )
    {
@@ -80,6 +90,11 @@ namespace Ardrone_rrt_avoid{
      if_behavior_set= true;
    }
 
+   void YlClRRT::SetSampler( Sampler3D* _sampler_pt)
+   {
+     this->sampler_pt= _sampler_pt;
+   }
+
    void YlClRRT::SetSampleParas()
    {
      CheckGoalSet();
@@ -92,14 +107,14 @@ namespace Ardrone_rrt_avoid{
      double y_goal= goal_node.state_pt->y;
      double z_goal= goal_node.state_pt->z;
      
-     sampler.SetParams(x_root, y_root, z_root, x_goal, y_goal, z_goal);
-     sampler.SetSigmaGa( config_pt->MaxAscend()*0.25 );
+     sampler_pt->SetParams(x_root, y_root, z_root, x_goal, y_goal, z_goal);
+     sampler_pt->SetSigmaGa( config_pt->MaxAscend()*0.25 );
      if_sampler_para_set= true;
    }//SetSampleParas()
 
    void YlClRRT::SampleNode()
    {//sample and check
-     sampler.SetSampleMethod(1);
+     sampler_pt->SetSampleMethod(1);
           
      double x_root= root_node.state_pt->x;
      double y_root= root_node.state_pt->y;
@@ -110,7 +125,7 @@ namespace Ardrone_rrt_avoid{
 
      while(1)
      {
-       sampler.GetSample(x_a,y_a,z_a,root_node.state_pt,goal_node.state_pt);
+       sampler_pt->GetSample(x_a,y_a,z_a,root_node.state_pt,goal_node.state_pt);
        //check
        //if in radius range
        double if_radius= utils::NotInRadius(x_root,y_root,the_a,x_a,y_a,rho);

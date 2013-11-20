@@ -5,7 +5,7 @@
 
 namespace utils{
 
-bool SingleCheck(const user_types::GeneralState* st_pt, const vector<user_types::obstacle3D>& obstacles)
+bool SingleCheck(const user_types::GeneralState* st_pt, std::vector<user_types::obstacle3D>& obstacles)
 {
    bool if_collide=false;
    double x_m = st_pt->x;
@@ -15,7 +15,7 @@ bool SingleCheck(const user_types::GeneralState* st_pt, const vector<user_types:
      
    for(int j=0; j!=obstacles.size(); ++j)
    {
-      obs3D obs3d=obstacles[j].Estimate(t_m);
+      user_types::obs3D obs3d=obstacles[j].Estimate(t_m);
       double dis_r=pow(obs3d.x-x_m,2)+pow(obs3d.y-y_m,2)+pow(obs3d.z-z_m,2);
       dis_r = sqrt(dis_r);
      

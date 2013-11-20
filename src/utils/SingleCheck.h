@@ -10,6 +10,6 @@ namespace user_types{
 
 namespace utils{
 
-  bool SingleCheck(const user_types::GeneralState* st_pt, const std::vector<user_types::obstacle3D>& obstacles);
+  bool SingleCheck(const user_types::GeneralState* st_pt, std::vector<user_types::obstacle3D>& obstacles);
   //true if collide
 };//namespaces ends

@@ -1,4 +1,8 @@
 #include "YlClRRT.hpp"
+//std lib
+#include <iostream>
+#include <fstream>
+
 //user types
 #include "UavConfig/ArdroneConfig.h"
 #include "point2D.h"
@@ -6,12 +10,10 @@
 #include "SpaceLimit.h"
 #include "UavState/ArdroneState.h"
 #include "obstacle3D.h"
+#include "Sampler3D/Sampler3D.hpp"
 //quad related
 #include "QuadCfg.h"
 #include "quadDubins3D.h"
-//std lib
-#include <iostream>
-#include <fstream>
 //utils
 #include "DubinsTotalCheck.h" 
 
@@ -42,6 +44,7 @@ int main(int argc, char** argv)
    //set the uav behavior
    yc_rrt.SetBehavior(new ArdroneBehavior() );
    //set the sampler
+   yc_rrt.SetSampler(new Sampler3D() );
    yc_rrt.SetSampleParas();
    //check all the flags
    yc_rrt.CheckFlagsSet();
@@ -49,7 +52,9 @@ int main(int argc, char** argv)
    cout<<"test sample node"<< endl;
    yc_rrt.SampleNode();
    //try to execute a dubins curve
-   vector<obstacle3D> obstacles;
+   vector<user_types::obstacle3D > obstacles;
+   obstacles.push_back( user_types::obstacle3D(4,1,M_PI/2,0.,0.8,0.0,0.0,0.5,0.5) );
+
    QuadCfg start(x_root,y_root,z_root,yaw_root);
    QuadCfg end(x_goal,y_goal,z_goal,yaw_goal);
    quadDubins3D db_3d(start,end,yc_rrt.GetRho() );
@@ -58,9 +63,8 @@ int main(int argc, char** argv)
    double length= 0.;
    vector<user_types::GeneralState*> path_log;
    user_types::GeneralState* st_final= NULL;
-   user_types::GeneralState* st_init= new ArdroneState(x_root+0.4,y_root-0.4,z_root+0.2,yaw_root);
-   utils::DubinsTotalCheck(db_3d,st_init,st_final,end,obstacles,*yc_rrt.GetCheckParaPt(),
-			 yc_rrt.GetConfigPt(),path_log,length);
+   user_types::GeneralState* st_init= new ArdroneState(x_root+0.4,y_root-0.4,z_root+0.2,0.,yaw_root);
+   utils::DubinsTotalCheck(db_3d,st_init,st_final,end,obstacles,yc_rrt.GetCheckParasPt(),yc_rrt.GetConfigPt(),path_log,length);
    cout<<"length after: "<< length<< endl;
    
    ofstream myfile("dubin_log.txt");
