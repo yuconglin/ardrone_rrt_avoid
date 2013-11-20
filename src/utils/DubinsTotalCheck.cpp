@@ -95,11 +95,11 @@ namespace utils{
          
 	 if(result==-1)
          {//collision
-         if( actual_length>= 0.5*(db_3d.seg_param[0]+db_3d.seg_param[1]+db_3d.seg_param[2]) )
-	    colli= 0;
-	 else
-	    colli= -1;
-	 break;
+           if( actual_length>= 0.5*(db_3d.seg_param[0]+db_3d.seg_param[1]+db_3d.seg_param[2]) )
+	     colli= 0;
+	   else
+	     colli= -1;
+	   break;
          }
          else if(result== 1)
          {//target reached without collision

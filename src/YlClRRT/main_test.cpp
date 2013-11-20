@@ -53,7 +53,7 @@ int main(int argc, char** argv)
    yc_rrt.SampleNode();
    //try to execute a dubins curve
    vector<user_types::obstacle3D > obstacles;
-   obstacles.push_back( user_types::obstacle3D(4,1,M_PI/2,0.,0.8,0.0,0.0,0.5,0.5) );
+   //obstacles.push_back( user_types::obstacle3D(4,1,M_PI/2,0.,0.8,0.0,0.0,0.5,0.5) );
 
    QuadCfg start(x_root,y_root,z_root,yaw_root);
    QuadCfg end(x_goal,y_goal,z_goal,yaw_goal);
@@ -64,10 +64,9 @@ int main(int argc, char** argv)
    vector<user_types::GeneralState*> path_log;
    user_types::GeneralState* st_final= new ArdroneState();
    user_types::GeneralState* st_init= new ArdroneState(x_root+0.4,y_root-0.4,z_root+0.2,0.,yaw_root);
-   utils::DubinsTotalCheck(db_3d,st_init,st_final,end,obstacles,yc_rrt.GetCheckParasPt(),yc_rrt.GetConfigPt(),path_log,length);
+   int coli= utils::DubinsTotalCheck(db_3d,st_init,st_final,end,obstacles,yc_rrt.GetCheckParasPt(),yc_rrt.GetConfigPt(),path_log,length);
    
-   cout<<"length after: "<< length<< endl;
-   cout<<"path_log size: "<< path_log.size()<< endl; 
+   cout<<"length after: "<< length<<" path_log size: "<< path_log.size()<<" coli: "<< coli<<endl; 
 
    ofstream myfile("dubin_log.txt");
    for(int i=0;i!= path_log.size();++i)

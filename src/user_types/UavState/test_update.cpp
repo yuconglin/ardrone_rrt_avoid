@@ -14,7 +14,7 @@ int main(int argc, char** argv)
    double t_limit= 4.0;
    //velocity command
    arma::vec::fixed<3> u;
-   u<< 1.<< 0.0 << 0.0;
+   u<< 1.0<< 1.0 << 0.;
 
    //log file
    ofstream myfile("../data/update_rec.txt");
