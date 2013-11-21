@@ -1,19 +1,10 @@
 #pragma once
 //generic tree 
 #include "tree.hh"
-//uav state
-//#include "UavState/GeneralState.h"
 //tree node
 #include "UavState/GSnode.h"
-//used structs
-//not everyone needs to be an object, some can just be pointers
-//list for cpp funcions to include
-//#include "Sampler3D/Sampler3D.hpp"
-//user types
-//#include "UavBehavior/GeneralBehavior.hpp"
-//#include "UavConfig/GeneralConfig.h"
-//#include "UavState/GeneralState.h"
-//#include "SpaceLimit.h"
+//ros
+#include "ros/ros.h"
 
 //forward declaration
 namespace user_types{
@@ -60,7 +51,13 @@ namespace Ardrone_rrt_avoid{
        //expand trees
        void ExpandTree();
      private:
-       //user defined times
+       //the tree body
+       tree<user_types:GSnode> main_tree;
+       std::vector<TREEIter> tree_vector;
+       std::vector<TREEIter> tree_vector_sort;
+       //obstacles
+       std::vector<user_types::obstacle3D> obstacles;
+       //user defined types
        user_types::Sampler3D* sampler_pt;
        user_types::SpaceLimit* spaceLimit_pt;
        user_types::GeneralConfig* config_pt;
@@ -80,6 +77,10 @@ namespace Ardrone_rrt_avoid{
        bool if_spacelimit_set;
        bool if_behavior_set;
        bool if_checkparas_set;
+       //time related
+       double t_limit;
+       ros::Time t_start;
+       bool if_in_ros;
        //check for flags
        void CheckGoalSet();
        void CheckRootSet();

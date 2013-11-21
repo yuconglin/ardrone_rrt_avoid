@@ -10,6 +10,8 @@
 #include "SpaceLimit.h"
 #include "Sampler3D/Sampler3D.hpp"
 #include "checkParas.h"
+//ros
+#include "ros/ros.h"
 //std lib
 #include <cmath>
 
@@ -32,6 +34,7 @@ namespace Ardrone_rrt_avoid{
      if_spacelimit_set= false;
      if_behavior_set= false;
      if_checkparas_set= false;
+     if_in_ros= false;
    }//YlClRRT() ends
  
    YlClRRT::~YlClRRT()
@@ -84,6 +87,9 @@ namespace Ardrone_rrt_avoid{
    void YlClRRT::SetRoot( GeneralState* state_pt )
    {
      root_node= GSnode(state_pt);
+     TREEIter root_it = main_tree.insert( main_tree.begin(), root_node );
+      //push root iter to the vector
+     tree_vector.push_back(root_it);
      if_root_set= true;
    }//SetRoot ends
    
@@ -158,6 +164,56 @@ namespace Ardrone_rrt_avoid{
      //assign to sample node
      sample_node= GSnode( behavior_pt->InitState(x_a,y_a,z_a,0,the_a) );
    }//SampleNode ends
+   
+   bool YlClRRT::CheckGoalReach(TREEIter it)
+   {//true if collided
+     QuadCfg cfg_start(it->state_pt->x,it->state_pt->y,it->state_pt->z,it->state_pt->yaw);
+     QuadCfg cfg_end(goal_node->state_pt->x,goal_node.state_pt->y,goal_node.state_pt->z,goal_node->state_pt->yaw);
+     //create a dubins curve connecting the node to the goal
+     quadDubins3D dubin_3d(cfg_start,cfg_end,config_pt->rho);
+     //check for rise limit
+     if( asin( fabs(goal_node->state_pt->z -it->state_pt->z)
+	/(dubin_3d.GetHeuriLength()) ) >= config_pt->MaxAscend() )
+     {
+       //std::cout<<"goal too steep"<<std::endl;
+       return false;
+     }
+     //check for collision
+     user_types::GeneralState* st_final= it->state_pt->copy();
+     std::vector<user_types::GeneralState*> path_log;
+     int colli= DubinsTotalCheck(dubin_3d,//the dubins curve
+                         it->state_pt,//initial actual state
+			 st_final,//final state
+			 cfg_end,//stop quad state
+			 obstacles,
+                         checkparas_pt,
+			 config_pt,
+			 path_log,//path for log
+			 double& actual_length//actual length tranversed
+			 );
+     delete st_final;
+     
+     if(colli== 1)//free of collision
+     {
+       it->cost2go= this->dubin_actual_length;
+       it->goal_reach= true;
+       if(!if_goal) if_goal= true;
+       return false;
+     }//if colli ends
+     else
+       return true;
+   }//CheckGoalReach ends
+
+
+   void YlClRRT::ExpandTree()
+   {
+     if(!if_in_ros)
+     {
+       ros::Time::init();
+       t_start = ros::Time::now();//timing start point
+     }
+
+   }//ExpandTree() ends
 
    void YlClRRT::CheckGoalSet()
    {

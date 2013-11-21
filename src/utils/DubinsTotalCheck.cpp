@@ -20,8 +20,8 @@ namespace utils{
 			 std::vector<user_types::obstacle3D>& obstacles,
                          user_types::checkParas* checkparas_pt,
 			 user_types::GeneralConfig* config_pt,
-			 std::vector<user_types::GeneralState*>& path_log,//path for log
-			 double& actual_length//actual length tranversed
+			 std::vector<user_types::GeneralState*>* path_log_pt,//path for log
+			 double* actual_length_pt//actual length tranversed
 			 )
    {  //don't forget to delete if needed 
       if(sqrt(pow(st_init->x-cfg_target.x,2)+pow(st_init->y-cfg_target.y,2)+pow(st_init->z-cfg_target.z,2))< checkparas_pt->end_r )
@@ -31,8 +31,8 @@ namespace utils{
          return 1;
       }
       //set actual_length and path_log to default
-      actual_length= 0.;
-      path_log.clear();
+      if(actual_length_pt) *actual_length_pt= 0.;
+      if(path_log_pt) path_log.clear();
       //see which segment st_init->is closest to
       QuadCfg cfgs[]={db_3d.cfg_start,db_3d.cfg_i1,db_3d.cfg_i2,db_3d.cfg_end};
       double d[4];
@@ -90,7 +90,7 @@ namespace utils{
          //modify total length
 	 actual_length+= length_sub;
 	 //update logged path
-	 std::cout<< "path_sub size: "<< path_sub.size()<< std::endl;
+	 //std::cout<< "path_sub size: "<< path_sub.size()<< std::endl;
 	 path_log.insert( path_log.end(),path_sub.begin(),path_sub.end() ); 
          
 	 if(result==-1)
