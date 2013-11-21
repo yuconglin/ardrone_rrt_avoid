@@ -38,6 +38,8 @@ namespace Ardrone_rrt_avoid{
      if_behavior_set= false;
      if_checkparas_set= false;
      if_in_ros= false;
+     if_limit_reach= false;
+     sec_count= 0.;
    }//YlClRRT() ends
  
    YlClRRT::~YlClRRT()
@@ -155,7 +157,7 @@ namespace Ardrone_rrt_avoid{
        dubins_init(q0,q1,rho,&path);
   
        double length= dubins_path_length(&path);
-       double h= abs(z_a-z_root);
+       double h= fabs(z_a-z_root);
        double gamma_d= atan2(h,length);
        bool if_ga= (gamma_d<= config_pt->MaxAscend() );
        if(!if_ga) continue;
@@ -167,9 +169,9 @@ namespace Ardrone_rrt_avoid{
      //assign to sample node
      sample_node= GSnode( behavior_pt->InitState(x_a,y_a,z_a,0,the_a) );
    }//SampleNode ends
-   /*
+   
    bool YlClRRT::CheckGoalReach(TREEIter it)
-   {//true if collided
+   {//true if goal reachable from it
      QuadCfg cfg_start(it->state_pt->x,it->state_pt->y,it->state_pt->z,it->state_pt->yaw);
      QuadCfg cfg_end(goal_node->state_pt->x,goal_node.state_pt->y,goal_node.state_pt->z,goal_node->state_pt->yaw);
      //create a dubins curve connecting the node to the goal
@@ -183,7 +185,8 @@ namespace Ardrone_rrt_avoid{
      }
      //check for collision
      user_types::GeneralState* st_final= it->state_pt->copy();
-     std::vector<user_types::GeneralState*> path_log;
+     double actual_length= 0.;
+     //std::vector<user_types::GeneralState*> path_log;
      int colli= DubinsTotalCheck(dubin_3d,//the dubins curve
                          it->state_pt,//initial actual state
 			 st_final,//final state
@@ -191,23 +194,20 @@ namespace Ardrone_rrt_avoid{
 			 obstacles,
                          checkparas_pt,
 			 config_pt,
-			 path_log,//path for log
-			 double& actual_length//actual length tranversed
+			 0,//path for log
+			 &actual_length//actual length tranversed
 			 );
      delete st_final;
      
      if(colli== 1)//free of collision
      {
-       it->cost2go= this->dubin_actual_length;
+       it->cost2go= actual_length;
        it->goal_reach= true;
-       if(!if_goal) if_goal= true;
-       return false;
-     }//if colli ends
-     else
+       if(!if_goal_reach) if_goal_reach= true;
        return true;
+     }//if colli ends
+     return false;
    }//CheckGoalReach ends
-   */
-
 
    void YlClRRT::ExpandTree()
    {
@@ -216,8 +216,151 @@ namespace Ardrone_rrt_avoid{
        ros::Time::init();
        t_start = ros::Time::now();//timing start point
      }
+     cout<<"tree expand starts"<<endl;
+     int sample_count = 0;//effective sample
+     int sample_raw= 0;//raw samples
+     CheckGoalReach( main_tree.begin());
+     
+     //main loop starts here
+     while(1)
+     {
+        SampleNode();
+	++sample_raw;
+        CalHeuri();  
+	SortNodes();
 
+        for(int j=0;j!=tree_vector_sort.size();++j)
+	{
+	   if(!if_limit_reach)
+	   {
+	     sec_count= ros::Time::now().toSec()-t_start.toSec();
+	     if( sec_count >= t_limit )
+	     {
+	       if_limit_reach= true;
+	       cout<<"stop2"<<endl;
+	       break;
+	     }//
+	   }
+	   
+	   TREEIter tree_it = tree_vector_sort[j];
+	   GeneralState* start = (*tree_it)->state_pt;
+           GeneralState* st_final= start->copy();
+
+	   QuadCfg cfg_start(start->x,start->y,start->z,start->yaw);
+	   QuadCfg cfg_end(sample_node->state_pt->x,sample_node->state_pt->y,sample_node->state_pt->z,sample_node->state_pt->yaw);
+	   //create a dubins curve connecting the node to the sampling node
+	   quadDubins3D dubin_3d(cfg_start,cfg_end,config_pt->rho);
+
+	   if(asin( fabs(sample_node->state_pt->z-start->z)/(dubin_3d.GetHeuriLength()) ) >= config_pt->MaxAscend() )
+	   {
+	      //cout<<"too steep"<<endl;
+	      continue;
+	   }
+	   else
+	   {	      
+	      double c_length= 0.;
+	      int colli= DubinsTotalCheck(dubin_3d,start,st_final,cfg_end,obstacles,checkparas_pt,config_pt,temp_log,&c_length);
+
+	      if(colli!=-1)
+	      {
+		++sample_count;
+		if( temp_log.size()> 10)
+		  InsertDubinsNode( tree_it ); 
+		//path_log.clear();
+		dubin_collects.push_back(dubin_3d);
+		//cout << "sample 1 genertated" <<endl;
+		break;
+	      } //if check ends
+	   } //else ends
+
+        }// for int j ends
+        //timer 
+        if(!if_limit_reach)
+        {
+	  sec_count= ros::Time::now().toSec()-t_start.toSec();
+	  if( sec_count >= t_limit )
+	  {
+	    if_limit_reach= true;
+	    cout<<"stop3"<<endl;
+	   //break;
+	  }// 
+        }
+      
+        if(if_limit_reach)
+        //while time limit for tree expanding reached 
+        {
+	   cout<<"time="<<" "<<sec_count<<" "\
+	       <<"nodes="<<" "<<tree_vector.size()<<" "\
+	       <<"samples good="<<" "<<sample_count<<" "\
+	       <<"smaples="<<" "<< sample_raw <<endl;
+	   break;
+        }
+
+     }//while ends
+   
    }//ExpandTree() ends
+   
+   void YlClRRT::InsertDubinsNode( TREEIter it)
+   {
+              
+   }//InsertDubinsNode ends
+
+   double YlClRRT::Heuristics( GSnode& node )
+   {//calculate the heuristics from the node to the sample node
+//basically the dubins length plus vertical height but if too steep just assign a large heuristic
+     double heuri=0;
+     double s_x= sample_node->state_pt->x;
+     double s_y= sample_node->state_pt->y;
+     double s_z= sample_node->state_pt->z;
+     double s_yaw= sample_node->state_pt->yaw;
+     double n_x= node->state_pt->x;
+     double n_y= node->state_pt->y;
+     double n_z= node->state_pt->z;
+     double n_yaw= node->state_pt->yaw;
+
+     double q0[]= {n_x,n_y,n_yaw};
+     double q1[]= {s_x,s_y,s_yaw};
+  
+     DubinsPath path;
+     dubins_init(q0, q1, rho, &path);
+     double length= dubins_path_length(&path);
+     double h= fabs(s_z-n_z);
+     double gamma_d= atan2(h,length);
+     if( gamma_d > config_pt->MaxAscend() ) 
+        heuri= 1e8;
+     else
+     {
+        heuri= sqrt(length*length + h*h);
+        boost::mt19937 generator;
+        generator.seed(static_cast<unsigned int>(std::time(0)));
+      
+        boost::uniform_real<double> distribution(0.0,1.0);
+        boost::variate_generator<boost::mt19937&,boost::uniform_real<> > p_dis(generator, distribution);
+
+        double p= p_dis();
+        if( !if_goal_reach && p<=0.3 || if_goal_reach && p>0.3 )
+	  heuri= node.cost+ heuri/config_pt->speed;
+     }
+     return heuri;
+}//Heuristics ends
+ 
+   void YlClRRT::CalHeuri()
+   {
+     for(TREEIter it=main_tree.begin();it!=main_tree.end();++it)
+        it->heuri=Heuristics(*it);	          
+   }
+
+   bool NodeCompFunc(TREEIter it1,TREEIter it2)
+   {
+     return it1->heuri < it1->heuri;
+   }
+
+   void YlClRRT::SortNodes( )
+   {
+     tree_vector_sort.clear();
+     tree_vector_sort = tree_vector;
+     std::sort(tree_vector_sort.begin(), tree_vector_sort.end(), NodeCompFunc);
+   }
 
    void YlClRRT::CheckGoalSet()
    {

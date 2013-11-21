@@ -53,6 +53,8 @@ namespace Ardrone_rrt_avoid{
        //expand trees
        void ExpandTree();
      private:
+       //path log
+       std::vector<user_types::GeneralState*> temp_log;
        //the tree body
        tree<user_types::GSnode> main_tree;
        std::vector<TREEIter> tree_vector;
@@ -82,7 +84,15 @@ namespace Ardrone_rrt_avoid{
        //time related
        double t_limit;
        ros::Time t_start;
+       bool if_limit_reach;
        bool if_in_ros;
+       double sec_count;
+       //private function
+       bool CheckGoalReach( TREEIter it); 
+       double Heuristics( GSnode& node);
+       void CalHeuri();
+       void SortNodes();
+       void InsertDubinsNode(TREEIter it);
        //check for flags
        void CheckGoalSet();
        void CheckRootSet();
