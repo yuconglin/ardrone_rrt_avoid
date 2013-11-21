@@ -25,16 +25,18 @@ namespace user_types{
      else if(sample_method ==1)
      {
        r0= sqrt(Dx*Dx+Dy*Dy);
+       //std::cout<<"r0= "<<r0<< std::endl;
        gamma0= atan2(Dz,r0);
      }
      else {;}
-    
+     //std::cout<<"Dx= "<< Dx <<" Dy= "<< Dy<<" r0= "<< r0<<std::endl;
      x0 = x_root;
      y0 = y_root;
      z0 = z_root;
      this->r0 = r0;
     
      sigma_r= 0.5*r0;
+      
      this->theta0 = theta0;
      sigma_theta= 0.125*M_PI;
      ga0 = gamma0;
@@ -47,10 +49,12 @@ namespace user_types{
       boost::mt19937 generator;
       static unsigned int seed = 0;
       generator.seed(static_cast<unsigned int>(std::time(0))+(++seed));
+      
+      //std::cout<<"sigma_r= "<< sigma_r <<std::endl;  
       boost::normal_distribution<> r_distribution(r0,sigma_r);
       boost::variate_generator<boost::mt19937&,boost::normal_distribution<> > r_nor(generator, r_distribution);  
       double r= r_nor();
-	      
+      
       boost::uniform_real<> the_uniform(theta0-M_PI/2.0, theta0+M_PI/2.0);
       boost::variate_generator<boost::mt19937&,boost::uniform_real<> > the_nor(generator, the_uniform);
       double theta= the_nor();

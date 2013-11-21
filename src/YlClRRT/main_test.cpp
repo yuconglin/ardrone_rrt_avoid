@@ -49,8 +49,9 @@ int main(int argc, char** argv)
    //check all the flags
    yc_rrt.CheckFlagsSet();
    //try to sample a node
-   cout<<"test sample node"<< endl;
+   //cout<<"test sample node"<< endl;
    yc_rrt.SampleNode();
+   //cout<<"tu tu"<< endl;
    //try to execute a dubins curve
    vector<user_types::obstacle3D > obstacles;
    //obstacles.push_back( user_types::obstacle3D(4,1,M_PI/2,0.,0.8,0.0,0.0,0.5,0.5) );
@@ -63,8 +64,9 @@ int main(int argc, char** argv)
    double length= 0.;
    vector<user_types::GeneralState*> path_log;
    user_types::GeneralState* st_final= new ArdroneState();
-   user_types::GeneralState* st_init= new ArdroneState(x_root+0.4,y_root-0.4,z_root+0.2,0.,yaw_root);
-   int coli= utils::DubinsTotalCheck(db_3d,st_init,st_final,end,obstacles,yc_rrt.GetCheckParasPt(),yc_rrt.GetConfigPt(),path_log,length);
+   user_types::GeneralState* st_init= new ArdroneState(x_root+0.0,y_root-0.0,z_root+0.0,0.,yaw_root);
+   //cout<<"main accer: "<< st_init->ax<<" "<<st_init->ay<<endl; 
+   int coli= utils::DubinsTotalCheck(db_3d,st_init,st_final,end,obstacles,yc_rrt.GetCheckParasPt(),yc_rrt.GetConfigPt(),&path_log,&length);
    
    cout<<"length after: "<< length<<" path_log size: "<< path_log.size()<<" coli: "<< coli<<endl; 
 

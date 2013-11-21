@@ -27,8 +27,8 @@ namespace utils{
 		     std::vector<user_types::obstacle3D>& obstacles,
 		     user_types::checkParas* checkparas_pt,
 		     user_types::GeneralConfig* config_pt,
-		     std::vector<user_types::GeneralState*>& path_sub,//path for log
-		     double& sub_length,//actual length tranversed
+		     std::vector<user_types::GeneralState*>* path_sub_pt,//path for log
+		     double* sub_length_pt,//actual length tranversed
 		     int idx_seg//which segment: 0,1,2
      )//don't forget to delete if needed
      {
@@ -52,8 +52,8 @@ namespace utils{
 	  }
 	}//if ends
         //set to default
-	path_sub.clear();
-	sub_length= 0.;
+	if(path_sub_pt) path_sub_pt->clear();
+	*sub_length_pt= 0.;
         
 	bool if_colli= false;
         //double lambda_h = 1.;
@@ -81,7 +81,7 @@ namespace utils{
         double s_end= db_3d.CloseLength(cfg2.x,cfg2.y,cfg2.z);
 
 	GeneralState* st_now= st_init->copy();
-        int n_seg= floor(sub_length/checkparas_pt->ds_check);
+        int n_seg= floor(*sub_length_pt/checkparas_pt->ds_check);
         arma::vec::fixed<3> u, v_target, v_end;
 	
 	//the while loop
@@ -99,12 +99,14 @@ namespace utils{
 	   config_pt->NormalizeU(u);
 	   //state update
 	   GeneralState* st_pre= st_now->copy();
+           //std::cout<<"st_now: "<<st_now->x <<" "<< st_now->y <<" "<< st_now->z <<std::endl; 
+	   //std::cout<<"u: "<< u(0)<<" "<<u(1)<<" "<<u(2)<< std::endl;
 	   st_now->Update(u,config_pt->dt);
-           sub_length+= sqrt(pow(st_now->x - st_pre->x,2)+pow(st_now->y - st_pre->y,2)+pow(st_now->z - st_pre->z,2) ); 
+           *sub_length_pt+= sqrt(pow(st_now->x - st_pre->x,2)+pow(st_now->y - st_pre->y,2)+pow(st_now->z - st_pre->z,2) ); 
 	   delete st_pre;
            
 	   //collision check
-           if( floor(sub_length/checkparas_pt->ds_check)> n_seg )
+           if( floor(*sub_length_pt/checkparas_pt->ds_check)> n_seg )
 	   {
 	     if( SingleCheck(st_now,obstacles) )
 	     {
@@ -115,15 +117,16 @@ namespace utils{
 	   }
 	   
 	   GeneralState* st_temp= st_now->copy();
-	   path_sub.push_back(st_temp);
-	   n_seg= floor(sub_length/checkparas_pt->ds_check);
+	   
+	   if(path_sub_pt)  path_sub_pt->push_back(st_temp);
+	   n_seg= floor(*sub_length_pt/checkparas_pt->ds_check);
 
 	   //end conditions
            double target_dis=sqrt(pow(cfg_target.x-st_now->x,2)+pow(cfg_target.y-st_now->y,2)+pow(cfg_target.z-st_now->z,2));
 	   v_target<< cfg_target.x-st_now->x << cfg_target.y-st_now->y << cfg_target.z-st_now->z;
 	   
 	   if(  dot(u,v_target)<=0&&target_dis<= 3*checkparas_pt->end_r ||target_dis< checkparas_pt->end_r 
-	      ||dot(u,v_target)<=0&& sub_length> s_target-s_init		    
+	      ||dot(u,v_target)<=0&& *sub_length_pt > s_target-s_init		    
 	     ) 
 	   {
 	     result= 1;
@@ -134,8 +137,8 @@ namespace utils{
 	   v_end<< cfg2.x-st_now->x<< cfg2.y-st_now->y<< cfg2.z-st_now->z;  
 	    
 	   if( dot(u,v_end)<=0&& end_dis<= 3*checkparas_pt->end_r || end_dis<= checkparas_pt->end_r
-	     ||dot(u,v_end)<=0 && sub_length> s_end-s_init
-	     ||sub_length> 3*(s_end-s_init) 
+	     ||dot(u,v_end)<=0 && *sub_length_pt > s_end-s_init
+	     ||*sub_length_pt > 3*(s_end-s_init) 
 	     ) 
 	     break;
 

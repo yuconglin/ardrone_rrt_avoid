@@ -1,5 +1,6 @@
 #include "armadillo"
 #include "ArdroneState.h"
+#include <cmath>
 //controller gains
 #include "controller/config/parrot/config_controller_Parrot.h"
 
@@ -22,6 +23,8 @@ namespace user_types{
        double Tc= 0.3;
 
        double vx_d,vy_d;
+       //std::cout<<"accer:"<< ax<<" "<<ay<<" "<<az<<" "<<a_yaw<< std::endl;
+
        //vx,x
        if( abs(ux) >vxy_max ) 
 	 vx_d= (ux < 0 ? -1.0 : 1.0) * vxy_max;
@@ -81,7 +84,6 @@ namespace user_types{
        //t
        t+= dt;
        return 0;
-  
    }//Update ends
    
    /* 

@@ -7,6 +7,7 @@
 #include "UavBehavior/GeneralBehavior.hpp"
 #include "UavConfig/GeneralConfig.h"
 #include "UavState/GeneralState.h"
+#include "UavState/GSnode.h"
 #include "SpaceLimit.h"
 #include "Sampler3D/Sampler3D.hpp"
 #include "checkParas.h"
@@ -14,6 +15,8 @@
 #include "ros/ros.h"
 //std lib
 #include <cmath>
+//tree
+#include "tree.hh"
 
 using namespace user_types;
 
@@ -122,6 +125,7 @@ namespace Ardrone_rrt_avoid{
      double y_goal= goal_node.state_pt->y;
      double z_goal= goal_node.state_pt->z;
      
+     sampler_pt->SetSampleMethod(1);
      sampler_pt->SetParams(x_root, y_root, z_root, x_goal, y_goal, z_goal);
      sampler_pt->SetSigmaGa( config_pt->MaxAscend()*0.25 );
      if_sampler_para_set= true;
@@ -129,8 +133,7 @@ namespace Ardrone_rrt_avoid{
 
    void YlClRRT::SampleNode()
    {//sample and check
-     sampler_pt->SetSampleMethod(1);
-          
+     //sampler_pt->SetSampleMethod(1);   
      double x_root= root_node.state_pt->x;
      double y_root= root_node.state_pt->y;
      double z_root= root_node.state_pt->z;
@@ -164,7 +167,7 @@ namespace Ardrone_rrt_avoid{
      //assign to sample node
      sample_node= GSnode( behavior_pt->InitState(x_a,y_a,z_a,0,the_a) );
    }//SampleNode ends
-   
+   /*
    bool YlClRRT::CheckGoalReach(TREEIter it)
    {//true if collided
      QuadCfg cfg_start(it->state_pt->x,it->state_pt->y,it->state_pt->z,it->state_pt->yaw);
@@ -203,6 +206,7 @@ namespace Ardrone_rrt_avoid{
      else
        return true;
    }//CheckGoalReach ends
+   */
 
 
    void YlClRRT::ExpandTree()

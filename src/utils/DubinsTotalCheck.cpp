@@ -31,8 +31,8 @@ namespace utils{
          return 1;
       }
       //set actual_length and path_log to default
-      if(actual_length_pt) *actual_length_pt= 0.;
-      if(path_log_pt) path_log.clear();
+      *actual_length_pt= 0.;
+      if(path_log_pt) path_log_pt->clear();
       //see which segment st_init->is closest to
       QuadCfg cfgs[]={db_3d.cfg_start,db_3d.cfg_i1,db_3d.cfg_i2,db_3d.cfg_end};
       double d[4];
@@ -84,18 +84,24 @@ namespace utils{
  
       for(int i= idx_seg;i!= 3;++i)
       {
+	 std::vector<user_types::GeneralState*>* path_sub_pt= 0;
 	 std::vector<user_types::GeneralState*> path_sub;
-	 double length_sub= 0.;
-         result= DubinsSubCheck(db_3d,st_first,st_next,cfg_target,obstacles,checkparas_pt,config_pt,path_sub,length_sub,i);
+         if(path_log_pt) path_sub_pt= &path_sub;
+	 
+	 double length_sub= 0;
+         double *length_sub_pt= &length_sub;
+	 result= DubinsSubCheck(db_3d,st_first,st_next,cfg_target,obstacles,checkparas_pt,config_pt,path_sub_pt,length_sub_pt,i);
+	 std::cout<<"la la la"<< std::endl;
          //modify total length
-	 actual_length+= length_sub;
+	 *actual_length_pt+= *length_sub_pt;
 	 //update logged path
 	 //std::cout<< "path_sub size: "<< path_sub.size()<< std::endl;
-	 path_log.insert( path_log.end(),path_sub.begin(),path_sub.end() ); 
+	 if(path_log_pt)
+	   path_log_pt->insert( path_log_pt->end(),path_sub_pt->begin(),path_sub_pt->end() ); 
          
 	 if(result==-1)
          {//collision
-           if( actual_length>= 0.5*(db_3d.seg_param[0]+db_3d.seg_param[1]+db_3d.seg_param[2]) )
+           if( *actual_length_pt>= 0.5*(db_3d.seg_param[0]+db_3d.seg_param[1]+db_3d.seg_param[2]) )
 	     colli= 0;
 	   else
 	     colli= -1;

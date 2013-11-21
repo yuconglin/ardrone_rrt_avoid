@@ -1,6 +1,8 @@
 #pragma once
 //generic tree 
 #include "tree.hh"
+//user types
+#include "obstacle3D.h"
 //tree node
 #include "UavState/GSnode.h"
 //ros
@@ -52,7 +54,7 @@ namespace Ardrone_rrt_avoid{
        void ExpandTree();
      private:
        //the tree body
-       tree<user_types:GSnode> main_tree;
+       tree<user_types::GSnode> main_tree;
        std::vector<TREEIter> tree_vector;
        std::vector<TREEIter> tree_vector_sort;
        //obstacles

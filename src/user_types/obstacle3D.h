@@ -1,5 +1,6 @@
 #pragma once
-
+#include <iostream>
+#include <cmath>
 namespace user_types{
   
      struct obs3D {
