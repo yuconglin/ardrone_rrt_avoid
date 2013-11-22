@@ -16,6 +16,8 @@
 #include "ros/ros.h"
 //std lib
 #include <cmath>
+//boost
+#include <boost/random.hpp>
 //tree
 #include "tree.hh"
 //quad related
@@ -182,7 +184,7 @@ namespace Ardrone_rrt_avoid{
      //create a dubins curve connecting the node to the goal
      quadDubins3D dubin_3d(cfg_start,cfg_end,config_pt->rho);
      //check for rise limit
-     if( asin( fabs(goal_node->state_pt->z -it->state_pt->z)
+     if( asin( fabs(goal_node.state_pt->z -it->state_pt->z)
 	/(dubin_3d.GetHeuriLength()) ) >= config_pt->MaxAscend() )
      {
        //std::cout<<"goal too steep"<<std::endl;
@@ -192,7 +194,7 @@ namespace Ardrone_rrt_avoid{
      user_types::GeneralState* st_final= it->state_pt->copy();
      double actual_length= 0.;
      //std::vector<user_types::GeneralState*> path_log;
-     int colli= DubinsTotalCheck(dubin_3d,//the dubins curve
+     int colli= utils::DubinsTotalCheck(dubin_3d,//the dubins curve
                          it->state_pt,//initial actual state
 			 st_final,//final state
 			 cfg_end,//stop quad state
@@ -248,7 +250,7 @@ namespace Ardrone_rrt_avoid{
 	   }
 	   
 	   TREEIter tree_it = tree_vector_sort[j];
-	   GeneralState* start = (*tree_it)->state_pt;
+	   GeneralState* start = tree_it->state_pt;
            GeneralState* st_final= start->copy();
 
 	   QuadCfg cfg_start(start->x,start->y,start->z,start->yaw);
@@ -256,7 +258,7 @@ namespace Ardrone_rrt_avoid{
 	   //create a dubins curve connecting the node to the sampling node
 	   quadDubins3D dubin_3d(cfg_start,cfg_end,config_pt->rho);
 
-	   if(asin( fabs(sample_node->state_pt->z-start->z)/(dubin_3d.GetHeuriLength()) ) >= config_pt->MaxAscend() )
+	   if(asin( fabs(sample_node.state_pt->z-start->z)/(dubin_3d.GetHeuriLength()) ) >= config_pt->MaxAscend() )
 	   {
 	      //cout<<"too steep"<<endl;
 	      continue;
@@ -264,14 +266,14 @@ namespace Ardrone_rrt_avoid{
 	   else
 	   {	      
 	      double c_length= 0.;
-	      int colli= DubinsTotalCheck(dubin_3d,start,st_final,cfg_end,obstacles,checkparas_pt,config_pt,temp_log,&c_length);
+	      int colli= utils::DubinsTotalCheck(dubin_3d,start,st_final,cfg_end,obstacles,checkparas_pt,config_pt,&temp_log,&c_length);
 
 	      if(colli!=-1)
 	      {
 		++sample_count;
 		if( temp_log.size()> 10)
 		  InsertDubinsNode( tree_it ); 
-		//path_log.clear();
+		TempLogClear();
 		dubin_collects.push_back(dubin_3d);
 		//cout << "sample 1 genertated" <<endl;
 		break;
@@ -305,7 +307,7 @@ namespace Ardrone_rrt_avoid{
    
    }//ExpandTree() ends
    
-   void YlClRRT::InsertDubinsNode( TREEIter it)
+   void YlClRRT::InsertDubinsNode( TREEIter start_it)
    {
      if(temp_log.size()==0){
        try {
@@ -319,7 +321,7 @@ namespace Ardrone_rrt_avoid{
      
      TREEIter insert_it;
      double step= config_pt->speed*config_pt->dt; 
-     int N_ITER = floor( config_pt->ds_insert/step );//insert interval
+     int N_ITER = floor( checkparas_pt->ds_insert/step );//insert interval
      int _idx_dubin= dubin_collects.size();
      double seg_len = 0.;
      //std::cout<<"insert path_log size: "<< path_copy.size() << std::endl;
@@ -345,7 +347,7 @@ namespace Ardrone_rrt_avoid{
 	{
 	   if(i== N_ITER) insert_it = start_it;//the first one
 	   user_types::GSnode cp_node;
-	   cp_node->state_pt= temp_log[i]->copy();
+	   cp_node.state_pt= temp_log[i]->copy();
 	   cp_node.cost= start_it->cost+ seg_len;
 	   cp_node.idx_dubin= _idx_dubin;
 	   cp_node.idx_state= i;
@@ -359,24 +361,34 @@ namespace Ardrone_rrt_avoid{
             
    }//InsertDubinsNode ends
 
+   void YlClRRT::TempLogClear()
+   {
+     for(int i=0;i!= temp_log.size();++i)
+     {
+        user_types::GeneralState* st_pt= temp_log[i];
+	delete st_pt;
+     }//for int i ends
+     temp_log.clear();
+   }//TempLogClear() ends
+
    double YlClRRT::Heuristics( GSnode& node )
    {//calculate the heuristics from the node to the sample node
 //basically the dubins length plus vertical height but if too steep just assign a large heuristic
      double heuri=0;
-     double s_x= sample_node->state_pt->x;
-     double s_y= sample_node->state_pt->y;
-     double s_z= sample_node->state_pt->z;
-     double s_yaw= sample_node->state_pt->yaw;
-     double n_x= node->state_pt->x;
-     double n_y= node->state_pt->y;
-     double n_z= node->state_pt->z;
-     double n_yaw= node->state_pt->yaw;
+     double s_x= sample_node.state_pt->x;
+     double s_y= sample_node.state_pt->y;
+     double s_z= sample_node.state_pt->z;
+     double s_yaw= sample_node.state_pt->yaw;
+     double n_x= node.state_pt->x;
+     double n_y= node.state_pt->y;
+     double n_z= node.state_pt->z;
+     double n_yaw= node.state_pt->yaw;
 
      double q0[]= {n_x,n_y,n_yaw};
      double q1[]= {s_x,s_y,s_yaw};
   
      DubinsPath path;
-     dubins_init(q0, q1, rho, &path);
+     dubins_init(q0, q1, config_pt->rho, &path);
      double length= dubins_path_length(&path);
      double h= fabs(s_z-n_z);
      double gamma_d= atan2(h,length);

@@ -71,12 +71,18 @@ int main(int argc, char** argv)
    cout<<"length after: "<< length<<" path_log size: "<< path_log.size()<<" coli: "<< coli<<endl; 
 
    ofstream myfile("dubin_log.txt");
+   
    for(int i=0;i!= path_log.size();++i)
    {
      user_types::GeneralState* st_pt= path_log[i];
      myfile << st_pt->x<<" "<< st_pt->y <<" "<< st_pt->z <<" "<< st_pt->t << endl;
      delete st_pt;
    }//for ends
+   
+   //path_log.clear();
+   bool a;
+   double f;
+   std::cout<<a <<" "<<f << " "<<path_log.size()<<std::endl;
    myfile.close();
    delete st_final;
    delete st_init;

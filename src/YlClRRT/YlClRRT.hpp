@@ -96,6 +96,7 @@ namespace Ardrone_rrt_avoid{
        void CalHeuri();
        void SortNodes();
        void InsertDubinsNode(TREEIter it);
+       void TempLogClear();
        //check for flags
        void CheckGoalSet();
        void CheckRootSet();
