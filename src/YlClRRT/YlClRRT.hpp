@@ -50,8 +50,13 @@ namespace Ardrone_rrt_avoid{
        //about sample
        void SetSampleParas();
        void SampleNode();
+       //set obstacles
+       inline void SetObs(std::vector<user_types::obstacle3D>& _obstacles){obstacles= _obstacles};
        //check all necesarry flags
        void CheckFlagsSet();
+       //time related
+       void SetTimeLimit(double _limit){t_limit= _limit;}
+       void SetIfInRos(bool _if_in_ros){if_in_ros= _if_in_ros;}
        //expand trees
        void ExpandTree();
      private:
