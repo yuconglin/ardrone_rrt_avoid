@@ -59,6 +59,8 @@ namespace Ardrone_rrt_avoid{
        void SetIfInRos(bool _if_in_ros){if_in_ros= _if_in_ros;}
        //expand trees
        void ExpandTree();
+       //clean the tree
+       void ClearTree();
      private:
        //path log
        std::vector<user_types::GeneralState*> temp_log;

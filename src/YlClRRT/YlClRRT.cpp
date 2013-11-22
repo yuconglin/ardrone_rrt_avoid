@@ -62,9 +62,9 @@ namespace Ardrone_rrt_avoid{
      if(if_checkparas_set)
        delete checkparas_pt;
      //root and goal
-     goal_node.free_point();
-     root_node.free_point();
-     sample_node.free_point();
+     //goal_node.free_point();
+     //root_node.free_point();
+     //sample_node.free_point();
      //delete the whole tree's pointer
    }  //~YlClRRT() ends  
 
@@ -277,10 +277,12 @@ namespace Ardrone_rrt_avoid{
 		TempLogClear();
 		dubin_collects.push_back(dubin_3d);
 		//cout << "sample 1 genertated" <<endl;
+		delete st_final;
 		break;
 	      } //if check ends
 	   } //else ends
-
+	   TempLogClear();
+           delete st_final;
         }// for int j ends
         //timer 
         if(!if_limit_reach)
@@ -303,11 +305,21 @@ namespace Ardrone_rrt_avoid{
 	       <<"smaples="<<" "<< sample_raw <<endl;
 	   break;
         }
-
+        //free sample_node
+        delete sample_node.state_pt;	
      }//while ends
-   
+     TempLogClear(); 
    }//ExpandTree() ends
-   
+  
+   void YlClRRT::ClearTree()
+   {
+     for(TREEIter it=main_tree.begin();it!=main_tree.end();++it)
+     {//free nodes pointers
+        delete(it->state_pt);
+     }//
+     main_tree.erase(main_tree.begin() );
+   }//ClearTree() ends
+
    void YlClRRT::InsertDubinsNode( TREEIter start_it)
    {
      if(temp_log.size()==0){
@@ -355,6 +367,7 @@ namespace Ardrone_rrt_avoid{
 	  
 	   insert_it=main_tree.append_child(start_it,cp_node);
 	   tree_vector.push_back( insert_it );
+	   //delete cp_node.state_pt;
 	   //goal connecting test
 	   CheckGoalReach(insert_it);
 	}// for i%N_ITER ends

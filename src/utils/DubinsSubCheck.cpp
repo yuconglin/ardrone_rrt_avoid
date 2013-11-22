@@ -118,9 +118,12 @@ namespace utils{
 	     }
 	   }
 	   
-	   GeneralState* st_temp= st_now->copy();
+	   if(path_sub_pt) 
+	   {  
+	     GeneralState* st_temp= st_now->copy();
+	     path_sub_pt->push_back(st_temp);
+	   }
 	   
-	   if(path_sub_pt)  path_sub_pt->push_back(st_temp);
 	   n_seg= floor(*sub_length_pt/checkparas_pt->ds_check);
 
 	   //end conditions
