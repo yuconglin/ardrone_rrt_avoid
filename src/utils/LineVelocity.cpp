@@ -16,6 +16,11 @@ namespace utils{
     
     double dis= sqrt(pow(x_start-x_end,2)+pow(y_start-y_end,2)+pow(z_start-z_end,2));
     
+    if(dis==0){
+      de_u<<0.<<0.<<0.;
+      return;
+    }
+    
     double phi= atan2(y_end-y_start,x_end-x_start);
     double gam= asin( (z_end-z_start)/dis );
 

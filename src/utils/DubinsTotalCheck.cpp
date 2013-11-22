@@ -11,6 +11,7 @@
 #include "checkParas.h"
 #include "UavConfig/GeneralConfig.h"
 
+using namespace std;
 namespace utils{
 
    int DubinsTotalCheck(quadDubins3D& db_3d,//the dubins curve
@@ -54,7 +55,7 @@ namespace utils{
 	    idx= i;
 	  }//if dis ends
       }//for int i ends
-     
+      //cout<<"idx: "<< idx<< endl; 
       int idx_seg= -1;
       if(idx==1||idx==2)
       {
@@ -66,6 +67,7 @@ namespace utils{
       else
 	  idx_seg= idx;//if idx ends
       if(idx_seg== 4) --idx_seg;
+      //std::cout<<"idx_seg: "<< idx_seg<< std::endl;
       //so idx_seg is the closest segment
       //check
       if(!(idx_seg==0||idx_seg==1||idx_seg==2) ){
@@ -87,11 +89,11 @@ namespace utils{
 	 std::vector<user_types::GeneralState*>* path_sub_pt= 0;
 	 std::vector<user_types::GeneralState*> path_sub;
          if(path_log_pt) path_sub_pt= &path_sub;
-	 
+	 //std::cout<<"i: "<< i<< std::endl; 
 	 double length_sub= 0;
          double *length_sub_pt= &length_sub;
 	 result= DubinsSubCheck(db_3d,st_first,st_next,cfg_target,obstacles,checkparas_pt,config_pt,path_sub_pt,length_sub_pt,i);
-	 std::cout<<"la la la"<< std::endl;
+	 //std::cout<<"la la la"<< std::endl;
          //modify total length
 	 *actual_length_pt+= *length_sub_pt;
 	 //update logged path
@@ -118,7 +120,7 @@ namespace utils{
          }
          else {;}//nothing
       
-         std::cout<< "st_next: "<<st_next->x <<" "<< st_next->y << " " <<st_next->z << std::endl;
+         //std::cout<< "st_next: "<<st_next->x <<" "<< st_next->y << " " <<st_next->z << std::endl;
 
       }//for int i ends
       

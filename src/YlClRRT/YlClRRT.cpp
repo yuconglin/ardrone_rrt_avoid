@@ -172,7 +172,7 @@ namespace Ardrone_rrt_avoid{
        bool if_in= spaceLimit_pt->TellIn(x_a,y_a,z_a);
        if(if_in) break;
      }//while ends
-     std::cout<<x_a <<" "<<y_a <<" "<<z_a<< " "<< the_a*180./M_PI<< std::endl; 
+     //std::cout<<x_a <<" "<<y_a <<" "<<z_a<< " "<< the_a*180./M_PI<< std::endl; 
      //assign to sample node
      sample_node= GSnode( behavior_pt->InitState(x_a,y_a,z_a,0,the_a) );
    }//SampleNode ends
@@ -205,7 +205,7 @@ namespace Ardrone_rrt_avoid{
 			 &actual_length//actual length tranversed
 			 );
      delete st_final;
-     
+     //cout<<"CheckGoalReach: colli "<< colli<<endl; 
      if(colli== 1)//free of collision
      {
        it->cost2go= actual_length;
@@ -233,6 +233,7 @@ namespace Ardrone_rrt_avoid{
      {
         SampleNode();
 	++sample_raw;
+	//cout<<"sample_raw: "<< sample_raw<< endl;
         CalHeuri();  
 	SortNodes();
 
@@ -456,7 +457,7 @@ namespace Ardrone_rrt_avoid{
 
    }//CheckRootSet() ends
    
-   void YlClRRT::CheckGoalReach()
+   void YlClRRT::CheckGoalIfReach()
    {
        if(!if_goal_reach){
 	    try {
@@ -468,7 +469,7 @@ namespace Ardrone_rrt_avoid{
 	    } 
 	  }//if_root_set not
 	  
-   }//CheckGoalReach() ends
+   }//CheckGoalIfReach() ends
    
    void YlClRRT::CheckSampleParaSet()
    {

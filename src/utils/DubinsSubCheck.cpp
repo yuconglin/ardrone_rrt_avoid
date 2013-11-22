@@ -17,6 +17,7 @@
 #include <vector>
 
 using namespace user_types;
+using namespace std;
 
 namespace utils{
 
@@ -97,6 +98,7 @@ namespace utils{
 	   }//else ends
            //normalize u
 	   config_pt->NormalizeU(u);
+	   //cout<<"u: "<<u(0)<<" "<<u(1)<<" "<<u(2)<< endl;
 	   //state update
 	   GeneralState* st_pre= st_now->copy();
            //std::cout<<"st_now: "<<st_now->x <<" "<< st_now->y <<" "<< st_now->z <<std::endl; 
@@ -143,10 +145,10 @@ namespace utils{
 	     break;
 
 	}//while ends
-        std::cout<<"st_now: "<< st_now->x << " "<< st_now->y <<" "<< st_now->z<< std::endl; 
+        //std::cout<<"st_now: "<< st_now->x << " "<< st_now->y <<" "<< st_now->z<< std::endl; 
 	//st_final= st_now->copy();
 	*st_final= *st_now;
-	std::cout<<"st_final: "<<st_final->x<<" "<<st_final->y<<" "<<st_final->z << std::endl;
+	//std::cout<<"st_final: "<<st_final->x<<" "<<st_final->y<<" "<<st_final->z << std::endl;
 	delete st_now;
         if(if_colli) result= -1;
         return result;

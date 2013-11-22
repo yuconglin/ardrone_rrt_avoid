@@ -105,7 +105,7 @@ namespace Ardrone_rrt_avoid{
        //check for flags
        void CheckGoalSet();
        void CheckRootSet();
-       void CheckGoalReach();
+       void CheckGoalIfReach();
        void CheckSampleParaSet();
        void CheckConfigSet();
        void CheckSpaceLimitSet();

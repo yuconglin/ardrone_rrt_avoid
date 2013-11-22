@@ -31,6 +31,12 @@ namespace utils{
 	double c_d= center[2];
 	 
 	double de_length= fabs(cfg_end.theta-cfg_start.theta)*rho;
+	
+	if(de_length==0){
+          de_u<<0.<<0.<<0.;
+	  return;
+	}
+	 
 	double h_diff= cfg_end.z-cfg_start.z;
 	double tan_gamma= h_diff/de_length;
         //vectors for calculation
