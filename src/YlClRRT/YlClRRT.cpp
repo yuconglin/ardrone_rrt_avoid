@@ -1,6 +1,7 @@
 #include "YlClRRT.hpp"
 //utilities
 #include "NotInRadius.h"
+#include "DubinsTotalCheck.h"
 //dubins
 #include "dubins.h"
 //user types
@@ -17,8 +18,12 @@
 #include <cmath>
 //tree
 #include "tree.hh"
+//quad related
+#include "QuadCfg.h"
+#include "quadDubins3D.h"
 
 using namespace user_types;
+using namespace std;
 
 namespace Ardrone_rrt_avoid{
 
@@ -173,7 +178,7 @@ namespace Ardrone_rrt_avoid{
    bool YlClRRT::CheckGoalReach(TREEIter it)
    {//true if goal reachable from it
      QuadCfg cfg_start(it->state_pt->x,it->state_pt->y,it->state_pt->z,it->state_pt->yaw);
-     QuadCfg cfg_end(goal_node->state_pt->x,goal_node.state_pt->y,goal_node.state_pt->z,goal_node->state_pt->yaw);
+     QuadCfg cfg_end(goal_node.state_pt->x,goal_node.state_pt->y,goal_node.state_pt->z,goal_node.state_pt->yaw);
      //create a dubins curve connecting the node to the goal
      quadDubins3D dubin_3d(cfg_start,cfg_end,config_pt->rho);
      //check for rise limit
@@ -247,7 +252,7 @@ namespace Ardrone_rrt_avoid{
            GeneralState* st_final= start->copy();
 
 	   QuadCfg cfg_start(start->x,start->y,start->z,start->yaw);
-	   QuadCfg cfg_end(sample_node->state_pt->x,sample_node->state_pt->y,sample_node->state_pt->z,sample_node->state_pt->yaw);
+	   QuadCfg cfg_end(sample_node.state_pt->x,sample_node.state_pt->y,sample_node.state_pt->z,sample_node.state_pt->yaw);
 	   //create a dubins curve connecting the node to the sampling node
 	   quadDubins3D dubin_3d(cfg_start,cfg_end,config_pt->rho);
 
@@ -302,7 +307,56 @@ namespace Ardrone_rrt_avoid{
    
    void YlClRRT::InsertDubinsNode( TREEIter it)
    {
-              
+     if(temp_log.size()==0){
+       try {
+          throw std::runtime_error ("temp_log size zero");
+       }
+       catch (std::runtime_error &e) {
+          std::cout << "Caught a runtime_error exception: "
+                  << e.what () << '\n';
+       }
+     }
+     
+     TREEIter insert_it;
+     double step= config_pt->speed*config_pt->dt; 
+     int N_ITER = floor( config_pt->ds_insert/step );//insert interval
+     int _idx_dubin= dubin_collects.size();
+     double seg_len = 0.;
+     //std::cout<<"insert path_log size: "<< path_copy.size() << std::endl;
+     for(int i=1;i!=temp_log.size();++i)
+     {
+	seg_len+= sqrt( pow(temp_log[i]->x-temp_log[i-1]->x,2) 
+                      + pow(temp_log[i]->y-temp_log[i-1]->y,2)
+		      + pow(temp_log[i]->z-temp_log[i-1]->z,2)
+	          );
+        
+	if(!if_limit_reach)
+	{
+	  sec_count= ros::Time::now().toSec()-t_start.toSec();
+	  if( sec_count >= t_limit)
+	  {
+	    if_limit_reach= true;
+	    cout<<"stop1"<<endl;
+	    break;
+	  }
+	}
+
+	if(i% N_ITER==0||i== temp_log.size()-1)
+	{
+	   if(i== N_ITER) insert_it = start_it;//the first one
+	   user_types::GSnode cp_node;
+	   cp_node->state_pt= temp_log[i]->copy();
+	   cp_node.cost= start_it->cost+ seg_len;
+	   cp_node.idx_dubin= _idx_dubin;
+	   cp_node.idx_state= i;
+	  
+	   insert_it=main_tree.append_child(start_it,cp_node);
+	   tree_vector.push_back( insert_it );
+	   //goal connecting test
+	   CheckGoalReach(insert_it);
+	}// for i%N_ITER ends
+     }//for int i ends
+            
    }//InsertDubinsNode ends
 
    double YlClRRT::Heuristics( GSnode& node )

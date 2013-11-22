@@ -7,6 +7,8 @@
 #include "UavState/GSnode.h"
 //ros
 #include "ros/ros.h"
+//quad related
+#include "quadDubins3D.h"
 
 //forward declaration
 namespace user_types{
@@ -59,6 +61,7 @@ namespace Ardrone_rrt_avoid{
        tree<user_types::GSnode> main_tree;
        std::vector<TREEIter> tree_vector;
        std::vector<TREEIter> tree_vector_sort;
+       std::vector<quadDubins3D> dubin_collects;
        //obstacles
        std::vector<user_types::obstacle3D> obstacles;
        //user defined types
@@ -89,7 +92,7 @@ namespace Ardrone_rrt_avoid{
        double sec_count;
        //private function
        bool CheckGoalReach( TREEIter it); 
-       double Heuristics( GSnode& node);
+       double Heuristics(user_types::GSnode& node);
        void CalHeuri();
        void SortNodes();
        void InsertDubinsNode(TREEIter it);
