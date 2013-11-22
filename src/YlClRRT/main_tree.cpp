@@ -43,7 +43,8 @@ int main(int argc, char** argv)
     //check all the flags
     yc_rrt.CheckFlagsSet();
     //set the obstacles
-    obstacles.push_back(obstacle3D(4,0,0,0.8,0.,0.,0.5,0.5) );
+    vector<obstacle3D> obstacles;
+    obstacles.push_back(obstacle3D(4.,0.,0.,0.,0.8,0.,0.,0.5,0.5) );
     yc_rrt.SetObs(obstacles);
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);

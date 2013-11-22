@@ -51,7 +51,7 @@ namespace Ardrone_rrt_avoid{
        void SetSampleParas();
        void SampleNode();
        //set obstacles
-       inline void SetObs(std::vector<user_types::obstacle3D>& _obstacles){obstacles= _obstacles};
+       inline void SetObs(std::vector<user_types::obstacle3D>& _obstacles){obstacles= _obstacles;}
        //check all necesarry flags
        void CheckFlagsSet();
        //time related
