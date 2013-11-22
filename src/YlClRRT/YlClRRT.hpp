@@ -61,6 +61,8 @@ namespace Ardrone_rrt_avoid{
        void ExpandTree();
        //clean the tree
        void ClearTree();
+       //generate the path
+       bool PathGen();
      private:
        //path log
        std::vector<user_types::GeneralState*> temp_log;
@@ -68,7 +70,10 @@ namespace Ardrone_rrt_avoid{
        tree<user_types::GSnode> main_tree;
        std::vector<TREEIter> tree_vector;
        std::vector<TREEIter> tree_vector_sort;
+       std::vector<TREEIter> goal_connect_nodes;
        std::vector<quadDubins3D> dubin_collects;
+       //path generated
+       std::vector<TREEIter> path_total;
        //obstacles
        std::vector<user_types::obstacle3D> obstacles;
        //user defined types

@@ -303,6 +303,7 @@ namespace Ardrone_rrt_avoid{
 	       <<"nodes="<<" "<<tree_vector.size()<<" "\
 	       <<"samples good="<<" "<<sample_count<<" "\
 	       <<"smaples="<<" "<< sample_raw <<endl;
+	   delete sample_node.state_pt;
 	   break;
         }
         //free sample_node
@@ -319,6 +320,121 @@ namespace Ardrone_rrt_avoid{
      }//
      main_tree.erase(main_tree.begin() );
    }//ClearTree() ends
+
+   bool YlClRRT::PathGen()
+   {
+      t_start= ros::Time::now();
+      bool if_path= false;
+      
+      goal_connect_nodes.clear();
+      for(TREEIter it = main_tree.begin();it!= main_tree.end();++it)
+      {
+	if(it->goal_reach)
+	  goal_connect_nodes.push_back(it);
+      }
+
+      path_total.clear();
+      if(!goal_connect_nodes.empty() )		    
+      {
+	cout<<"goal nodes size="<<" "<<goal_connect_nodes.size()<<endl;
+	//sort goal nodes
+	std::sort(goal_connect_nodes.begin(),goal_connect_nodes.end(),GoalCompFunc);
+	//add the goal to the tree
+	cout << "goal: "<<goal_node.state_pt->x <<" "<<goal_node.state_pt->y <<" "<<goal_node.state_pt->z <<endl;
+	TREEIter it_next= goal_connect_nodes[0];
+	QuadCfg cfg_start(it_next->state_pt->x,it_next->state_pt->y,it_next->state_pt->z,it_next->state_pt->yaw);
+	QuadCfg cfg_end(goal_node.state_pt->x,goal_node.state_pt->y,goal_node.state_pt->z,goal_node.state_pt->yaw);
+	//create a dubins curve connecting the node to the sampling node
+	quadDubins3D dubin_3d(cfg_start,cfg_end,config_pt->rho);
+
+	dubin_collects.push_back(dubin_3d);
+	goal_node.idx_dubin= dubin_collects.size()-1;
+	it_next =main_tree.append_child(it_next, goal_node);
+	
+	//forming the path		   
+	while(1)
+	{
+	  QuadState st= it_next->state;
+	  //cout<<st.x<<" "<<st.y<<" "<<st.z<<" "<<it_next->idx_dubin<<endl;
+	  path_total.push_back(it_next);
+	  it_next= main_tree.parent(it_next);
+	  if( it_next==main_tree.begin() )
+	  {
+	    QuadState st= it_next->state;
+	    //cout<<st.x<<" "<<st.y<<" "<<st.z<<" "<<it_next->idx_dubin<<endl;
+	    path_total.push_back(it_next);
+	    break;
+	  }
+	}
+	std::reverse( path_total.begin(),path_total.end() );
+	
+	//prune the path
+	if( path_total.size()>3 )
+	{  
+	   cout<<"original path length: "<<path_total.size()<<endl;
+	   vector<TREEIter> path_prune;
+	   int i_start=0,i_end;
+	   path_prune.push_back(path_total[i_start]);
+	   while(1)
+	   {
+	     if(i_start==0) 
+	       i_end= path_total.size()-2;//the node prior to the goal
+	     else 
+	       i_end= path_total.size()-1;
+	     
+	     TREEIter it_start= path_total[i_start];
+	     int i; 
+	     
+	     double delta_t= 1e8;
+	     QuadState st_final,st_sample;
+	     for(i= i_end; i> i_start+1; --i)
+	     {
+	       TREEIter it_end= path_total[i];
+	       QuadCfg cfg_start(it_start->state.x,it_start->state.y,it_start->state.z,it_start->state.theta);
+	       QuadCfg cfg_end(it_end->state.x,it_end->state.y,it_end->state.z,it_end->state.theta);
+	       //create a dubins curve connecting the node to the sampling node
+	       quadDubins3D dubin_3d(cfg_start,cfg_end,rho);
+	       
+	       int colli=DubinsTotalCheck(delta_t,dubin_3d,it_start->state,cfg_end,st_final,st_sample,obstacles);
+	       if(colli==1)
+	       {
+		 i_start= i;
+		 path_prune.push_back(path_total[i_start]);
+		 break;
+	       }//if colli!= -1 ends
+
+	     }//for int i ends
+	     if(i== i_start+1) break;
+	     if(i_start== path_total.size()-1)
+	     {
+	       path_total= path_prune;
+	       break;
+	     }
+	     if(i_start==path_total.size()-2)
+	     {
+	       path_prune.push_back( path_total.back() );
+	       path_total= path_prune;
+	       break;
+	     }
+	   }//while ends
+       }//prune ends
+	
+	cout<<"path size="<<" "<<path_total.size()<<endl;
+	if_path= true; //path found
+      } //if !goal_connect ends
+      else
+      {
+	cout<<"no way to the goal"<<endl;
+	if_path= false; //path not found 
+      }
+      
+      ros::Duration du= ros::Time::now()- t_start;
+      cout<< "time total: "<< du.toSec() << endl;
+
+      //ProfilerStop();
+      return if_path;
+
+   }//PathGen() ends
 
    void YlClRRT::InsertDubinsNode( TREEIter start_it)
    {
