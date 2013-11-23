@@ -44,6 +44,7 @@ namespace Ardrone_rrt_avoid{
        double GetRho();
        inline user_types::checkParas* GetCheckParasPt(){return this->checkparas_pt;}
        inline user_types::GeneralConfig* GetConfigPt(){return config_pt;}
+       inline std::vector<user_types::GeneralState*>* GetTrajRecPt(){return &traj_rec;}
        //set root and goal node
        void SetRoot( user_types::GeneralState* state_pt );
        void SetGoal( user_types::GeneralState* state_pt );
@@ -61,14 +62,16 @@ namespace Ardrone_rrt_avoid{
        void ExpandTree();
        //clean the tree
        void ClearTree();
+       void ClearSubTree(TREEIter sub_it);
        //generate the path
        bool PathGen();
        //PathCheck
        bool PathCheck(user_types::GeneralState* st_init,TREEIter& it_block,std::vector<user_types::GeneralState*>& traj_rec);
-
+       bool PathCheckRepeat(user_types::GeneralState* st_current);
      private:
        //path log
        std::vector<user_types::GeneralState*> temp_log;
+       std::vector<user_types::GeneralState*> traj_rec;
        //the tree body
        tree<user_types::GSnode> main_tree;
        std::vector<TREEIter> tree_vector;
@@ -90,6 +93,8 @@ namespace Ardrone_rrt_avoid{
        user_types::GSnode root_node;
        //sampled node
        user_types::GSnode sample_node;
+       //current state
+       user_types::GeneralState* st_current;
        //protection flags
        bool if_goal_set;
        bool if_root_set;

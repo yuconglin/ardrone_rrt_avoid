@@ -5,7 +5,7 @@
 #include "controller/config/parrot/config_controller_Parrot.h"
 
 namespace user_types{
-   
+   /*
    int ArdroneState::Update(const arma::vec::fixed<3> u, double dt)
    {
        //first world reference to local reference
@@ -85,8 +85,9 @@ namespace user_types{
        t+= dt;
        return 0;
    }//Update ends
+   */
    
-   /* 
+   
    int ArdroneState::Update(const arma::vec::fixed<3> u, double dt)
    { //first world reference to local reference
       double ux= u(0)*cos(yaw)+ u(1)*sin(yaw);
@@ -152,7 +153,7 @@ namespace user_types{
       t+= dt;
       return 0;
    }//Update ends
-   */
+   
    void ArdroneState::LogData(std::ofstream& file)
    {
       if(!file.is_open() )
@@ -172,7 +173,7 @@ namespace user_types{
    
    GeneralState* ArdroneState::copy()
    {  //potential memory link
-      //return new ArdroneState(x,y,z,t,yaw,vx,vy,vz,yaw_rate);
-      return new ArdroneState(x,y,z,t,yaw,vx,vy,vz,yaw_rate,ax,ay,az,a_yaw);
+      return new ArdroneState(x,y,z,t,yaw,vx,vy,vz,yaw_rate);
+      //return new ArdroneState(x,y,z,t,yaw,vx,vy,vz,yaw_rate,ax,ay,az,a_yaw);
    }
 };//namespace ends

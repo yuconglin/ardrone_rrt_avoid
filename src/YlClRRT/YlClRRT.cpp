@@ -318,7 +318,8 @@ namespace Ardrone_rrt_avoid{
      {//free nodes pointers
         delete(it->state_pt);
      }//
-     main_tree.erase(main_tree.begin() );
+     if(main_tree.size()!=0 )
+       main_tree.erase(main_tree.begin() );
    }//ClearTree() ends
 
    bool GoalCompFunc(TREEIter it1, TREEIter it2)
@@ -443,114 +444,144 @@ namespace Ardrone_rrt_avoid{
    
    bool YlClRRT::PathCheck(user_types::GeneralState* st_init,TREEIter& it_block,std::vector<user_types::GeneralState*>& traj_rec)
    {
-	cout<<"*************it is path check***************"<<endl;
-	t_start= ros::Time::now();
-	
-	if(path_total.size()==0){
-          try {
-            throw std::runtime_error("PathCheck: path_total empty");
-          }
-          catch (std::runtime_error &e) {
-            std::cout << "Caught a runtime_error exception: "
-                  << e.what () << '\n';
-          } 
-	}//if ends
-	
-	traj_rec.clear();
-	GeneralState* st_temp= st_init->copy();
-	traj_rec.push_back( st_temp );
-	//to see which wp it starts from
-	double dwp[path_total.size()];//wp 0,1,2,3...path_total.size()-1
-	double len_wp[path_total.size()-1];//k points, k-1 segments
-	//curve 0,1,2...path_total.size()-2
-	int idx= -1;
-	double dis_temp= 1e8;
-	
-	for(int i=0;i< path_total.size();++i)
+      cout<<"*************it is path check***************"<<endl;
+      t_start= ros::Time::now();
+      
+      if(path_total.size()==0){
+	try {
+	  throw std::runtime_error("PathCheck: path_total empty");
+	}
+	catch (std::runtime_error &e) {
+	  std::cout << "Caught a runtime_error exception: "
+		<< e.what () << '\n';
+	} 
+      }//if ends
+      
+      traj_rec.clear();
+      GeneralState* st_temp= st_init->copy();
+      traj_rec.push_back( st_temp );
+      //to see which wp it starts from
+      double dwp[path_total.size()];//wp 0,1,2,3...path_total.size()-1
+      double len_wp[path_total.size()-1];//k points, k-1 segments
+      //curve 0,1,2...path_total.size()-2
+      int idx= -1;
+      double dis_temp= 1e8;
+      
+      for(int i=0;i< path_total.size();++i)
+      {
+	GeneralState* st= path_total[i]->state_pt;
+	double dis=pow(st->x-st_init->x,2)+pow(st->y-st_init->y,2)+pow(st->z-st_init->z,2);
+	dwp[i]= sqrt(dis);
+	if(dwp[i]<dis_temp )
 	{
-	  GeneralState* st= path_total[i]->state_pt;
-	  double dis=pow(st->x-st_init->x,2)+pow(st->y-st_init->y,2)+pow(st->z-st_init->z,2);
-	  dwp[i]= sqrt(dis);
-	  if(dwp[i]<dis_temp )
-	  {
-	     dis_temp= dwp[i];
-	     idx= i;
-	  }//if dis ends
+	   dis_temp= dwp[i];
+	   idx= i;
+	}//if dis ends
 
-	  if( i< path_total.size()-1 )
-	  //if(i>0)
-	  {
-	    if(i!=path_total.size()-2)
-	      len_wp[i]= path_total[i+1]->idx_length;
-	    else
-	      len_wp[i]= dubin_collects[path_total[i+1]->idx_dubin].GetHeuriLength();
-	  }
-	}
-	
-	int idx_sec= -1;
-	if(idx!=0 && idx!=path_total.size()-1)
+	if( i< path_total.size()-1 )
+	//if(i>0)
 	{
-	  if( dwp[idx-1]/len_wp[idx-1]< dwp[idx+1]/len_wp[idx] )
-	    idx_sec= idx-1;
+	  if(i!=path_total.size()-2)
+	    len_wp[i]= path_total[i+1]->idx_length;
 	  else
-	    idx_sec= idx;
+	    len_wp[i]= dubin_collects[path_total[i+1]->idx_dubin].GetHeuriLength();
 	}
+      }
+      
+      int idx_sec= -1;
+      if(idx!=0 && idx!=path_total.size()-1)
+      {
+	if( dwp[idx-1]/len_wp[idx-1]< dwp[idx+1]/len_wp[idx] )
+	  idx_sec= idx-1;
 	else
 	  idx_sec= idx;
-	
-	cout<<"idx: "<<idx<<" idx_sec: "<< idx_sec <<endl;
-	int colli=1;
-        
-	GeneralState *st_cu= st_init->copy(),*st_next= st_init->copy(); 
+      }
+      else
+	idx_sec= idx;
+      
+      cout<<"idx: "<<idx<<" idx_sec: "<< idx_sec <<endl;
+      int colli=1;
+      
+      GeneralState *st_cu= st_init->copy(),*st_next= st_init->copy(); 
 
-	for(int i=idx_sec; i!= path_total.size()-1; ++i)
-	{
-	   TREEIter it_wp= path_total[i+1];
-	   vector<user_types::GeneralState*> path_sub;
-	   double c_length=0;
-	   cout<<"xxxxxxxxxxx,it_wp idx_dubin: "<<it_wp->idx_dubin<<endl;
-	   quadDubins3D dubin_3d= dubin_collects[it_wp->idx_dubin];
-	   //cout<<"dubin start "<<dubin_3d.cfg_start.x<<" "<<dubin_3d.cfg_start.y<<" "<<dubin_3d.cfg_start.z<<endl;
-	   //cout<<"dubin end "<<dubin_3d.cfg_end.x<<" "<<dubin_3d.cfg_end.y<<" "<<dubin_3d.cfg_end.z<<endl;
-	   //if_colli= db_3d.PropTotalCheck(st_cu,it_wp->state,st_next,obstacles);
-	   QuadCfg cfg_target(it_wp->state_pt->x,it_wp->state_pt->y,it_wp->state_pt->z,it_wp->state_pt->yaw ); 
-	   colli= utils::DubinsTotalCheck(dubin_3d,st_init,st_next,cfg_target,obstacles,checkparas_pt,config_pt,&path_sub,&c_length);
+      for(int i=idx_sec; i!= path_total.size()-1; ++i)
+      {
+	 TREEIter it_wp= path_total[i+1];
+	 vector<user_types::GeneralState*> path_sub;
+	 double c_length=0;
+	 cout<<"xxxxxxxxxxx,it_wp idx_dubin: "<<it_wp->idx_dubin<<endl;
+	 quadDubins3D dubin_3d= dubin_collects[it_wp->idx_dubin];
+	 //cout<<"dubin start "<<dubin_3d.cfg_start.x<<" "<<dubin_3d.cfg_start.y<<" "<<dubin_3d.cfg_start.z<<endl;
+	 //cout<<"dubin end "<<dubin_3d.cfg_end.x<<" "<<dubin_3d.cfg_end.y<<" "<<dubin_3d.cfg_end.z<<endl;
+	 //if_colli= db_3d.PropTotalCheck(st_cu,it_wp->state,st_next,obstacles);
+	 QuadCfg cfg_target(it_wp->state_pt->x,it_wp->state_pt->y,it_wp->state_pt->z,it_wp->state_pt->yaw ); 
+	 colli= utils::DubinsTotalCheck(dubin_3d,st_init,st_next,cfg_target,obstacles,checkparas_pt,config_pt,&path_sub,&c_length);
 
-	   //cout<<"check colli: "<<colli<<endl;
-	   cout<<"idx "<<i<<" "<<st_next->x <<" "<<st_next->y <<" "<<st_next->z <<" "<< st_next->t <<endl;
-	   cout<<"ideal "<<i<<" "<< it_wp->state_pt->x <<" "<<it_wp->state_pt->y<<" "<< it_wp->state_pt->z <<endl;
+	 //cout<<"check colli: "<<colli<<endl;
+	 cout<<"idx "<<i<<" "<<st_next->x <<" "<<st_next->y <<" "<<st_next->z <<" "<< st_next->t <<endl;
+	 cout<<"ideal "<<i<<" "<< it_wp->state_pt->x <<" "<<it_wp->state_pt->y<<" "<< it_wp->state_pt->z <<endl;
 
-	   if(colli!=1) 
-	   {
-	     if(i== path_total.size()-2)
-		it_block= path_total[i-1];
-	     else
-	     {
-		it_block= it_wp;
-		cout<<"it_block "<<i<<" "<<it_wp->state_pt->x <<" "<< it_wp->state_pt->y <<" "<< it_wp->state_pt->z <<endl;
-	     }
-	     break;
-	   }
+	 if(colli!=1) 
+	 {
+	   if(i== path_total.size()-2)
+	      it_block= path_total[i-1];
 	   else
 	   {
-	     *st_cu= *st_next;
-	     traj_rec.insert(traj_rec.end(),path_sub.begin(),path_sub.end() );
+	      it_block= it_wp;
+	      cout<<"it_block "<<i<<" "<<it_wp->state_pt->x <<" "<< it_wp->state_pt->y <<" "<< it_wp->state_pt->z <<endl;
 	   }
-	}//for int i end
-        delete st_cu;
-	delete st_next;
+	   break;
+	 }
+	 else
+	 {
+	   *st_cu= *st_next;
+	   traj_rec.insert(traj_rec.end(),path_sub.begin(),path_sub.end() );
+	 }
+      }//for int i end
+      delete st_cu;
+      delete st_next;
 
-	ros::Duration du= ros::Time::now()- t_start;
-	cout<<"colli: "<<colli<<endl;
-	cout<< "check time total:+++++++++++++++++++++++ "<< du.toSec() << endl;
-	return (colli!=1);
+      ros::Duration du= ros::Time::now()- t_start;
+      cout<<"colli: "<<colli<<endl;
+      cout<< "check time total:+++++++++++++++++++++++ "<< du.toSec() << endl;
+      return (colli!=1);
 
-      }//end PathCheck	
+   }//end PathCheck	
    
-   //clear a sub tree
-   void ClearSubTree( TREEIter it)
-   {
+   bool YlClRRT::PathCheckRepeat( user_types::GeneralState* st_current)
+   {//if collided, re-select path. True if path is good
+      bool if_colli= false,if_path= false;
+      TREEIter it_block;
+      
+      while(1)
+      {
+	if(!PathGen() ) 
+	{//no path to the goal
+	  cout<<"no path, stop or local avoidance"<<endl;
+	  break;
+	}
+	if_colli= PathCheck(st_current,it_block,traj_rec);
+	if(!if_colli) 
+	{
+	  if_path= true;
+	  break;
+	}
+	else
+	{
+	  //remove child tree and regenerate path
+	  ClearSubTree(it_block); 	      
+	}//if-else ends
+	cout<<"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"<<endl;
+      }//while ends
+      return if_path;
+   }//PathCheckRepeat() ends
 
+   //clear a sub tree
+   void YlClRRT::ClearSubTree( TREEIter it_sub)
+   {
+      for(TREEIter it= it_sub.begin();it!=it_sub.end();++it)
+	delete(it->state_pt);
+      main_tree.erase(it_sub);
    }//ClearSubTree ends
 
    void YlClRRT::InsertDubinsNode( TREEIter start_it)
