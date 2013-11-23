@@ -15,9 +15,9 @@ namespace user_types{
      double idx_length;//length from the start of the dubin's curve
      bool goal_reach;//if accessible from the goal
 
-     GSnode():state_pt(NULL),heuri(0.),cost(0.),cost2go(0.),idx_dubin(-1),idx_state(-1),goal_reach(false){ };
+     GSnode():state_pt(NULL),heuri(0.),cost(0.),cost2go(0.),idx_dubin(-1),idx_length(0.),goal_reach(false){ };
 
-     GSnode(GeneralState* _state_pt):state_pt(_state_pt),heuri(0.),cost(0.),cost2go(0.),idx_dubin(-1),idx_state(-1),goal_reach(false){ };
+     GSnode(GeneralState* _state_pt):state_pt(_state_pt),heuri(0.),cost(0.),cost2go(0.),idx_dubin(-1),idx_length(0.),goal_reach(false){ };
 
      void free_point(){ delete state_pt; }
   };

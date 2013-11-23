@@ -501,7 +501,7 @@ namespace Ardrone_rrt_avoid{
 	cout<<"idx: "<<idx<<" idx_sec: "<< idx_sec <<endl;
 	int colli=1;
         
-	GeneralState* st_cu= st_init->copy(),st_next= st_init->copy(); 
+	GeneralState *st_cu= st_init->copy(),*st_next= st_init->copy(); 
 
 	for(int i=idx_sec; i!= path_total.size()-1; ++i)
 	{
@@ -514,7 +514,7 @@ namespace Ardrone_rrt_avoid{
 	   //cout<<"dubin end "<<dubin_3d.cfg_end.x<<" "<<dubin_3d.cfg_end.y<<" "<<dubin_3d.cfg_end.z<<endl;
 	   //if_colli= db_3d.PropTotalCheck(st_cu,it_wp->state,st_next,obstacles);
 	   QuadCfg cfg_target(it_wp->state_pt->x,it_wp->state_pt->y,it_wp->state_pt->z,it_wp->state_pt->yaw ); 
-	   colli=DubinsTotalCheck(dubin_3d,st_init,st_next,cfg_target,obstacles,checkparas_pt,config_pt,&path_sub,&c_length);
+	   colli= utils::DubinsTotalCheck(dubin_3d,st_init,st_next,cfg_target,obstacles,checkparas_pt,config_pt,&path_sub,&c_length);
 
 	   //cout<<"check colli: "<<colli<<endl;
 	   cout<<"idx "<<i<<" "<<st_next->x <<" "<<st_next->y <<" "<<st_next->z <<" "<< st_next->t <<endl;
@@ -546,7 +546,12 @@ namespace Ardrone_rrt_avoid{
 	return (colli!=1);
 
       }//end PathCheck	
- 
+   
+   //clear a sub tree
+   void ClearSubTree( TREEIter it)
+   {
+
+   }//ClearSubTree ends
 
    void YlClRRT::InsertDubinsNode( TREEIter start_it)
    {
