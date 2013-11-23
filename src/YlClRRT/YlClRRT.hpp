@@ -63,6 +63,9 @@ namespace Ardrone_rrt_avoid{
        void ClearTree();
        //generate the path
        bool PathGen();
+       //PathCheck
+       bool PathCheck(user_types::GeneralState* st_init,TREEIter& it_block,std::vector<user_types::GeneralState*>& traj_rec);
+
      private:
        //path log
        std::vector<user_types::GeneralState*> temp_log;

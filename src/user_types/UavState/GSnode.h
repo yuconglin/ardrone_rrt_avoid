@@ -11,7 +11,8 @@ namespace user_types{
      double cost;//cost from root to it
      double cost2go;//cost to the goal
      int idx_dubin;//which dubins curve it belongs to
-     int idx_state;//which state in the dubins curve it is
+     //int idx_state;//which state in the dubins curve it is
+     double idx_length;//length from the start of the dubin's curve
      bool goal_reach;//if accessible from the goal
 
      GSnode():state_pt(NULL),heuri(0.),cost(0.),cost2go(0.),idx_dubin(-1),idx_state(-1),goal_reach(false){ };

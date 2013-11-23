@@ -50,6 +50,7 @@ int main(int argc, char** argv)
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(false);
     yc_rrt.ExpandTree();
+    yc_rrt.PathGen();
     //clear the tree
     yc_rrt.ClearTree();
 }//main ends
