@@ -3,13 +3,12 @@
 //forward declaration
 struct quadDubins3D;
 struct QuadCfg;
-struct obstacle3D;
 
 namespace user_types{
   struct GeneralState;
   struct checkParas;
   struct GeneralConfig;
-  struct obstacle3D;
+  struct ObsCollect;
 }
 
 namespace utils{
@@ -18,7 +17,7 @@ namespace utils{
                      user_types::GeneralState* st_init,//initial actual state
 		     user_types::GeneralState* st_final,//final state
 		     QuadCfg &cfg_target,//stop quad state
-		     std::vector<user_types::obstacle3D>& obstacles,
+		     user_types::ObsCollect& obs_collect,
 		     user_types::checkParas* checkparas_pt,
 		     user_types::GeneralConfig* config_pt,
 		     std::vector<user_types::GeneralState*>* path_log_pt,//path for log

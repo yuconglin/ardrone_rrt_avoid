@@ -62,7 +62,7 @@ namespace Ardrone_rrt_avoid{
      if(if_checkparas_set)
        delete checkparas_pt;
      //root and goal
-     //goal_node.free_point();
+     goal_node.free_point();
      //root_node.free_point();
      //sample_node.free_point();
      //delete the whole tree's pointer
@@ -121,6 +121,16 @@ namespace Ardrone_rrt_avoid{
    {
      this->sampler_pt= _sampler_pt;
    }
+
+   void YlClRRT::SetObs2D(const std::vector<user_types::obstacle2D>& _obs2ds)
+   {
+     obs_collect.obs_2ds= _obs2ds;
+   }//SetObs2D ends
+
+   void YlClRRT::SetObs3D(const std::vector<user_types::obstacle3D>& _obs3ds)
+   {
+     obs_collect.obs_3ds= _obs3ds;
+   }//SetObs3D ends
 
    void YlClRRT::SetSampleParas()
    {
@@ -198,7 +208,7 @@ namespace Ardrone_rrt_avoid{
                          it->state_pt,//initial actual state
 			 st_final,//final state
 			 cfg_end,//stop quad state
-			 obstacles,
+			 obs_collect,
                          checkparas_pt,
 			 config_pt,
 			 0,//path for log
@@ -267,7 +277,7 @@ namespace Ardrone_rrt_avoid{
 	   else
 	   {	      
 	      double c_length= 0.;
-	      int colli= utils::DubinsTotalCheck(dubin_3d,start,st_final,cfg_end,obstacles,checkparas_pt,config_pt,&temp_log,&c_length);
+	      int colli= utils::DubinsTotalCheck(dubin_3d,start,st_final,cfg_end,obs_collect,checkparas_pt,config_pt,&temp_log,&c_length);
 
 	      if(colli!=-1)
 	      {
@@ -355,7 +365,7 @@ namespace Ardrone_rrt_avoid{
 
 	dubin_collects.push_back(dubin_3d);
 	goal_node.idx_dubin= dubin_collects.size()-1;
-	it_next =main_tree.append_child(it_next, goal_node);
+	it_next =main_tree.append_child(it_next, goal_node.copy() );
 	
 	//forming the path		   
 	while(1)
@@ -399,7 +409,7 @@ namespace Ardrone_rrt_avoid{
 	       quadDubins3D dubin_3d(cfg_start,cfg_end,config_pt->rho);
 	       
 	       double c_length= 0.;
-	       int colli= utils::DubinsTotalCheck(dubin_3d,it_start->state_pt,st_final,cfg_end,obstacles,checkparas_pt,config_pt,0,&c_length); 	       
+	       int colli= utils::DubinsTotalCheck(dubin_3d,it_start->state_pt,st_final,cfg_end,obs_collect,checkparas_pt,config_pt,0,&c_length); 	       
 	       if(colli==1)
 	       {
 		 i_start= i;
@@ -442,7 +452,7 @@ namespace Ardrone_rrt_avoid{
 
    }//PathGen() ends
    
-   bool YlClRRT::PathCheck(user_types::GeneralState* st_init,TREEIter& it_block,std::vector<user_types::GeneralState*>& traj_rec)
+   bool YlClRRT::PathCheck(user_types::GeneralState* st_init, int& it_idx,std::vector<user_types::GeneralState*>& log_rec) 
    {
       cout<<"*************it is path check***************"<<endl;
       t_start= ros::Time::now();
@@ -457,9 +467,9 @@ namespace Ardrone_rrt_avoid{
 	} 
       }//if ends
       
-      traj_rec.clear();
+      log_rec.clear();
       GeneralState* st_temp= st_init->copy();
-      traj_rec.push_back( st_temp );
+      log_rec.push_back( st_temp );
       //to see which wp it starts from
       double dwp[path_total.size()];//wp 0,1,2,3...path_total.size()-1
       double len_wp[path_total.size()-1];//k points, k-1 segments
@@ -500,7 +510,7 @@ namespace Ardrone_rrt_avoid{
 	idx_sec= idx;
       
       cout<<"idx: "<<idx<<" idx_sec: "<< idx_sec <<endl;
-      int colli=1;
+      int colli;
       
       GeneralState *st_cu= st_init->copy(),*st_next= st_init->copy(); 
 
@@ -513,29 +523,25 @@ namespace Ardrone_rrt_avoid{
 	 quadDubins3D dubin_3d= dubin_collects[it_wp->idx_dubin];
 	 //cout<<"dubin start "<<dubin_3d.cfg_start.x<<" "<<dubin_3d.cfg_start.y<<" "<<dubin_3d.cfg_start.z<<endl;
 	 //cout<<"dubin end "<<dubin_3d.cfg_end.x<<" "<<dubin_3d.cfg_end.y<<" "<<dubin_3d.cfg_end.z<<endl;
-	 //if_colli= db_3d.PropTotalCheck(st_cu,it_wp->state,st_next,obstacles);
+	 //if_colli= db_3d.PropTotalCheck(st_cu,it_wp->state,st_next,obs_collect);
 	 QuadCfg cfg_target(it_wp->state_pt->x,it_wp->state_pt->y,it_wp->state_pt->z,it_wp->state_pt->yaw ); 
-	 colli= utils::DubinsTotalCheck(dubin_3d,st_init,st_next,cfg_target,obstacles,checkparas_pt,config_pt,&path_sub,&c_length);
+	 colli= utils::DubinsTotalCheck(dubin_3d,st_cu,st_next,cfg_target,obs_collect,checkparas_pt,config_pt,&path_sub,&c_length);
 
 	 //cout<<"check colli: "<<colli<<endl;
 	 cout<<"idx "<<i<<" "<<st_next->x <<" "<<st_next->y <<" "<<st_next->z <<" "<< st_next->t <<endl;
 	 cout<<"ideal "<<i<<" "<< it_wp->state_pt->x <<" "<<it_wp->state_pt->y<<" "<< it_wp->state_pt->z <<endl;
 
-	 if(colli!=1) 
+	 if(colli!=1)
 	 {
-	   if(i== path_total.size()-2)
-	      it_block= path_total[i-1];
-	   else
-	   {
-	      it_block= it_wp;
-	      cout<<"it_block "<<i<<" "<<it_wp->state_pt->x <<" "<< it_wp->state_pt->y <<" "<< it_wp->state_pt->z <<endl;
-	   }
+	   it_idx= i+1;
 	   break;
+
 	 }
 	 else
-	 {
+	 { //cout<<"collision free."<< endl;
+	   it_idx= -1;
 	   *st_cu= *st_next;
-	   traj_rec.insert(traj_rec.end(),path_sub.begin(),path_sub.end() );
+	   log_rec.insert(log_rec.end(),path_sub.begin(),path_sub.end() );
 	 }
       }//for int i end
       delete st_cu;
@@ -560,7 +566,10 @@ namespace Ardrone_rrt_avoid{
 	  cout<<"no path, stop or local avoidance"<<endl;
 	  break;
 	}
-	if_colli= PathCheck(st_current,it_block,traj_rec);
+	int it_idx;
+	//cout<<"traj_rec size: "<< traj_rec.size()<< endl;
+	if_colli= PathCheck(st_current,it_idx,traj_rec);
+	
 	if(!if_colli) 
 	{
 	  if_path= true;
@@ -569,7 +578,17 @@ namespace Ardrone_rrt_avoid{
 	else
 	{
 	  //remove child tree and regenerate path
-	  ClearSubTree(it_block); 	      
+	  if(it_idx== path_total.size()-1||it_idx==path_total.size()-2)
+	  {
+            TREEIter it_block= path_total[path_total.size()-2];
+	    //it_block->goal_reach= false;
+	    ClearSubTree(it_block);
+	  }
+	  else
+	  {
+	    TREEIter it_block= path_total[it_idx]; 
+	    ClearSubTree(it_block);
+	  }
 	}//if-else ends
 	cout<<"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"<<endl;
       }//while ends
@@ -579,6 +598,7 @@ namespace Ardrone_rrt_avoid{
    //clear a sub tree
    void YlClRRT::ClearSubTree( TREEIter it_sub)
    {
+      delete it_sub->state_pt;
       for(TREEIter it= it_sub.begin();it!=it_sub.end();++it)
 	delete(it->state_pt);
       main_tree.erase(it_sub);

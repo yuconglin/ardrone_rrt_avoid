@@ -3,12 +3,12 @@
 #include "quadDubins3D.h"
 #include "QuadCfg.h"
 //utils
-#include "SingleCheck.h"
+#include "CollectCheck.h"
 #include "LineVelocity.h"
 #include "CircleVelocity.h"
 //user defined types
 #include "UavState/GeneralState.h"
-#include "obstacle3D.h"
+#include "ObsCollect.h"
 #include "checkParas.h"
 #include "UavConfig/GeneralConfig.h"
 //other libraries
@@ -25,7 +25,7 @@ namespace utils{
                      user_types::GeneralState* st_init,//initial actual state
 		     user_types::GeneralState* st_final,//final state
 		     QuadCfg& cfg_target,//stop quad state
-		     std::vector<user_types::obstacle3D>& obstacles,
+		     user_types::ObsCollect& obs_collect,
 		     user_types::checkParas* checkparas_pt,
 		     user_types::GeneralConfig* config_pt,
 		     std::vector<user_types::GeneralState*>* path_sub_pt,//path for log
@@ -110,7 +110,8 @@ namespace utils{
 	   //collision check
            if( floor(*sub_length_pt/checkparas_pt->ds_check)> n_seg )
 	   {
-	     if( SingleCheck(st_now,obstacles) )
+	     //if( SingleCheck(st_now,obstacles) )
+	     if( CollectCheck(st_now,obs_collect) )
 	     {
 	        //dubin_actual_length+= length;
 	        if_colli= true;

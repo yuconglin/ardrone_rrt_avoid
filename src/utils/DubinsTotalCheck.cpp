@@ -7,7 +7,7 @@
 #include "SingleCheck.h"
 //user defined types
 #include "UavState/GeneralState.h"
-#include "obstacle3D.h"
+#include "ObsCollect.h"
 #include "checkParas.h"
 #include "UavConfig/GeneralConfig.h"
 
@@ -18,7 +18,7 @@ namespace utils{
                          user_types::GeneralState* st_init,//initial actual state
 			 user_types::GeneralState* st_final,//final state
 			 QuadCfg& cfg_target,//stop quad state
-			 std::vector<user_types::obstacle3D>& obstacles,
+			 user_types::ObsCollect& obs_collect,
                          user_types::checkParas* checkparas_pt,
 			 user_types::GeneralConfig* config_pt,
 			 std::vector<user_types::GeneralState*>* path_log_pt,//path for log
@@ -92,7 +92,7 @@ namespace utils{
 	 //std::cout<<"i: "<< i<< std::endl; 
 	 double length_sub= 0;
          double *length_sub_pt= &length_sub;
-	 result= DubinsSubCheck(db_3d,st_first,st_next,cfg_target,obstacles,checkparas_pt,config_pt,path_sub_pt,length_sub_pt,i);
+	 result= DubinsSubCheck(db_3d,st_first,st_next,cfg_target,obs_collect,checkparas_pt,config_pt,path_sub_pt,length_sub_pt,i);
 	 //std::cout<<"la la la"<< std::endl;
          //modify total length
 	 *actual_length_pt+= *length_sub_pt;

@@ -43,9 +43,17 @@ int main(int argc, char** argv)
     //check all the flags
     yc_rrt.CheckFlagsSet();
     //set the obstacles
-    vector<obstacle3D> obstacles;
-    obstacles.push_back(obstacle3D(4.,0.,0.,0.,0.8,0.,0.,0.5,0.5) );
-    yc_rrt.SetObs(obstacles);
+    vector<obstacle2D> obs2d;
+    obs2d.push_back( obstacle2D(4.,0.,0.5,0.5) );
+    //write the 2D obstacles to a text file
+    ofstream obs2d_file("obs2ds.txt");
+    for(int i=0;i!=obs2d.size();++i)
+    {
+      obs2d_file<<obs2d[i].x<<" "<<obs2d[i].y<<" "<<obs2d[i].r<<" "<<obs2d[i].delta_r<< endl;
+    }//for ends
+    obs2d_file.close();
+    //
+    yc_rrt.SetObs2D( obs2d );
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(false);

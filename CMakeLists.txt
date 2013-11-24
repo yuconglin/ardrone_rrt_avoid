@@ -92,7 +92,7 @@ src/utils/GetRho.cpp
 src/utils/LineVelocity.cpp
 src/utils/NotInRadius.cpp
 src/utils/PointInPoly.cpp
-src/utils/SingleCheck.cpp
+src/utils/CollectCheck.cpp
 src/utils/systemtime.cpp
            )
 

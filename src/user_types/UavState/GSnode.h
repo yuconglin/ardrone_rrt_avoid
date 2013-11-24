@@ -19,6 +19,13 @@ namespace user_types{
 
      GSnode(GeneralState* _state_pt):state_pt(_state_pt),heuri(0.),cost(0.),cost2go(0.),idx_dubin(-1),idx_length(0.),goal_reach(false){ };
 
+     GSnode(GeneralState* _state_pt,double _heuri,double _cost,double _cost2go,double _idx_dubin,double _idx_length,double _goal_reach):
+      state_pt(_state_pt),heuri(_heuri),cost(_cost),cost2go(_cost2go),idx_dubin(_idx_dubin),idx_length(_idx_length),goal_reach(_goal_reach){ };
+
      void free_point(){ delete state_pt; }
+     
+     GSnode copy(){
+       return GSnode(state_pt->copy(),heuri,cost,cost2go,idx_dubin,idx_length,goal_reach);
+     }
   };
 };//namespace ends

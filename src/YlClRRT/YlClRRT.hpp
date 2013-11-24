@@ -2,7 +2,8 @@
 //generic tree 
 #include "tree.hh"
 //user types
-#include "obstacle3D.h"
+//#include "obstacle3D.h"
+#include "ObsCollect.h"
 //tree node
 #include "UavState/GSnode.h"
 //ros
@@ -52,7 +53,8 @@ namespace Ardrone_rrt_avoid{
        void SetSampleParas();
        void SampleNode();
        //set obstacles
-       inline void SetObs(std::vector<user_types::obstacle3D>& _obstacles){obstacles= _obstacles;}
+       void SetObs2D(const std::vector<user_types::obstacle2D>& _obs2ds);
+       void SetObs3D(const std::vector<user_types::obstacle3D>& _obs3ds);
        //check all necesarry flags
        void CheckFlagsSet();
        //time related
@@ -66,8 +68,9 @@ namespace Ardrone_rrt_avoid{
        //generate the path
        bool PathGen();
        //PathCheck
-       bool PathCheck(user_types::GeneralState* st_init,TREEIter& it_block,std::vector<user_types::GeneralState*>& traj_rec);
+       bool PathCheck(user_types::GeneralState* st_init,int& it_idx,std::vector<user_types::GeneralState*>& traj_rec);
        bool PathCheckRepeat(user_types::GeneralState* st_current);
+     
      private:
        //path log
        std::vector<user_types::GeneralState*> temp_log;
@@ -81,7 +84,8 @@ namespace Ardrone_rrt_avoid{
        //path generated
        std::vector<TREEIter> path_total;
        //obstacles
-       std::vector<user_types::obstacle3D> obstacles;
+       //std::vector<user_types::obstacle3D> obstacles;
+       user_types::ObsCollect obs_collect; 
        //user defined types
        user_types::Sampler3D* sampler_pt;
        user_types::SpaceLimit* spaceLimit_pt;

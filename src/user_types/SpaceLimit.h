@@ -11,6 +11,7 @@ namespace user_types{
      double h_lower;
      //vertex for the geofencing polygon
      std::vector<point2D> vertex;
+     //vertex for polygon
      //constructor
      SpaceLimit():h_upper(0.),h_lower(0.){};
      ~SpaceLimit(){};
