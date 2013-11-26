@@ -176,7 +176,7 @@ namespace user_types{
       //return new ArdroneState(x,y,z,t,yaw,vx,vy,vz,yaw_rate,ax,ay,az,a_yaw);
    }
 
-   GeneralState* InterPolate(double dt)
+   GeneralState* ArdroneState::InterPolate(double dt)
    {
       double x_a= x+vx*dt;
       double y_a= y+vy*dt;

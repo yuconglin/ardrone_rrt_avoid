@@ -10,6 +10,7 @@ namespace user_types{
   struct checkParas;
   struct GeneralConfig;
   struct ObsCollect;
+  struct SpaceLimit;
 }
 
 namespace utils{
@@ -21,6 +22,7 @@ namespace utils{
 			 user_types::ObsCollect& obs_collect,
                          user_types::checkParas* checkparas_pt,
 			 user_types::GeneralConfig* config_pt,
+			 user_types::SpaceLimit* spaceLimit_pt,
                          std::vector<user_types::GeneralState*>* path_log_pt=0,//path for log
 			 double *actual_length_pt=0	 
 			 );

@@ -279,7 +279,7 @@ void ParrotExe::PublishFlags()
    pub_state_idx.publish(state_idx_msg);
 }//PublishFlags ends
 
-void ParrtExe::PubQuadState()
+void ParrotExe::PubQuadState()
 {
    state_msg.x= x_est;
    state_msg.y= y_est;

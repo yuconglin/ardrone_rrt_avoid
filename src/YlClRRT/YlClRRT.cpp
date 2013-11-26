@@ -99,7 +99,7 @@ namespace Ardrone_rrt_avoid{
    void YlClRRT::SetRoot( GeneralState* state_pt )
    {
      root_node= GSnode(state_pt);
-     TREEIter root_it = main_tree.insert( main_tree.begin(), root_node );
+     TREEIter root_it = main_tree.insert( main_tree.begin(), root_node.copy() );
       //push root iter to the vector
      tree_vector.push_back(root_it);
      if_root_set= true;
@@ -228,6 +228,7 @@ namespace Ardrone_rrt_avoid{
 			 obs_collect,
                          checkparas_pt,
 			 config_pt,
+			 spaceLimit_pt,
 			 0,//path for log
 			 &actual_length//actual length tranversed
 			 );
@@ -294,7 +295,7 @@ namespace Ardrone_rrt_avoid{
 	   else
 	   {	      
 	      double c_length= 0.;
-	      int colli= utils::DubinsTotalCheck(dubin_3d,start,st_final,cfg_end,obs_collect,checkparas_pt,config_pt,&temp_log,&c_length);
+	      int colli= utils::DubinsTotalCheck(dubin_3d,start,st_final,cfg_end,obs_collect,checkparas_pt,config_pt,spaceLimit_pt,&temp_log,&c_length);
 
 	      if(colli!=-1)
 	      {
@@ -426,7 +427,7 @@ namespace Ardrone_rrt_avoid{
 	       quadDubins3D dubin_3d(cfg_start,cfg_end,config_pt->rho);
 	       
 	       double c_length= 0.;
-	       int colli= utils::DubinsTotalCheck(dubin_3d,it_start->state_pt,st_final,cfg_end,obs_collect,checkparas_pt,config_pt,0,&c_length); 	       
+	       int colli= utils::DubinsTotalCheck(dubin_3d,it_start->state_pt,st_final,cfg_end,obs_collect,checkparas_pt,config_pt,spaceLimit_pt,0,&c_length); 	       
 	       if(colli==1)
 	       {
 		 i_start= i;
@@ -538,6 +539,8 @@ namespace Ardrone_rrt_avoid{
       {
 	 TREEIter it_wp= path_total[i+1];
 	 vector<user_types::GeneralState*> path_sub;
+	 vector<user_types::GeneralState*>* path_pt=0;
+	 if(if_log) path_pt= &path_sub;
 	 double c_length=0;
 	 cout<<"xxxxxxxxxxx,it_wp idx_dubin: "<<it_wp->idx_dubin<<endl;
 	 quadDubins3D dubin_3d= dubin_collects[it_wp->idx_dubin];
@@ -545,11 +548,8 @@ namespace Ardrone_rrt_avoid{
 	 //cout<<"dubin end "<<dubin_3d.cfg_end.x<<" "<<dubin_3d.cfg_end.y<<" "<<dubin_3d.cfg_end.z<<endl;
 	 //if_colli= db_3d.PropTotalCheck(st_cu,it_wp->state,st_next,obs_collect);
 	 QuadCfg cfg_target(it_wp->state_pt->x,it_wp->state_pt->y,it_wp->state_pt->z,it_wp->state_pt->yaw );
-	 if(if_log)
-	   colli= utils::DubinsTotalCheck(dubin_3d,st_cu,st_next,cfg_target,obs_collect,checkparas_pt,config_pt,&path_sub,&c_length);
-         else
-	   colli= utils::DubinsTotalCheck(dubin_3d,st_cu,st_next,cfg_target,obs_collect,checkparas_pt,config_pt,0,&c_length);
-
+	 colli= utils::DubinsTotalCheck(dubin_3d,st_cu,st_next,cfg_target,obs_collect,checkparas_pt,config_pt,spaceLimit_pt,path_pt,&c_length);
+         
 	 //cout<<"check colli: "<<colli<<endl;
 	 cout<<"idx "<<i<<" "<<st_next->x <<" "<<st_next->y <<" "<<st_next->z <<" "<< st_next->t <<endl;
 	 cout<<"ideal "<<i<<" "<< it_wp->state_pt->x <<" "<<it_wp->state_pt->y<<" "<< it_wp->state_pt->z <<endl;

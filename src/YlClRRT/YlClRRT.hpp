@@ -49,6 +49,7 @@ namespace Ardrone_rrt_avoid{
        double GetRho();
        inline user_types::checkParas* GetCheckParasPt(){return this->checkparas_pt;}
        inline user_types::GeneralConfig* GetConfigPt(){return config_pt;}
+       inline user_types::SpaceLimit* GetSpaceLimitPt(){return spaceLimit_pt;}
        inline std::vector<user_types::GeneralState*>* GetTrajRecPt(){return &traj_rec;}
        //set root and goal node
        void SetRoot( user_types::GeneralState* state_pt );
@@ -67,6 +68,8 @@ namespace Ardrone_rrt_avoid{
        inline void SetStartTime(ros::Time _t_start){t_start= _t_start;}
        //expand trees
        void ExpandTree();
+       //clear to default
+       void ClearToDefault();
        //clean the tree
        void ClearTree();
        void ClearSubTree(TREEIter sub_it);
@@ -75,6 +78,8 @@ namespace Ardrone_rrt_avoid{
        //PathCheck
        bool PathCheck(user_types::GeneralState* st_init,int& it_idx,std::vector<user_types::GeneralState*>& traj_rec,bool if_log);
        bool PathCheckRepeat(user_types::GeneralState* st_current);
+       //state prediction
+       user_types::GeneralState* TimeStateEstimate(double Dt);
        //Path to Msg
        void PathToMsg(ardrone_rrt_avoid::DubinPath_msg& path_msg);
      private:

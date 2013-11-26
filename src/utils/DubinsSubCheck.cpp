@@ -10,6 +10,7 @@
 #include "UavState/GeneralState.h"
 #include "ObsCollect.h"
 #include "checkParas.h"
+#include "SpaceLimit.h"
 #include "UavConfig/GeneralConfig.h"
 //other libraries
 #include "armadillo"
@@ -28,6 +29,7 @@ namespace utils{
 		     user_types::ObsCollect& obs_collect,
 		     user_types::checkParas* checkparas_pt,
 		     user_types::GeneralConfig* config_pt,
+                     user_types::SpaceLimit* spaceLimit_pt,
 		     std::vector<user_types::GeneralState*>* path_sub_pt,//path for log
 		     double* sub_length_pt,//actual length tranversed
 		     int idx_seg//which segment: 0,1,2
@@ -111,7 +113,9 @@ namespace utils{
            if( floor(*sub_length_pt/checkparas_pt->ds_check)> n_seg )
 	   {
 	     //if( SingleCheck(st_now,obstacles) )
-	     if( CollectCheck(st_now,obs_collect) )
+	     if( CollectCheck(st_now,obs_collect)
+	       ||!spaceLimit_pt->TellIn(st_now->x,st_now->y,st_now->z)
+	       )
 	     {
 	        //dubin_actual_length+= length;
 	        if_colli= true;
