@@ -11,6 +11,10 @@
 //quad related
 #include "quadDubins3D.h"
 
+//ros msgs
+#include "ardrone_rrt_avoid/DubinPath_msg.h"
+//#include "ardrone_rrt_avoid/ArdroneState_msg.h"
+
 //forward declaration
 namespace user_types{
    struct GeneralState;
@@ -69,9 +73,10 @@ namespace Ardrone_rrt_avoid{
        //generate the path
        bool PathGen();
        //PathCheck
-       bool PathCheck(user_types::GeneralState* st_init,int& it_idx,std::vector<user_types::GeneralState*>& traj_rec);
+       bool PathCheck(user_types::GeneralState* st_init,int& it_idx,std::vector<user_types::GeneralState*>& traj_rec,bool if_log);
        bool PathCheckRepeat(user_types::GeneralState* st_current);
-     
+       //Path to Msg
+       void PathToMsg(ardrone_rrt_avoid::DubinPath_msg& path_msg);
      private:
        //path log
        std::vector<user_types::GeneralState*> temp_log;

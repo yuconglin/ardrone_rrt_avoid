@@ -63,7 +63,7 @@ namespace Ardrone_rrt_avoid{
        delete checkparas_pt;
      //root and goal
      goal_node.free_point();
-     //root_node.free_point();
+     root_node.free_point();
      //sample_node.free_point();
      //delete the whole tree's pointer
    }  //~YlClRRT() ends  
@@ -469,8 +469,8 @@ namespace Ardrone_rrt_avoid{
 
    }//PathGen() ends
    
-   bool YlClRRT::PathCheck(user_types::GeneralState* st_init, int& it_idx,std::vector<user_types::GeneralState*>& log_rec) 
-   {
+   bool YlClRRT::PathCheck(user_types::GeneralState* st_init, int& it_idx,std::vector<user_types::GeneralState*>& log_rec,bool if_log) 
+   {  //false if collision free
       cout<<"*************it is path check***************"<<endl;
       t_start= ros::Time::now();
       
@@ -484,9 +484,12 @@ namespace Ardrone_rrt_avoid{
 	} 
       }//if ends
       
-      log_rec.clear();
-      GeneralState* st_temp= st_init->copy();
-      log_rec.push_back( st_temp );
+      if(if_log)
+      {
+        log_rec.clear();
+        GeneralState* st_temp= st_init->copy();
+        log_rec.push_back( st_temp );
+      }
       //to see which wp it starts from
       double dwp[path_total.size()];//wp 0,1,2,3...path_total.size()-1
       double len_wp[path_total.size()-1];//k points, k-1 segments
@@ -541,8 +544,11 @@ namespace Ardrone_rrt_avoid{
 	 //cout<<"dubin start "<<dubin_3d.cfg_start.x<<" "<<dubin_3d.cfg_start.y<<" "<<dubin_3d.cfg_start.z<<endl;
 	 //cout<<"dubin end "<<dubin_3d.cfg_end.x<<" "<<dubin_3d.cfg_end.y<<" "<<dubin_3d.cfg_end.z<<endl;
 	 //if_colli= db_3d.PropTotalCheck(st_cu,it_wp->state,st_next,obs_collect);
-	 QuadCfg cfg_target(it_wp->state_pt->x,it_wp->state_pt->y,it_wp->state_pt->z,it_wp->state_pt->yaw ); 
-	 colli= utils::DubinsTotalCheck(dubin_3d,st_cu,st_next,cfg_target,obs_collect,checkparas_pt,config_pt,&path_sub,&c_length);
+	 QuadCfg cfg_target(it_wp->state_pt->x,it_wp->state_pt->y,it_wp->state_pt->z,it_wp->state_pt->yaw );
+	 if(if_log)
+	   colli= utils::DubinsTotalCheck(dubin_3d,st_cu,st_next,cfg_target,obs_collect,checkparas_pt,config_pt,&path_sub,&c_length);
+         else
+	   colli= utils::DubinsTotalCheck(dubin_3d,st_cu,st_next,cfg_target,obs_collect,checkparas_pt,config_pt,0,&c_length);
 
 	 //cout<<"check colli: "<<colli<<endl;
 	 cout<<"idx "<<i<<" "<<st_next->x <<" "<<st_next->y <<" "<<st_next->z <<" "<< st_next->t <<endl;
@@ -558,7 +564,8 @@ namespace Ardrone_rrt_avoid{
 	 { //cout<<"collision free."<< endl;
 	   it_idx= -1;
 	   *st_cu= *st_next;
-	   log_rec.insert(log_rec.end(),path_sub.begin(),path_sub.end() );
+	   if(if_log)
+	    log_rec.insert(log_rec.end(),path_sub.begin(),path_sub.end() );
 	 }
       }//for int i end
       delete st_cu;
@@ -585,7 +592,7 @@ namespace Ardrone_rrt_avoid{
 	}
 	int it_idx;
 	//cout<<"traj_rec size: "<< traj_rec.size()<< endl;
-	if_colli= PathCheck(st_current,it_idx,traj_rec);
+	if_colli= PathCheck(st_current,it_idx,traj_rec,true);
 	
 	if(!if_colli) 
 	{
@@ -676,6 +683,81 @@ namespace Ardrone_rrt_avoid{
      }//for int i ends
             
    }//InsertDubinsNode ends
+
+   user_types::GeneralState* YlClRRT::TimeStateEstimate(double Dt)
+   {//to estimate the state >from the initial state after time interval Dt and assign it to st
+     if( traj_rec.empty() )
+     {
+       try {
+        throw std::runtime_error ("traj_rec empty");
+       }
+       catch (std::runtime_error &e) {
+        std::cout << "Caught a runtime_error exception: "
+                  << e.what () << '\n';
+       } 
+     }
+
+     user_types::GeneralState* st_start= traj_rec.front();
+     if(Dt> config_pt->dt*traj_rec.size() )
+     {
+       user_types::GeneralState* st_end= traj_rec.back();
+       double dt_a= Dt-st_end->t + st_start->t;
+       return st_end->InterPolate(dt_a);  
+     }
+     else
+     {
+       user_types::GeneralState* st_close= traj_rec[floor(Dt/config_pt->dt)];  
+       double dt_a= Dt-st_close->t + st_start->t;
+       return st_close->InterPolate(dt_a);
+     }//if else ends
+
+   }//TimeStateEstimate ends
+
+   void YlClRRT::PathToMsg(ardrone_rrt_avoid::DubinPath_msg& path_msg)
+   {
+      path_msg.dubin_path.clear();
+      //if path contains only one nodes, the quad will just stop and hover
+      //int8 type, Quad_msg start,Quad_msg pt_i1,Quad_msg pt_i2,Quad_msg end
+      //no path
+      if( path_total.size()==0 ) return;
+       //there is> path
+      for(int i=1; i!=path_total.size(); ++i)
+      {
+	 TREEIter it= path_total[i];
+	 quadDubins3D db_3d= dubin_collects[it->idx_dubin]; 
+	 ardrone_rrt_avoid::DubinSeg_msg db_msg;//actually a dubin_seg message
+	    //type
+	    db_msg.d_dubin.type= db_3d.path2D.type;
+	    //start
+	    db_msg.d_dubin.start.x= db_3d.cfg_start.x;
+	    db_msg.d_dubin.start.y= db_3d.cfg_start.y;
+	    db_msg.d_dubin.start.z= db_3d.cfg_start.z;
+	    db_msg.d_dubin.start.theta= db_3d.cfg_start.theta;
+	    //end
+	    db_msg.d_dubin.end.x= db_3d.cfg_end.x;
+	    db_msg.d_dubin.end.y= db_3d.cfg_end.y;
+	    db_msg.d_dubin.end.z= db_3d.cfg_end.z;
+	    db_msg.d_dubin.end.theta= db_3d.cfg_end.theta;
+	    //cfg_i1
+	    db_msg.d_dubin.pt_i1.x= db_3d.cfg_i1.x;
+	    db_msg.d_dubin.pt_i1.y= db_3d.cfg_i1.y;
+	    db_msg.d_dubin.pt_i1.z= db_3d.cfg_i1.z;
+	    db_msg.d_dubin.pt_i1.theta= db_3d.cfg_i1.theta;
+	    //cfg_i2
+	    db_msg.d_dubin.pt_i2.x= db_3d.cfg_i2.x;
+	    db_msg.d_dubin.pt_i2.y= db_3d.cfg_i2.y;
+	    db_msg.d_dubin.pt_i2.z= db_3d.cfg_i2.z;
+	    db_msg.d_dubin.pt_i2.theta= db_3d.cfg_i2.theta;
+	    //target
+	    db_msg.stop_pt.x= it->state_pt->x;
+	    db_msg.stop_pt.y= it->state_pt->y;
+	    db_msg.stop_pt.z= it->state_pt->z;
+	 //insert into the path
+	 path_msg.dubin_path.push_back(db_msg);
+	 
+      }//for i ends
+
+   }//PathToMsg ends
 
    void YlClRRT::TempLogClear()
    {

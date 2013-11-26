@@ -46,7 +46,7 @@ namespace user_types{
     int Update(const arma::vec::fixed<3> u, double dt); 
     void LogData(std::ofstream& file);
     GeneralState* copy();
-
+    GeneralState* InterPolate(double dt);
   };//ArdroneState ends
 
 };//namespace ends

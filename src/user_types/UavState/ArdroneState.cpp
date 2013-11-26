@@ -86,8 +86,7 @@ namespace user_types{
        return 0;
    }//Update ends
    */
-   
-   
+    
    int ArdroneState::Update(const arma::vec::fixed<3> u, double dt)
    { //first world reference to local reference
       double ux= u(0)*cos(yaw)+ u(1)*sin(yaw);
@@ -176,4 +175,19 @@ namespace user_types{
       return new ArdroneState(x,y,z,t,yaw,vx,vy,vz,yaw_rate);
       //return new ArdroneState(x,y,z,t,yaw,vx,vy,vz,yaw_rate,ax,ay,az,a_yaw);
    }
+
+   GeneralState* InterPolate(double dt)
+   {
+      double x_a= x+vx*dt;
+      double y_a= y+vy*dt;
+      double z_a= z+vz*dt;
+      double t_a= t+dt;
+      double yaw_a= yaw;
+      double vx_a= vx;
+      double vy_a= vy;
+      double vz_a= vz;
+      double yaw_rate_a= yaw_rate;
+      return new ArdroneState(x_a,y_a,z_a,t_a,yaw_a,vx_a,vy_a,vz_a,yaw_rate_a);
+   }//InterPolate ends
+
 };//namespace ends

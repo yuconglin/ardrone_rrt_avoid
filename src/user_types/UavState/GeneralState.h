@@ -17,6 +17,7 @@ namespace user_types{
      virtual int Update(const arma::vec::fixed<3> u, double dt)= 0;
      virtual void LogData(std::ofstream& file )= 0;
      virtual GeneralState* copy()=0;
+     virtual GeneralState* InterPolate(double dt)= 0;
   };//GeneralState ends
 
 };//namespace ends

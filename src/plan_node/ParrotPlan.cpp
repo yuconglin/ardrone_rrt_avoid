@@ -63,8 +63,8 @@ namespace Ardrone_rrt_avoid{
     bool if_path_good= false;
   
     if_state= false;
-    user_types::ArdroneState st_root;
-    user_types::ArdroneState st_pre;//current quad state and previous quad state
+    user_types::ArdroneState* st_root_pt;
+    user_types::ArdroneState* st_pre;//current quad state and previous quad state
     //ros sleep for msgs to be stable
     ros::Duration(t_offset).sleep();
     rrt_pt->SetStartTime( ros::Time::now() );
@@ -112,12 +112,9 @@ namespace Ardrone_rrt_avoid{
 	   //actually, before tree expand we can check if previously path is still collision free, if so, we can still convert it to a message and ready to send if no new path is available.
 	   rrt_pt->ClearToDefault();
 	   rrt_pt->ClearTree();
+	   //reset the obstacles
 	   //reset tree root
-	   //cout<<"st_root: "<<st_root.x<<","<<st_root.y<<","<<st_root.z<<","\
-	       <<st_root.theta<<","<<st_root.v<<","<<st_root.vz<<","\
-	       <<st_root.t<<endl;
-	   //cout<<"goal: "<<goal_node.state.x<<","<<goal_node.state.y<<","<<goal_node.state.z<<endl;
-	   rrt_pt->SetRoot(st_root);
+	   rrt_pt->SetRoot(st_root_pt);
 	   //reset sample parameters because they are influenced by goal and root
 	   rrt_pt->SetSamplesParas();
 	   //tree expand within time limit
@@ -131,10 +128,6 @@ namespace Ardrone_rrt_avoid{
 	   cout<<"*****************PATH CHECK***************"<<endl;
 	   if(if_state)//that means an updated quad state is received
 	   { 
-	     //cout<<"st_current: "<<st_current.x<<" "<<st_current.y<<" "\
-		 <<st_current.z<<" "<<st_current.theta/M_PI*180<<" "\
-		 <<st_current.v<<" "<<st_current.vz<<" "<<st_current.t<<endl;
-	     quad.SetCurrentSt( st_current );
 	     double d_t= st_current.t-st_pre.t;
 	     st_pre= st_current;
 	     //only check when a travelled state is received
@@ -142,24 +135,19 @@ namespace Ardrone_rrt_avoid{
 	       ||!if_path_good
 	       )
 	     {
-	       if( quad.PathCheckRepeat() )
+	       if( rrt_pt->PathCheckRepeat(st_current) )
 	       {//a good path is available
-		 quad.TimeStateEstimate(t_limit,st_root);
-		 //cout<<"st_root estimate: "<<st_root.x<<" "<<st_root.y<<" "\
-		     <<st_root.z<<" "\
-		     <<st_root.theta<<" "<<st_root.v<<" "<<st_root.vz<<" "\
-		     <<st_root.t<<endl;
-
+		 delete st_root_pt;
+		 st_root_pt= rrt_pt->TimeStateEstimate(t_limit);
+		 
 		 //for logging
 		 if(if_first)
 		 {
 		    if_first= false;
-		    vector<QuadState>* real_pt= quad.GetTrajRec();
-		    for(int i=0;i!= real_pt->size();++i)
+		    vector<GeneralState*>* traj_pt= rrt_pt->GetTrajRecPt();
+		    for(int i=0;i!= traj_pt->size();++i)
 		    {
-		       //if(i*quad.GetDt() > t_limit)
-		       //  break;
-		       QuadState st= real_pt->at(i);
+		       GeneralState* st= traj_pt->at(i);
 		       if(myfile.is_open() )
 			 myfile<< st.x<<" "<<st.y<<" "<<st.z<<" "<<st.t<< endl;
 		    }//for int i ends
@@ -172,7 +160,7 @@ namespace Ardrone_rrt_avoid{
 		 if_path_good= false;
 	       }
 	       //path to msg
-	       quad.PathToMsg(path_msg);
+	       rrt_pt->PathToMsg(path_msg);
 	       //cout<<"path_msg size: "<<path_msg.dubin_path.size()<<endl;
 	       case_idx= PATH_READY;
 	     }//end if d_t
@@ -185,7 +173,9 @@ namespace Ardrone_rrt_avoid{
 	   cout<<"*************WAIT STATE*****************"<<endl;
 	   if(if_state)
 	   {
-	     st_root= st_current;
+	     user_types::GeneralState* temp_pt= &st_current;
+	     delete st_root_pt;
+	     st_root_pt= temp_pt->copy();
 	     st_pre= st_current;
 	     case_idx= TREE_EXPAND;
 	     if_state= false;
@@ -199,31 +189,19 @@ namespace Ardrone_rrt_avoid{
 	   //sth may happen when it is closet to the last sec
 	   if(if_state)
 	   {
-	     //cout<<"recheck st_current: "<<st_current.x<<" "<<st_current.y<<" "\
-		 <<st_current.z<<" "<<st_current.theta/M_PI*180<<" "\
-		 <<st_current.v<<" "<<st_current.vz<<" "<<st_current.t<<endl;
-	     quad.SetCurrentSt( st_current );
+	     //quad.SetCurrentSt( st_current );
 	     double d_t= st_current.t-st_pre.t;
 	     st_pre= st_current;
-	     QuadState predict_st;
+	     user_types::GeneralState* predict_pt;
 
 	     if(d_t>0.5*t_limit)
 	     {
-	       quad.TimeStateEstimate(t_limit,predict_st);
-	       if(which_obs==1)
-	       {
-		 //reset the obstacles
-		 vector<obstacle3D> obs_vec;
-		 obstacle3D obs;
-		 ob_log.t_obstacle( predict_st.t,obs,ob_idx );
-		 obs_vec.clear();
-		 obs_vec.push_back(obs);
-		 quad.SetObs(obs_vec);
-	       }
-	       TREEIter it_block;
-	       vector<QuadState> temp_rec;
+	       predict_pt= rrt_pt->TimeStateEstimate(t_limit);
+	       //reset the obstacles 
+	       int idx;
+	       std::vector<user_types::GeneralState*>& temp_rec;
 	       //st_root is actually predicted state
-	       if( !quad.PathCheck(predict_st,it_block,temp_rec) )
+	       if( !rrt_pt->PathCheck(predict_st,idx,temp_rec,false) )
 	       {
 		 //cout<<"still good path, yeah"<<endl;
 		 case_idx= PATH_READY;
@@ -235,6 +213,7 @@ namespace Ardrone_rrt_avoid{
 		 case_idx= TREE_EXPAND;
 	       }
 	     }//if d_t ends
+	     delete predict_pt;
 	     if_state= false; 
 	   }//if_state
 	   break;
@@ -252,6 +231,8 @@ namespace Ardrone_rrt_avoid{
       }//switch ends
       //cout<<"once once once"<<endl;
       ros::spinOnce();
+      myfile.close();
+      return 0;
 
   }//working ends
 
