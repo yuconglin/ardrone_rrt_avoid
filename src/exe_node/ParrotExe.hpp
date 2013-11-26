@@ -17,7 +17,7 @@
 
 //ros msgs
 #include "ardrone_rrt_avoid/DubinPath_msg.h"
-#include "ardrone_rrt_avoid/QuadState_msg.h"
+#include "ardrone_rrt_avoid/ArdroneState_msg.h"
 
 //declaration of classes used
 class Controller_MidLevelCnt;
@@ -170,7 +170,7 @@ class ParrotExe{
    //dubins curve to receive
    ardrone_rrt_avoid::DubinPath_msg path_msg;
    //quad state to publish
-   ardrone_rrt_avoid::QuadState_msg state_msg;
+   ardrone_rrt_avoid::ArdroneState_msg state_msg;
    //velocity command to send
    geometry_msgs::Twist twist;
    //path to execute

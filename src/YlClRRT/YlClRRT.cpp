@@ -150,6 +150,23 @@ namespace Ardrone_rrt_avoid{
      if_sampler_para_set= true;
    }//SetSampleParas()
 
+   void YlClRRT::ClearToDefault()
+   {
+     //clear vectors
+     temp_log.clear();
+     traj_rec.clear();
+     tree_vector.clear();
+     tree_vector_sort.clear();
+     goal_connect_nodes.clear();
+     dubin_collects.clear();
+     path_total.clear();
+     //flags to default
+     sec_count= 0;
+     if_limit_reach= false;
+     if_goal_reach= false;
+     if_sampler_para_set= false;
+   }//ClearToDefault
+
    void YlClRRT::SampleNode()
    {//sample and check
      //sampler_pt->SetSampleMethod(1);   

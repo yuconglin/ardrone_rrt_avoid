@@ -89,7 +89,15 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
 
    //specify some parameters of the quad
    if(ParamFromXML("/home/yucong/.ros/param.xml")!=0)
-     std::runtime_error("ParamFromXML error");
+   {
+     try {
+        throw std::runtime_error ("ParamFromXML error");
+     }
+     catch (std::runtime_error &e) {
+        std::cout << "Caught a runtime_error exception: "
+                  << e.what () << '\n';
+     }
+   }
    //parameters
    rho= v/yaw_rate;
    speed= sqrt(v*v+vz*vz);
@@ -271,6 +279,20 @@ void ParrotExe::PublishFlags()
    pub_state_idx.publish(state_idx_msg);
 }//PublishFlags ends
 
+void ParrtExe::PubQuadState()
+{
+   state_msg.x= x_est;
+   state_msg.y= y_est;
+   state_msg.z= z_mea;
+   state_msg.yaw= yaw_est;
+   state_msg.vx= vx_est;
+   state_msg.vy= vy_est;
+   state_msg.vz= vzm_est;
+   state_msg.t= tk.toSec();
+   //pub the state
+   pub_state.publish(state_msg);
+}//PubQuadState ends
+
 void ParrotExe::SendControlToDrone(ControlCommand cmd)
 {
    // TODO: check converstion (!)
@@ -434,9 +456,19 @@ int ParrotExe::PathCommand(const double _t_limit)
      idx_dubin= idx_sec;
             //then see which seg of the dubins curve it should follow
    }//if_restart_path ends
+   
    else{
+     
      if(idx_dubin== -1)
-       std::runtime_error("error:idx_dubin unassigned");
+     {
+        try {
+          throw std::runtime_error ("error:idx_dubin unassigned");
+        }
+        catch (std::runtime_error &e) {
+          std::cout << "Caught a runtime_error exception: "
+                  << e.what () << '\n';
+        }
+     }
    }//else ends
    
    //yeah, let's follow that dubin's curve 
@@ -459,6 +491,7 @@ int ParrotExe::PathCommand(const double _t_limit)
    if(result==0)
    {//time up
      if_reach= 1;
+     //here we may need to publish a state
    }
 
    if(if_reach==1||if_reach==2)
@@ -535,15 +568,30 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
        idx_seg=2;
      //make sure idx_seg correct value
      if(!(idx_seg==0||idx_seg==1||idx_seg==2))
-       std::runtime_error("idx_seg must be 0 or 1 or 2");
-     
+     {
+       try {
+        throw std::runtime_error ("idx_seg must be 0 or 1 or 2");
+       }
+       catch (std::runtime_error &e) {
+        std::cout << "Caught a runtime_error exception: "
+                  << e.what () << '\n';
+       }
+     }
      idx_dubin_sub= idx_seg;
 
    }//if_restart_dubin ends
    else
    {
      if(idx_dubin_sub== -1)
-       std::runtime_error("error:idx_dubin_sub unassigned");
+     {
+       try {
+        throw std::runtime_error ("error:idx_dubin_sub unassigned");
+       }
+       catch (std::runtime_error &e) {
+        std::cout << "Caught a runtime_error exception: "
+                  << e.what () << '\n';
+       }
+     }
    }//else ends
    
    double t_limit = _t_limit;
@@ -612,11 +660,29 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
    QuadCfg cfg_stop= db_seg.cfg_stop;
    
    if( !(idx_sub==0||idx_sub==1||idx_sub==2) )
-     std::runtime_error("idx_sub must be 0 or 1 or 2.");
+    //std::runtime_error("idx_sub must be 0 or 1 or 2.");
+   {
+     try {
+        throw std::runtime_error ("idx_sub must be 0 or 1 or 2.");
+     }
+     catch (std::runtime_error &e) {
+        std::cout << "Caught a runtime_error exception: "
+                  << e.what () << '\n';
+     }
+   }
    const int* types = DIRDATA[dubin_3d.path2D.type];
    int type= types[idx_sub];
    if(!( type == L_SEG || type == S_SEG || type == R_SEG ))
-     std::runtime_error("dubin_sub type incorrect");
+     //std::runtime_error("dubin_sub type incorrect");
+   {
+     try {
+        throw std::runtime_error ("dubin_sub type incorrect");
+     }
+     catch (std::runtime_error &e) {
+        std::cout << "Caught a runtime_error exception: "
+                  << e.what () << '\n';
+     }
+   }
    
    //the start and end point of this seg
    QuadCfg cfg_start,cfg_end;

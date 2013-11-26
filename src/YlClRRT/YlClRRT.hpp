@@ -58,8 +58,9 @@ namespace Ardrone_rrt_avoid{
        //check all necesarry flags
        void CheckFlagsSet();
        //time related
-       void SetTimeLimit(double _limit){t_limit= _limit;}
-       void SetIfInRos(bool _if_in_ros){if_in_ros= _if_in_ros;}
+       inline void SetTimeLimit(double _limit){t_limit= _limit;}
+       inline void SetIfInRos(bool _if_in_ros){if_in_ros= _if_in_ros;}
+       inline void SetStartTime(ros::Time _t_start){t_start= _t_start;}
        //expand trees
        void ExpandTree();
        //clean the tree
