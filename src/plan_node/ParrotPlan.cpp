@@ -66,14 +66,15 @@ namespace Ardrone_rrt_avoid{
     bool if_path_good= false;
   
     if_state= false;
-    user_types::ArdroneState* st_root_pt;
-    user_types::ArdroneState* st_pre;//current quad state and previous quad state
+    user_types::GeneralState* st_root_pt;
+    user_types::ArdroneState st_pre;//current quad state and previous quad state
     //ros sleep for msgs to be stable
     ros::Duration(t_offset).sleep();
     rrt_pt->SetStartTime( ros::Time::now() );
     //rrt_pt->SetIfInRos(false);
     //the rest already set outside:root,goal,obstacle,geofence, etc
 
+    bool if_first= true;
     //start the process
     rrt_pt->ExpandTree(); 
     //while loop: keep planning and sending
@@ -119,7 +120,7 @@ namespace Ardrone_rrt_avoid{
 	   //reset tree root
 	   rrt_pt->SetRoot(st_root_pt);
 	   //reset sample parameters because they are influenced by goal and root
-	   rrt_pt->SetSamplesParas();
+	   rrt_pt->SetSampleParas();
 	   //tree expand within time limit
 	   rrt_pt->ExpandTree();
 	   //tree expanding ends, wait for current quad state and check path
@@ -138,7 +139,7 @@ namespace Ardrone_rrt_avoid{
 	       ||!if_path_good
 	       )
 	     {
-	       if( rrt_pt->PathCheckRepeat(st_current) )
+	       if( rrt_pt->PathCheckRepeat(&st_current) )
 	       {//a good path is available
 		 delete st_root_pt;
 		 st_root_pt= rrt_pt->TimeStateEstimate(t_limit);
@@ -147,12 +148,12 @@ namespace Ardrone_rrt_avoid{
 		 if(if_first)
 		 {
 		    if_first= false;
-		    vector<GeneralState*>* traj_pt= rrt_pt->GetTrajRecPt();
+		    vector<user_types::GeneralState*>* traj_pt= rrt_pt->GetTrajRecPt();
 		    for(int i=0;i!= traj_pt->size();++i)
 		    {
-		       GeneralState* st= traj_pt->at(i);
+		      user_types::GeneralState* st= traj_pt->at(i);
 		       if(myfile.is_open() )
-			 myfile<< st.x<<" "<<st.y<<" "<<st.z<<" "<<st.t<< endl;
+			 myfile<< st->x <<" "<<st->y<<" "<<st->z<<" "<<st->t<< endl;
 		    }//for int i ends
 		 }
 		 if_path_good= true;
@@ -202,9 +203,9 @@ namespace Ardrone_rrt_avoid{
 	       predict_pt= rrt_pt->TimeStateEstimate(t_limit);
 	       //reset the obstacles 
 	       int idx;
-	       std::vector<user_types::GeneralState*>& temp_rec;
+	       std::vector<user_types::GeneralState*> temp_rec;
 	       //st_root is actually predicted state
-	       if( !rrt_pt->PathCheck(predict_st,idx,temp_rec,false) )
+	       if( !rrt_pt->PathCheck(predict_pt,idx,temp_rec,false) )
 	       {
 		 //cout<<"still good path, yeah"<<endl;
 		 case_idx= PATH_READY;
@@ -236,6 +237,7 @@ namespace Ardrone_rrt_avoid{
       }//switch ends
       //cout<<"once once once"<<endl;
       ros::spinOnce();
+    }//while ends
       myfile.close();
       return 0;
 
