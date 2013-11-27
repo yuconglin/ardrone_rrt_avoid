@@ -1,3 +1,4 @@
+#include "ParrotPlan.hpp"
 #include "YlClRRT.hpp"
 //std lib
 #include <iostream>
@@ -57,7 +58,15 @@ int main(int argc, char** argv)
     yc_rrt.SetObs2D( obs2d );
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
-    yc_rrt.SetIfInRos(false);
+    yc_rrt.SetIfInRos(true);
+    //ros start
+    ros::init(argc,argv,"planner");
+    //initialize the object
+    ParrotPlan planner(&yc_rrt);
+    planner.SetTOffset(1.0); 
+    planner.working();    
+    return 0; 
+    /*
     yc_rrt.ExpandTree();
     ArdroneState* st_current= new ArdroneState(x_root+0.4,y_root-0.4,z_root+0.1,0,0);
     yc_rrt.PathCheckRepeat(st_current);
@@ -74,4 +83,5 @@ int main(int argc, char** argv)
        delete st;
     }//for ends
     myfile.close();
+    */
 }//main ends

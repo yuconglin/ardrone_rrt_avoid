@@ -222,6 +222,8 @@ namespace Ardrone_rrt_avoid{
 	 case ARRIVED:
 	 {
 	   cout<<"arrived:hohoho"<<endl;
+	   rrt_pt->ClearToDefault();
+	   rrt_pt->ClearTree();
 	   break;
 	 }
 	 default:
