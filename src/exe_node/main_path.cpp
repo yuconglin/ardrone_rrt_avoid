@@ -34,7 +34,7 @@ int main(int argc, char** argv)
   parrot_exe.sendTakeoff();
  
   bool if_start= false;
-  double YAW_STANDARD= 100;//wait to measure
+  //double YAW_STANDARD= 100;//wait to measure
   //while
   while(ros::ok() )
   {
@@ -49,10 +49,11 @@ int main(int argc, char** argv)
         parrot_exe.GetCurrentCfg(cfg_start);
 	//parrot_exe.SetStartTime(ros::Time::now() );
 	//set YawInit
-	parrot_exe.SetYawInit(YAW_STANDARD);
+	double yaw_init= cfg_start.theta;
+	parrot_exe.SetYawInit(yaw_init);
 	//set x_est,y_est
-	double x_init_frame= cfg_start.x*cos(YAW_STANDARD)-cfg_start.y*sin(YAW_STANDARD);
-	double y_init_frame= cfg_start.x*sin(YAW_STANDARD)+cfg_start.y*cos(YAW_STANDARD);
+	double x_init_frame= cfg_start.x*cos(yaw_init)-cfg_start.y*sin(yaw_init);
+	double y_init_frame= cfg_start.x*sin(yaw_init)+cfg_start.y*cos(yaw_init);
 	 //set some
 	 parrot_exe.SetXEst(x_init_frame);
 	 parrot_exe.SetYEst(y_init_frame);
