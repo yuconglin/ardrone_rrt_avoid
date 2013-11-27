@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="plan_path"
+  	pkg="ardrone_rrt_avoid" 
+  	type="plan_path"
+  	respawn="false" output="screen" 
+	launch-prefix="valgrind" >
+  </node>
+</launch>
