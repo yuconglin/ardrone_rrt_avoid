@@ -70,9 +70,10 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
    //for planning related
    pub_rec = nh.advertise<std_msgs::Bool>("path_rec",1);
    pub_vel = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-   pub_reach= nh.advertise<std_msgs::Bool>("quad_reach",1);
+   pub_reach= nh.advertise<std_msgs::Int16>("quad_reach",1);
    pub_state= nh.advertise<ardrone_rrt_avoid::ArdroneState_msg>("quad_state",1); 
    pub_new_rec= nh.advertise<std_msgs::Bool>("if_new_rec",1);
+   pub_state_idx= nh.advertise<std_msgs::Int16>("state_id",1);
    //for quad related
    takeoff_pub= nh.advertise<std_msgs::Empty>("ardrone/takeoff",1);
    land_pub= nh.advertise<std_msgs::Empty>("ardrone/land",1);

@@ -12,9 +12,9 @@ gnome-terminal \
                                         exec bash\""  \
 	--tab --title "planner"	 --command "bash -c \"
 					env sleep 3s;
-					roslaunch ardrone_rrt_avoid replan.launch; 
+					roslaunch ardrone_rrt_avoid parrot_plan.launch >rec_plan.txt; 
 					exec bash\""  \
 	--tab --title "exe_path" --command "bash -c \"
                                         env sleep 3s ;
-                                        rosrun ardrone_rrt_avoid exe_path;
+                                        rosrun ardrone_rrt_avoid exe_path >record.txt >rec_exe.txt;
                                         exec bash\""  \

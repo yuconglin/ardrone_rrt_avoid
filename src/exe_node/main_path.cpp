@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 	 parrot_exe.SetPreYEst(y_init_frame);
 	 parrot_exe.SetPreZ(cfg_start.z);
 	 
-	 //std::cout<<"x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
+	 std::cout<<"x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
 	 //controller reset
 	 parrot_exe.ControllerReset();
          if_start= true;  

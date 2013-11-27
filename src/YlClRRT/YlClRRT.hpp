@@ -51,6 +51,7 @@ namespace Ardrone_rrt_avoid{
        inline user_types::GeneralConfig* GetConfigPt(){return config_pt;}
        inline user_types::SpaceLimit* GetSpaceLimitPt(){return spaceLimit_pt;}
        inline std::vector<user_types::GeneralState*>* GetTrajRecPt(){return &traj_rec;}
+       inline double GetTimeLimit(){return this->t_limit;}
        //set root and goal node
        void SetRoot( user_types::GeneralState* state_pt );
        void SetGoal( user_types::GeneralState* state_pt );

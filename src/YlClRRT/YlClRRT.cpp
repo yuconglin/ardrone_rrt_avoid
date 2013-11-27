@@ -706,7 +706,8 @@ namespace Ardrone_rrt_avoid{
      }
      else
      {
-       user_types::GeneralState* st_close= traj_rec[floor(Dt/config_pt->dt)];  
+       user_types::GeneralState* st_close= traj_rec[floor(Dt/config_pt->dt)]; 
+       //std::cout<<"t close: "<< st_close->t<<" t start: "<<st_start->t << std::endl;
        double dt_a= Dt-st_close->t + st_start->t;
        return st_close->InterPolate(dt_a);
      }//if else ends

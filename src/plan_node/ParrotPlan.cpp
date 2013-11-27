@@ -75,6 +75,7 @@ namespace Ardrone_rrt_avoid{
     //the rest already set outside:root,goal,obstacle,geofence, etc
 
     bool if_first= true;
+    t_limit= rrt_pt->GetTimeLimit();
     //start the process
     rrt_pt->ExpandTree(); 
     //while loop: keep planning and sending
@@ -129,7 +130,7 @@ namespace Ardrone_rrt_avoid{
 	 }
 	 case PATH_CHECK:
 	 {
-	   cout<<"*****************PATH CHECK***************"<<endl;
+	   //cout<<"*****************PATH CHECK***************"<<endl;
 	   if(if_state)//that means an updated quad state is received
 	   { 
 	     double d_t= st_current.t-st_pre.t;
