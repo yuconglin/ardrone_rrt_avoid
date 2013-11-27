@@ -24,7 +24,7 @@ int main(int argc, char** argv)
   
   //file for navdata
   char file_nav[256];
-  sprintf( file_nav, "data/%s:%.1f:%.1f:%.1f:%s.txt",str_time.c_str(),x_e,y_e,z_e,"nav");
+  sprintf( file_nav, "data/%s:%s.txt",str_time.c_str(),"path");
 
   //ParrotExe initialization
   ParrotExe parrot_exe(controlMid,file_nav);
@@ -34,6 +34,9 @@ int main(int argc, char** argv)
   parrot_exe.sendTakeoff();
  
   bool if_start= false;
+  //the start config when switch from takeoff to hover
+  QuadCfg cfg_start;
+
   //double YAW_STANDARD= 100;//wait to measure
   //while
   while(ros::ok() )
@@ -64,7 +67,7 @@ int main(int argc, char** argv)
 	 //std::cout<<"x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
 	 //controller reset
 	 parrot_exe.ControllerReset();
-    
+         if_start= true;  
       }
     }//if(!if_start) ends
     else

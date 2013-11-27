@@ -1,17 +1,17 @@
 #pragma once
 //ros related
+#include "ros/ros.h"
 #include "std_msgs/Bool.h"
 #include "std_msgs/Int16.h"
 //ardrone msg
 #include "ardrone_rrt_avoid/DubinPath_msg.h"
-#include "ardrone_rrt_avoid/QuadState_msg.h"
+#include "ardrone_rrt_avoid/ArdroneState_msg.h"
 //ardrone state
 #include "UavState/ArdroneState.h"
 
-class YlClRRT;
 
 namespace Ardrone_rrt_avoid {
-
+  class YlClRRT;
   class ParrotPlan{
     
      public:
@@ -21,7 +21,7 @@ namespace Ardrone_rrt_avoid {
        void receiveCb(const std_msgs::Bool::ConstPtr& msg);
        void recNewCb(const std_msgs::Bool::ConstPtr& msg);
        void reachCb(const std_msgs::Int16::ConstPtr& msg);
-       void stateCb(const ardrone_rrt_avoid::QuadState_msg::ConstPtr& msg);
+       void stateCb(const ardrone_rrt_avoid::ArdroneState_msg::ConstPtr& msg);
        //set 
        inline void SetTimeLimit(const double _t_limit){t_limit= _t_limit;}
        inline void SetTOffset(const double _t_offset){t_offset=_t_offset;}

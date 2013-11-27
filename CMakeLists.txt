@@ -121,7 +121,7 @@ rosbuild_add_executable(exe_record src/exe_node/main_record.cpp)
 target_link_libraries(exe_record parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 #path following
 rosbuild_add_executable(exe_path src/exe_node/main_path.cpp)
-target_link_libraries(exe_path parrot_exe jesus_codes dubin lib_ticpp lib_utils {OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
+target_link_libraries(exe_path parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 
 #the planner
 include_directories("src/tree")
@@ -155,4 +155,4 @@ target_link_libraries(test_tree lib_clrrt lib_user_types lib_utils lib_ticpp dub
 #planner node
 add_library(plan_node src/plan_node/ParrotPlan.cpp)
 rosbuild_add_executable(plan_path src/plan_node/main_plan.cpp)
-target_link_libraries(plan_path plan_node lib_lib_clrrt lib_user_types lib_utils lib_ticpp dubin ${ARMADILLO_LIBRARIES})
+target_link_libraries(plan_path plan_node lib_clrrt lib_user_types lib_utils lib_ticpp dubin ${ARMADILLO_LIBRARIES})

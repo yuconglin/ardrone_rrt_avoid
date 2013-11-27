@@ -1,13 +1,16 @@
 #include "ParrotPlan.hpp"
+#include "YlClRRT/YlClRRT.hpp"
 //ros related
+#include "ros/ros.h"
 #include "std_msgs/Bool.h"
 #include "std_msgs/Int16.h"
 //ardrone msg
 #include "ardrone_rrt_avoid/DubinPath_msg.h"
-#include "ardrone_rrt_avoid/QuadState_msg.h"
+#include "ardrone_rrt_avoid/ArdroneState_msg.h"
 //ardrone state
 #include "UavState/ArdroneState.h"
 
+using namespace std;
 namespace Ardrone_rrt_avoid{
 
   ParrotPlan::ParrotPlan(YlClRRT* _rrt_pt):rrt_pt(_rrt_pt),if_receive(false),if_new_rec(false),if_reach(0),if_state(false) 
@@ -17,10 +20,10 @@ namespace Ardrone_rrt_avoid{
     pub_path=nh.advertise<ardrone_rrt_avoid::DubinPath_msg>("path",100);
     pub_if_new=nh.advertise<std_msgs::Bool>("if_new_path",100);
     //subscribers
-    sub_receive=nh.subscribe("path_rec",100,&ReplanNode::receiveCb,this);
-    sub_if_new_rec=nh.subscribe("if_new_rec",100,&ReplanNode::recNewCb,this);
-    sub_reach=nh.subscribe("quad_reach",100,&ReplanNode::reachCb,this);
-    sub_state =nh.subscribe("quad_state",100,&ReplanNode::stateCb,this);    
+    sub_receive=nh.subscribe("path_rec",100,&ParrotPlan::receiveCb,this);
+    sub_if_new_rec=nh.subscribe("if_new_rec",100,&ParrotPlan::recNewCb,this);
+    sub_reach=nh.subscribe("quad_reach",100,&ParrotPlan::reachCb,this);
+    sub_state =nh.subscribe("quad_state",100,&ParrotPlan::stateCb,this);    
   }//ParrotPlan ends
 
   void ParrotPlan::receiveCb(const std_msgs::Bool::ConstPtr& msg)
@@ -52,12 +55,12 @@ namespace Ardrone_rrt_avoid{
     if_state= true;
   }
 
-  void ParrotPlan::working()
+  int ParrotPlan::working()
   {
     ofstream myfile("virtual_replan_rec.txt");
     //messages
     ardrone_rrt_avoid::DubinPath_msg path_msg;
-    ardrone_rrt_avoid::Bool if_new_msg;
+    std_msgs::Bool if_new_msg;
   
     int case_idx =PATH_CHECK;
     bool if_path_good= false;
