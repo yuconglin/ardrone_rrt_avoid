@@ -94,6 +94,7 @@ src/utils/NotInRadius.cpp
 src/utils/PointInPoly.cpp
 src/utils/CollectCheck.cpp
 src/utils/systemtime.cpp
+src/utils/QuatRPY.cpp
            )
 
 #the main part
@@ -122,6 +123,9 @@ target_link_libraries(exe_record parrot_exe jesus_codes dubin lib_ticpp lib_util
 #path following
 rosbuild_add_executable(exe_path src/exe_node/main_path.cpp)
 target_link_libraries(exe_path parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
+#path simulation
+rosbuild_add_executable(sim_path src/exe_node/main_sim_path.cpp)
+target_link_libraries(sim_path parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 
 #the planner
 include_directories("src/tree")
