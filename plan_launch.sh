@@ -16,5 +16,5 @@ gnome-terminal \
 					exec bash\""  \
 	--tab --title "exe_path" --command "bash -c \"
                                         env sleep 3s ;
-                                        rosrun ardrone_rrt_avoid exe_path >record.txt >rec_exe.txt;
+                                        rosrun ardrone_rrt_avoid exe_path >rec_exe.txt;
                                         exec bash\""  \

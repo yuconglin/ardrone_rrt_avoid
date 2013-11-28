@@ -50,6 +50,7 @@ namespace Ardrone_rrt_avoid{
     st_current.vx= msg->vx;
     st_current.vy= msg->vy;
     st_current.vz= msg->vz;
+    st_current.yaw_rate= msg->yaw_rate;
     st_current.t= msg->t;
     //update if_state flag
     if_state= true;
@@ -63,6 +64,7 @@ namespace Ardrone_rrt_avoid{
     std_msgs::Bool if_new_msg;
   
     int case_idx =PATH_CHECK;
+    int pre_case_idx= -1;
     bool if_path_good= false;
   
     if_state= false;
@@ -90,7 +92,8 @@ namespace Ardrone_rrt_avoid{
       {
 	 case PATH_READY:
 	 {//path ready to send
-	   cout<<"********PATH READY********"<<endl; 
+           if(pre_case_idx!= PATH_READY)
+	     cout<<"********PATH READY********"<<endl; 
 	   if(!if_receive)
 	   {
 	     pub_path.publish(path_msg);
@@ -116,7 +119,8 @@ namespace Ardrone_rrt_avoid{
 	 }
 	 case TREE_EXPAND:
 	 { //tree expand to generate a new path
-	   cout<<"**********TREE EXPAND**************"<<endl;
+           if(pre_case_idx!= TREE_EXPAND)
+	     cout<<"**********TREE EXPAND**************"<<endl;
 	   //clean previously tree and vectors
 	   //actually, before tree expand we can check if previously path is still collision free, if so, we can still convert it to a message and ready to send if no new path is available.
 	   rrt_pt->ClearToDefault();
@@ -134,7 +138,8 @@ namespace Ardrone_rrt_avoid{
 	 }
 	 case PATH_CHECK:
 	 {
-	   //cout<<"*****************PATH CHECK***************"<<endl;
+	   if(pre_case_idx!= PATH_CHECK)   
+	     cout<<"*****************PATH CHECK***************"<<endl;
 	   if(if_state)//that means an updated quad state is received
 	   { 
 	     //double d_t= st_current.t-st_pre.t;
@@ -147,7 +152,7 @@ namespace Ardrone_rrt_avoid{
 	       if(!if_path_good ) st_check= st_current;
 
 	       if( rrt_pt->PathCheckRepeat(&st_current) )
-	       {//a good path is available   
+	       {//a good path is available
 		 if(st_root_pt) delete st_root_pt;
 		 st_root_pt= rrt_pt->TimeStateEstimate(t_limit);
 		 
@@ -182,7 +187,8 @@ namespace Ardrone_rrt_avoid{
 	 }
 	 case WAIT_STATE:
 	 { 
-	   cout<<"*************WAIT STATE*****************"<<endl;
+	   if(pre_case_idx!= WAIT_STATE)  
+	      cout<<"*************WAIT STATE*****************"<<endl;
 	   if(if_state)
 	   {
 	     user_types::GeneralState* temp_pt= &st_current;
@@ -197,7 +203,8 @@ namespace Ardrone_rrt_avoid{
 	 case PATH_RECHECK:
 	 {
 	   //check the same path with a predicted state after dt
-	   cout<<"*******************PATH RECHECK*************"<<endl;
+	   if(pre_case_idx!= PATH_RECHECK)
+	     cout<<"*******************PATH RECHECK*************"<<endl;
 	   //sth may happen when it is closet to the last sec
 	   if(if_state)
 	   {
@@ -232,7 +239,8 @@ namespace Ardrone_rrt_avoid{
 	 }
 	 case ARRIVED:
 	 {
-	   cout<<"arrived:hohoho"<<endl;
+	   if(pre_case_idx!= ARRIVED)
+	     cout<<"arrived:hohoho"<<endl;
 	   rrt_pt->ClearToDefault();
 	   rrt_pt->ClearTree();
 	   break;
@@ -243,6 +251,7 @@ namespace Ardrone_rrt_avoid{
 	 }
       }//switch ends
       //cout<<"once once once"<<endl;
+      pre_case_idx= case_idx;
       ros::spinOnce();
     }//while ends
       myfile.close();
