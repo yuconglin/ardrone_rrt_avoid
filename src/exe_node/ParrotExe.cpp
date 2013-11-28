@@ -1,3 +1,5 @@
+#define IF_SIM 0
+
 #include "ParrotExe.hpp"
 #include "ticpp.h"
 #include "ros/ros.h"
@@ -88,10 +90,11 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
    joy_sub= nh.subscribe(nh.resolveName("joy"), 1, &ParrotExe::joyCb, this);
    nav_sub= nh.subscribe("ardrone/navdata", 1, &ParrotExe::navdataCb, this);
    //for simulation
+#if IF_SIM == 1
    gmscl= nh.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
    gmscl.waitForExistence();
    getmodelstate.request.model_name = "quadrotor";
-
+#endif
    //services
    flattrim_srv= nh.serviceClient<std_srvs::Empty>(nh.resolveName("ardrone/flattrim"),1);
 
