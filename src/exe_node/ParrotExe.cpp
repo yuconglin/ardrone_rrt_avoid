@@ -15,6 +15,9 @@
 #include "ardrone_rrt_avoid/ArdroneState_msg.h"
 //ros messages
 #include "std_msgs/Empty.h"
+#include "gazebo_msgs/GetModelState.h"
+//utils
+#include "QuatRPY.h"
 
 using namespace std;
 namespace Ardrone_rrt_avoid{
@@ -84,6 +87,10 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
    sub_if_new= nh.subscribe("if_new_path",1, &ParrotExe::newCallback,this);
    joy_sub= nh.subscribe(nh.resolveName("joy"), 1, &ParrotExe::joyCb, this);
    nav_sub= nh.subscribe("ardrone/navdata", 1, &ParrotExe::navdataCb, this);
+   //for simulation
+   gmscl= nh.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
+   gmscl.waitForExistence();
+   getmodelstate.request.model_name = "quadrotor";
 
    //services
    flattrim_srv= nh.serviceClient<std_srvs::Empty>(nh.resolveName("ardrone/flattrim"),1);
@@ -188,6 +195,29 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
 
 }//navdataCb ends
 
+void ParrotExe::SimDataUpdate()
+{
+   double q_x,q_y,q_z,q_w,roll,pitch;
+   gmscl.call(getmodelstate);
+   //pose
+   x_est = getmodelstate.response.pose.position.x;
+   y_est = getmodelstate.response.pose.position.y;
+   z_mea = getmodelstate.response.pose.position.z;
+   q_x = getmodelstate.response.pose.orientation.x;
+   q_y = getmodelstate.response.pose.orientation.y;
+   q_z = getmodelstate.response.pose.orientation.z;
+   q_w = getmodelstate.response.pose.orientation.w;
+   utils::Quat2RPY(q_x,q_y,q_z,q_w,roll,pitch,yaw_est);
+   //twist
+   vx_est= getmodelstate.response.twist.linear.x;
+   vy_est= getmodelstate.response.twist.linear.y;
+   vzm_est= getmodelstate.response.twist.linear.z;
+   wz_est= getmodelstate.response.twist.angular.z;
+   //time
+   tk= ros::Time::now();
+   
+}//dataUpdate ends
+
 int ParrotExe::GetCurrentCfg(QuadCfg& cfg)
 {
    cfg= QuadCfg(x_est,y_est,z_mea,yaw_est);
@@ -289,6 +319,7 @@ void ParrotExe::PubQuadState()
    state_msg.vx= vx_est;
    state_msg.vy= vy_est;
    state_msg.vz= vzm_est;
+   state_msg.yaw_rate= wz_est;
    state_msg.t= tk.toSec();
    //pub the state
    pub_state.publish(state_msg);

@@ -9,6 +9,7 @@
 #include "std_msgs/Int16.h"
 #include <geometry_msgs/Twist.h>
 #include "std_srvs/Empty.h"
+#include "gazebo_msgs/GetModelState.h"
 
 #include "quadDubins3D.h"
 #include "QuadCfg.h"
@@ -85,7 +86,9 @@ class ParrotExe{
    int CircleCommand(const QuadCfg& start,const QuadCfg& end,int type,double rho,double _t_limit);
    
    //to publish quad's state
-   void PubQuadState();  
+   void PubQuadState(); 
+   //data update in simulation
+   void SimDataUpdate();
    //to access flags
    inline bool GetIfRec(){return this->if_receive;}
    inline bool GetIfReach(){return this->if_reach;}
@@ -158,6 +161,10 @@ class ParrotExe{
    //services
    ros::ServiceClient flattrim_srv;
    std_srvs::Empty flattrim_srv_srvs;
+
+   //for simulation
+   ros::ServiceClient gmscl;
+   gazebo_msgs::GetModelState getmodelstate;
 
    //msgs
    //if a dubins curve is received
