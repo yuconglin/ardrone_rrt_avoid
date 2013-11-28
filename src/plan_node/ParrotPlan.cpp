@@ -66,7 +66,7 @@ namespace Ardrone_rrt_avoid{
     bool if_path_good= false;
   
     if_state= false;
-    user_types::GeneralState* st_root_pt;
+    user_types::GeneralState* st_root_pt= NULL;
     //user_types::ArdroneState st_pre;//current quad state and previous quad state
     user_types::ArdroneState st_check, st_recheck;//the state for check
     //ros sleep for msgs to be stable
@@ -147,8 +147,8 @@ namespace Ardrone_rrt_avoid{
 	       if(!if_path_good ) st_check= st_current;
 
 	       if( rrt_pt->PathCheckRepeat(&st_current) )
-	       {//a good path is available
-		 delete st_root_pt;
+	       {//a good path is available   
+		 if(st_root_pt) delete st_root_pt;
 		 st_root_pt= rrt_pt->TimeStateEstimate(t_limit);
 		 
 		 //for logging
@@ -186,7 +186,7 @@ namespace Ardrone_rrt_avoid{
 	   if(if_state)
 	   {
 	     user_types::GeneralState* temp_pt= &st_current;
-	     delete st_root_pt;
+	     if(st_root_pt) delete st_root_pt;
 	     st_root_pt= temp_pt->copy();
 	     //st_pre= st_current;
 	     case_idx= TREE_EXPAND;
@@ -203,7 +203,7 @@ namespace Ardrone_rrt_avoid{
 	   {
 	     //double d_t= st_current.t-st_pre.t;
 	     //st_pre= st_current;
-	     user_types::GeneralState* predict_pt;
+	     user_types::GeneralState* predict_pt= NULL;
 
 	     if(st_current.t-st_recheck.t>= t_limit)
 	     {
@@ -224,7 +224,7 @@ namespace Ardrone_rrt_avoid{
 		 case_idx= TREE_EXPAND;
 	       }
 	     }//if d_t ends
-	     delete predict_pt;
+	     if(predict_pt) delete predict_pt;
 	     if_state= false; 
 	   }//if_state
 	   break;

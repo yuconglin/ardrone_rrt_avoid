@@ -15,7 +15,7 @@ while ischar(traj_line)
    traj_line= fgetl(f_traj);
 end
 
-log_data =fopen('../../data/20131127-144459:path.txt','r');
+log_data =fopen('../../data/20131127-202642:path.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
