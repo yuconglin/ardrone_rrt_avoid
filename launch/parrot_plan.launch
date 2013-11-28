@@ -3,7 +3,8 @@
   <node name="plan_path"
   	pkg="ardrone_rrt_avoid" 
   	type="plan_path"
-  	respawn="false" output="screen" 
-	launch-prefix="valgrind" >
+	respawn="false" output="screen"
+	launch-prefix="xterm -e gdb --args">
+	<!--launch-prefix="valgrind"-->
   </node>
 </launch>
