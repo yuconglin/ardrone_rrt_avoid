@@ -67,7 +67,8 @@ namespace Ardrone_rrt_avoid{
   
     if_state= false;
     user_types::GeneralState* st_root_pt;
-    user_types::ArdroneState st_pre;//current quad state and previous quad state
+    //user_types::ArdroneState st_pre;//current quad state and previous quad state
+    user_types::ArdroneState st_check, st_recheck;//the state for check
     //ros sleep for msgs to be stable
     ros::Duration(t_offset).sleep();
     rrt_pt->SetStartTime( ros::Time::now() );
@@ -75,6 +76,7 @@ namespace Ardrone_rrt_avoid{
     //the rest already set outside:root,goal,obstacle,geofence, etc
 
     bool if_first= true;
+    //bool if_recheck_start= false;
     t_limit= rrt_pt->GetTimeLimit();
     //start the process
     rrt_pt->ExpandTree(); 
@@ -103,6 +105,8 @@ namespace Ardrone_rrt_avoid{
 	   {
 	     if(if_path_good){
 	       //first check if the previous path is still collision free
+	       //if_recheck_start= true;
+	       st_recheck= st_current;
 	       case_idx= PATH_RECHECK; 
 	     }//if_path_good ends
 	     else
@@ -133,13 +137,15 @@ namespace Ardrone_rrt_avoid{
 	   //cout<<"*****************PATH CHECK***************"<<endl;
 	   if(if_state)//that means an updated quad state is received
 	   { 
-	     double d_t= st_current.t-st_pre.t;
-	     st_pre= st_current;
+	     //double d_t= st_current.t-st_pre.t;
+	     //st_pre= st_current;
 	     //only check when a travelled state is received
-	     if( d_t>0.5*t_limit && if_path_good
+	     if( st_current.t-st_check.t>=t_limit && if_path_good
 	       ||!if_path_good
 	       )
 	     {
+	       if(!if_path_good ) st_check= st_current;
+
 	       if( rrt_pt->PathCheckRepeat(&st_current) )
 	       {//a good path is available
 		 delete st_root_pt;
@@ -164,6 +170,7 @@ namespace Ardrone_rrt_avoid{
 		 cout<<"plan no path"<<endl;
 		 if_path_good= false;
 	       }
+
 	       //path to msg
 	       rrt_pt->PathToMsg(path_msg);
 	       //cout<<"path_msg size: "<<path_msg.dubin_path.size()<<endl;
@@ -181,7 +188,7 @@ namespace Ardrone_rrt_avoid{
 	     user_types::GeneralState* temp_pt= &st_current;
 	     delete st_root_pt;
 	     st_root_pt= temp_pt->copy();
-	     st_pre= st_current;
+	     //st_pre= st_current;
 	     case_idx= TREE_EXPAND;
 	     if_state= false;
 	   }
@@ -194,12 +201,11 @@ namespace Ardrone_rrt_avoid{
 	   //sth may happen when it is closet to the last sec
 	   if(if_state)
 	   {
-	     //quad.SetCurrentSt( st_current );
-	     double d_t= st_current.t-st_pre.t;
-	     st_pre= st_current;
+	     //double d_t= st_current.t-st_pre.t;
+	     //st_pre= st_current;
 	     user_types::GeneralState* predict_pt;
 
-	     if(d_t>0.5*t_limit)
+	     if(st_current.t-st_recheck.t>= t_limit)
 	     {
 	       predict_pt= rrt_pt->TimeStateEstimate(t_limit);
 	       //reset the obstacles 
