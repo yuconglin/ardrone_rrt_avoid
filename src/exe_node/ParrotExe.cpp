@@ -388,6 +388,7 @@ void ParrotExe::ControllerReset()
 
 int ParrotExe::PathCommand(const double _t_limit)
 {   //if no path, just stop and hover
+   //cout<<"PathCommand"<< endl;
    if(if_restart_path && path_msg.dubin_path.size()==0 )
    { //command it to stop. for fixed wing, maybe other mechnism
      SendControlToDrone( ControlCommand(0,0,0,0) );
@@ -403,7 +404,7 @@ int ParrotExe::PathCommand(const double _t_limit)
    
    //first see if the current position is already at the goal
    ardrone_rrt_avoid::DubinSeg_msg dubin_last = path_msg.dubin_path.back();
-   cout<<"execute one time"<< endl; 
+   
    if( sqrt(pow(x_est-dubin_last.stop_pt.x,2)+pow(y_est-dubin_last.stop_pt.y,2)+pow(z_mea-dubin_last.stop_pt.z,2)) < end_r )
    {
      SendControlToDrone( ControlCommand(0,0,0,0) );
@@ -507,10 +508,12 @@ int ParrotExe::PathCommand(const double _t_limit)
    }//else ends
    
    //yeah, let's follow that dubin's curve 
+   cout<<"execute one time"<< endl; 
    int result= DubinCommand(dubin_segs[idx_dubin], _t_limit);
    //reaching the end of a dubin's curve
    if(result==1 || result==2)
    {
+     cout<<"kusa kusa"<< endl;
      if(idx_dubin== dubin_segs.size()-1) 
      {//if it is the last dubin's curve
        if_reach= 2; //arived
@@ -546,6 +549,7 @@ int ParrotExe::PathCommand(const double _t_limit)
 int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
 {  //0:time up, 1:cfg_stop reached, 2: seg end reached, -1: still ongoing
    //if already at the target, just return
+   //cout<<"DubinCommand"<< endl;
    QuadCfg cfg_stop= db_seg.cfg_stop;
    quadDubins3D dubin_3d= db_seg.d_dubin;
    
@@ -662,8 +666,11 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
           ++idx_dubin_sub;
        std::cout<<"idx_dubin_sub: "<<idx_dubin_sub<<std::endl;
        //while ends
-       if(idx_dubin_sub <3) 
-         db_result= SegCommand(db_seg,idx_dubin_sub,t_limit);
+       if(idx_dubin_sub <3)
+       {
+         cout<<"budo,budo"<< endl;
+	 db_result= SegCommand(db_seg,idx_dubin_sub,t_limit);
+       }
      }
    }
    return db_result;
@@ -672,6 +679,7 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
 
 int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
 { //-1: on the fly, 0:time up, 1:target reached, 2:length reached
+   //cout<<"SegCommand"<< endl;
    if(if_restart_seg) 
    {
      if_restart_seg= false;
