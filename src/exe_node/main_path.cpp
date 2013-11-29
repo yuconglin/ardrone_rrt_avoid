@@ -74,10 +74,11 @@ int main(int argc, char** argv)
     { 
       //get path msg and execute it in a fixed time
       if(  parrot_exe.GetIfRec() 
-        && parrot_exe.GetIfReach() ==0
+        && parrot_exe.GetIfReach()!=2
         && parrot_exe.GetIfNewPath()
 	&& !if_joy
         )
+      //if( parrot_exe.GetIfReach()!=2 && !if_joy)
       {
         //std::cout<<"execute one time"<<std::endl;
         parrot_exe.PathCommand(t_limit);
