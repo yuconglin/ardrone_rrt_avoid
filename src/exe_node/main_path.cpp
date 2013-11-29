@@ -79,7 +79,7 @@ int main(int argc, char** argv)
 	&& !if_joy
         )
       {
-        std::cout<<"execute one time"<<std::endl;
+        //std::cout<<"execute one time"<<std::endl;
         parrot_exe.PathCommand(t_limit);
       }
       //publish its state

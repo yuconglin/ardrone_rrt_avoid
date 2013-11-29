@@ -403,7 +403,7 @@ int ParrotExe::PathCommand(const double _t_limit)
    
    //first see if the current position is already at the goal
    ardrone_rrt_avoid::DubinSeg_msg dubin_last = path_msg.dubin_path.back();
-   
+   cout<<"execute one time"<< endl; 
    if( sqrt(pow(x_est-dubin_last.stop_pt.x,2)+pow(y_est-dubin_last.stop_pt.y,2)+pow(z_mea-dubin_last.stop_pt.z,2)) < end_r )
    {
      SendControlToDrone( ControlCommand(0,0,0,0) );

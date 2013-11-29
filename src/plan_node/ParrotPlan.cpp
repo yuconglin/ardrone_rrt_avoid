@@ -94,6 +94,7 @@ namespace Ardrone_rrt_avoid{
 	 {//path ready to send
            if(pre_case_idx!= PATH_READY)
 	     cout<<"********PATH READY********"<<endl; 
+	   pre_case_idx= case_idx;
 	   if(!if_receive)
 	   {
 	     pub_path.publish(path_msg);
@@ -121,6 +122,7 @@ namespace Ardrone_rrt_avoid{
 	 { //tree expand to generate a new path
            if(pre_case_idx!= TREE_EXPAND)
 	     cout<<"**********TREE EXPAND**************"<<endl;
+	   pre_case_idx= case_idx;
 	   //clean previously tree and vectors
 	   //actually, before tree expand we can check if previously path is still collision free, if so, we can still convert it to a message and ready to send if no new path is available.
 	   rrt_pt->ClearToDefault();
@@ -140,6 +142,7 @@ namespace Ardrone_rrt_avoid{
 	 {
 	   if(pre_case_idx!= PATH_CHECK)   
 	     cout<<"*****************PATH CHECK***************"<<endl;
+	   pre_case_idx= case_idx;
 	   if(if_state)//that means an updated quad state is received
 	   { 
 	     //double d_t= st_current.t-st_pre.t;
@@ -189,6 +192,7 @@ namespace Ardrone_rrt_avoid{
 	 { 
 	   if(pre_case_idx!= WAIT_STATE)  
 	      cout<<"*************WAIT STATE*****************"<<endl;
+	   pre_case_idx= case_idx;
 	   if(if_state)
 	   {
 	     user_types::GeneralState* temp_pt= &st_current;
@@ -205,6 +209,7 @@ namespace Ardrone_rrt_avoid{
 	   //check the same path with a predicted state after dt
 	   if(pre_case_idx!= PATH_RECHECK)
 	     cout<<"*******************PATH RECHECK*************"<<endl;
+	   pre_case_idx= case_idx;
 	   //sth may happen when it is closet to the last sec
 	   if(if_state)
 	   {
@@ -241,6 +246,7 @@ namespace Ardrone_rrt_avoid{
 	 {
 	   if(pre_case_idx!= ARRIVED)
 	     cout<<"arrived:hohoho"<<endl;
+	   pre_case_idx= case_idx;
 	   rrt_pt->ClearToDefault();
 	   rrt_pt->ClearTree();
 	   break;
@@ -251,7 +257,6 @@ namespace Ardrone_rrt_avoid{
 	 }
       }//switch ends
       //cout<<"once once once"<<endl;
-      pre_case_idx= case_idx;
       ros::spinOnce();
     }//while ends
       myfile.close();
