@@ -64,7 +64,8 @@ int main(int argc, char** argv)
     //initialize the object
     ParrotPlan planner(&yc_rrt);
     planner.SetTOffset(1.0); 
-    planner.working();    
+    //planner.working();    
+    planner.PathPlanning();
     return 0; 
     /*
     yc_rrt.ExpandTree();

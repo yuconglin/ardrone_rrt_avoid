@@ -27,7 +27,7 @@ namespace Ardrone_rrt_avoid {
        inline void SetTOffset(const double _t_offset){t_offset=_t_offset;}
        //working part
        int working();
- 
+       int PathPlanning();
      private:
        //the planner
        YlClRRT* rrt_pt;

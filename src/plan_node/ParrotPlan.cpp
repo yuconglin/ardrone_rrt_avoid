@@ -56,6 +56,159 @@ namespace Ardrone_rrt_avoid{
     if_state= true;
   }
 
+  int ParrotPlan::PathPlanning()
+  {
+    ofstream myfile("virtual_replan_rec.txt");
+    //messages
+    ardrone_rrt_avoid::DubinPath_msg path_msg;
+    std_msgs::Bool if_new_msg;
+
+    int case_idx =PATH_CHECK;
+    int pre_case_idx= -1;
+    bool if_path_good= false;
+  
+    if_state= false;
+    user_types::GeneralState* st_root_pt= NULL;
+    user_types::ArdroneState st_check; 
+    //ros sleep for msgs to be stable
+    ros::Duration(t_offset).sleep();
+    rrt_pt->SetStartTime( ros::Time::now() );
+    rrt_pt->ExpandTree();
+    bool if_first= true;
+    //bool if_recheck_start= false;
+    t_limit= rrt_pt->GetTimeLimit();
+
+    //while loop
+    while(ros::ok())
+    {
+      if(if_reach==2)
+      case_idx= ARRIVED;
+
+      switch(case_idx)
+      {
+        case PATH_READY:
+	{
+           if(pre_case_idx!= PATH_READY)
+	     cout<<"********PATH READY********"<<endl; 
+	   pre_case_idx= case_idx;
+	   if(!if_receive)
+	   {
+	     pub_path.publish(path_msg);
+	   } 
+	   if(!if_new_rec)
+	   {
+	     if_new_msg.data= true;
+	      pub_if_new.publish(if_new_msg);
+	   }
+           if(if_receive && if_new_rec)
+	   {
+	     if(!if_path_good)
+	      case_idx= WAIT_STATE;
+	   }//if (if_receive) ends
+
+           break;
+	}
+	case PATH_CHECK:
+	{
+          if(pre_case_idx!= PATH_CHECK)   
+	    cout<<"*****************PATH CHECK***************"<<endl;
+	  pre_case_idx= case_idx;
+	  if(if_state)//that means an updated quad state is received
+	  { 
+	    if( st_current.t-st_check.t>=t_limit && if_path_good
+	      ||!if_path_good
+	      )
+	    {
+	      if(!if_path_good ) st_check= st_current;
+
+	      if( rrt_pt->PathCheckRepeat(&st_current) )
+	      {//a good path is available
+		if(st_root_pt) delete st_root_pt;
+		st_root_pt= rrt_pt->TimeStateEstimate(t_limit);
+		
+		//for logging
+		if(if_first)
+		{
+		   if_first= false;
+		   vector<user_types::GeneralState*>* traj_pt= rrt_pt->GetTrajRecPt();
+		   for(int i=0;i!= traj_pt->size();++i)
+		   {
+		     user_types::GeneralState* st= traj_pt->at(i);
+		      if(myfile.is_open() )
+			myfile<< st->x <<" "<<st->y<<" "<<st->z<<" "<<st->t<< endl;
+		   }//for int i ends
+		}
+		if_path_good= true;
+	      }
+	      else
+	      {
+		cout<<"plan no path"<<endl;
+		if_path_good= false;
+	      }
+
+	      //path to msg
+	      rrt_pt->PathToMsg(path_msg);
+	      //cout<<"path_msg size: "<<path_msg.dubin_path.size()<<endl;
+	      case_idx= PATH_READY;
+	    }//end if d_t
+	    if_state= false;
+	  }//end if_state
+	  break;
+	}
+	case TREE_EXPAND:
+	{
+           if(pre_case_idx!= TREE_EXPAND)
+	      cout<<"**********TREE EXPAND**************"<<endl;
+	   pre_case_idx= case_idx;
+	   rrt_pt->ClearToDefault();
+	   rrt_pt->ClearTree();
+	   //reset the obstacles
+	   //reset tree root
+	   rrt_pt->SetRoot(st_root_pt);
+	   //reset sample parameters because they are influenced by goal and root
+	   rrt_pt->SetSampleParas();
+	   //tree expand within time limit
+	   rrt_pt->ExpandTree();
+	   //tree expanding ends, wait for current quad state and check path
+	   case_idx= PATH_CHECK;
+	   break;
+	}
+        case WAIT_STATE:
+	{ 
+	  if(pre_case_idx!= WAIT_STATE)  
+	     cout<<"*************WAIT STATE*****************"<<endl;
+	  pre_case_idx= case_idx;
+	  if(if_state)
+	  {
+	    user_types::GeneralState* temp_pt= &st_current;
+	    if(st_root_pt) delete st_root_pt;
+	    st_root_pt= temp_pt->copy();
+	    //st_pre= st_current;
+	    case_idx= TREE_EXPAND;
+	    if_state= false;
+	  }
+	  break;
+	}
+	case ARRIVED:
+	{
+           if(pre_case_idx!= ARRIVED)
+	     cout<<"arrived:hohoho"<<endl;
+	   pre_case_idx= case_idx;
+	   rrt_pt->ClearToDefault();
+	   rrt_pt->ClearTree();
+	   break;
+	}
+	default:
+	{
+           break;
+	}
+      }//switch ends
+      ros::spinOnce();
+    }//while ends
+    myfile.close();
+    return 0;
+  }//PathPlanning ends
+
   int ParrotPlan::working()
   {
     ofstream myfile("virtual_replan_rec.txt");
