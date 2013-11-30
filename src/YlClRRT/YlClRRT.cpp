@@ -398,6 +398,7 @@ namespace Ardrone_rrt_avoid{
 	  if( it_next==main_tree.begin() )
 	  {
 	    path_total.push_back(it_next);
+	    //cout<<"first dubin_idx: "<< it_next->idx_dubin<< endl;
 	    break;
 	  }
 	}
@@ -434,7 +435,10 @@ namespace Ardrone_rrt_avoid{
 	       if(colli==1)
 	       {
 		 i_start= i;
-		 path_prune.push_back(path_total[i_start]);
+		 int _idx_dubin= dubin_collects.size();
+                 dubin_collects.push_back(dubin_3d);
+		 it_end->idx_dubin= _idx_dubin;
+		 path_prune.push_back(it_end);
 		 break;
 	       }//if colli!= -1 ends
 
@@ -554,8 +558,8 @@ namespace Ardrone_rrt_avoid{
 	 colli= utils::DubinsTotalCheck(dubin_3d,st_cu,st_next,cfg_target,obs_collect,checkparas_pt,config_pt,spaceLimit_pt,path_pt,&c_length);
          
 	 //cout<<"check colli: "<<colli<<endl;
-	 if(i==idx_sec) 
-	   cout<<"ini: "<<dubin_3d.cfg_start.x<<" "<<dubin_3d.cfg_start.y<<" "<<dubin_3d.cfg_start.z<<endl;
+	 //if(i==idx_sec) 
+	 cout<<"ini: "<<dubin_3d.cfg_start.x<<" "<<dubin_3d.cfg_start.y<<" "<<dubin_3d.cfg_start.z<<endl;
 	 
 	 cout<<"idx "<<i<<" "<<st_next->x <<" "<<st_next->y <<" "<<st_next->z <<" "<< st_next->t <<endl;
 	 cout<<"ideal "<<i<<" "<< it_wp->state_pt->x <<" "<<it_wp->state_pt->y<<" "<< it_wp->state_pt->z <<endl;
@@ -649,7 +653,10 @@ namespace Ardrone_rrt_avoid{
      TREEIter insert_it;
      double step= config_pt->speed*config_pt->dt; 
      int N_ITER = floor( checkparas_pt->ds_insert/step );//insert interval
+     //set dubin index
      int _idx_dubin= dubin_collects.size();
+     //start_it.idx_dubin= _idx_dubin; 
+
      double seg_len = 0.;
      //std::cout<<"insert path_log size: "<< path_copy.size() << std::endl;
      for(int i=1;i!=temp_log.size();++i)

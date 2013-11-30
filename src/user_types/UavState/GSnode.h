@@ -10,7 +10,7 @@ namespace user_types{
      double heuri;//heuristics to the sampled node
      double cost;//cost from root to it
      double cost2go;//cost to the goal
-     int idx_dubin;//which dubins curve it belongs to
+     int idx_dubin;//which dubins curve it belongs to:the one starts from it
      //int idx_state;//which state in the dubins curve it is
      double idx_length;//length from the start of the dubin's curve
      bool goal_reach;//if accessible from the goal

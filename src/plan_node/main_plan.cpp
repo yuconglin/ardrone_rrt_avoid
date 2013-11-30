@@ -47,7 +47,7 @@ int main(int argc, char** argv)
     yc_rrt.CheckFlagsSet();
     //set the obstacles
     vector<obstacle2D> obs2d;
-    obs2d.push_back( obstacle2D(7.3152,-0.2032,0.5,0.5) );
+    obs2d.push_back( obstacle2D(7.3152,-0.2032,0.4,0.2) );
     //obs2d.push_back(obstacle2D(4.,0,0.4,0.3) );
     //write the 2D obstacles to a text file
     ofstream obs2d_file("obs2ds.txt");
