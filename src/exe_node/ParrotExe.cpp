@@ -1,4 +1,4 @@
-#define IF_SIM 1
+#define IF_SIM 0
 
 #include "ParrotExe.hpp"
 #include "ticpp.h"
@@ -389,6 +389,7 @@ void ParrotExe::ControllerReset()
 int ParrotExe::PathCommand(const double _t_limit)
 {   //if no path, just stop and hover
    //cout<<"PathCommand"<< endl;
+   cout<<"path t_limit:"<< _t_limit << endl;
    if(if_restart_path && path_msg.dubin_path.size()==0 )
    { //command it to stop. for fixed wing, maybe other mechnism
      SendControlToDrone( ControlCommand(0,0,0,0) );
@@ -435,6 +436,10 @@ int ParrotExe::PathCommand(const double _t_limit)
        //std::cout<<i<<" seg length: "<<db_3d.seg_param[0]<<" "<<db_3d.seg_param[1]<<" "<<db_3d.seg_param[2]<<std::endl;
        QuadCfg stop(db_msg.stop_pt.x,db_msg.stop_pt.y,db_msg.stop_pt.z,0);
        //std::cout<<"to msg stop: "<<stop.x<<" "<<stop.y<<" "<<stop.z<<std::endl;
+       //print each of the dubin's curve
+       std::cout<<i <<" start: "<< start.x<<" "<<start.y<<" "<<start.z<< std::endl;
+       std::cout<<i <<" stop: "<< stop.x<<" "<< stop.y<<" "<< stop.z<< std::endl;
+       //print ends
        DubinSeg db_seg;
        db_seg.d_dubin= db_3d;
        db_seg.cfg_stop= stop;
@@ -476,7 +481,7 @@ int ParrotExe::PathCommand(const double _t_limit)
 	     
        if( idx!=0 && idx!=dubin_segs.size() )
        {
-	 if( dwp[idx-1]/len_wp[idx-1]< dwp[idx+1]/len_wp[idx] )
+	 if( dwp[idx-1]/(len_wp[idx-1]+1e-8)< dwp[idx+1]/(len_wp[idx]+1e-8) )
 	   idx_sec= idx-1;
 	 else
 	   idx_sec= idx;
@@ -508,7 +513,7 @@ int ParrotExe::PathCommand(const double _t_limit)
    }//else ends
    
    //yeah, let's follow that dubin's curve 
-   cout<<"execute one time"<< endl; 
+   cout<<"execute one time: "<<"idx_dubin: "<< idx_dubin<< endl; 
    int result= DubinCommand(dubin_segs[idx_dubin], _t_limit);
    //reaching the end of a dubin's curve
    if(result==1 || result==2)
@@ -570,6 +575,7 @@ int ParrotExe::DubinCommand(DubinSeg& db_seg, const double _t_limit)
      std::cout<<"i1: "<<dubin_3d.cfg_i1.x<<" "<<dubin_3d.cfg_i1.y<<" "<<dubin_3d.cfg_i1.z<<" "<<dubin_3d.cfg_i1.theta*180./M_PI<<std::endl;
      std::cout<<"i2: "<<dubin_3d.cfg_i2.x<<" "<<dubin_3d.cfg_i2.y<<" "<<dubin_3d.cfg_i2.z<<" "<<dubin_3d.cfg_i2.theta*180./M_PI<<std::endl;
      std::cout<<"end: "<<dubin_3d.cfg_end.x<<" "<<dubin_3d.cfg_end.y<<" "<<dubin_3d.cfg_end.z<<" "<<dubin_3d.cfg_end.theta*180./M_PI<<std::endl;
+     std::cout<<"stop: "<<cfg_stop.x<<" "<<cfg_stop.y<<" "<<cfg_stop.z<< std::endl;
      /***print ends******/
      
      QuadCfg cfgs[]={dubin_3d.cfg_start,dubin_3d.cfg_i1,dubin_3d.cfg_i2,dubin_3d.cfg_end};
@@ -694,6 +700,7 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
    if( ros::Time::now()-t_start>= ros::Duration(_t_limit) ) 
    { 
       seg_result= 0;
+      cout<<"time up:"<< ros::Time::now().toSec()-t_start.toSec()<<" "<< ros::Duration(_t_limit).toSec() <<endl;
       if_restart_seg= true;
       return seg_result;
       //break;
@@ -833,7 +840,7 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
 int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double dt)
 {
    double de_yaw= atan2(u(1),u(0) );
-   //cout<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<" d_yaw: "<<d_yaw*180./M_PI<<" d_len: "<<d_len<<endl; 
+   cout<<"StepCommand: "<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<endl; 
    yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, de_yaw);
    controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
    controlMid.setReference( 0.0, 0.0, de_yaw, 0.0, u(0), u(1) );

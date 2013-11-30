@@ -283,6 +283,9 @@ namespace Ardrone_rrt_avoid{
            GeneralState* st_final= start->copy();
 
 	   QuadCfg cfg_start(start->x,start->y,start->z,start->yaw);
+	   if(sample_count==0)
+             cout<<"expand first: "<< start->x<<" "<<start->y<<" "<<start->z<< endl;
+
 	   QuadCfg cfg_end(sample_node.state_pt->x,sample_node.state_pt->y,sample_node.state_pt->z,sample_node.state_pt->yaw);
 	   //create a dubins curve connecting the node to the sampling node
 	   quadDubins3D dubin_3d(cfg_start,cfg_end,config_pt->rho);
@@ -399,7 +402,7 @@ namespace Ardrone_rrt_avoid{
 	  }
 	}
 	std::reverse( path_total.begin(),path_total.end() );
-	
+        cout<<"pathgen first: "<< path_total[0]->state_pt->x<<" "<<path_total[0]->state_pt->y<<" "<<path_total[0]->state_pt->z<< endl;	
 	//prune the path
 	if( path_total.size()>3 )
 	{  
@@ -551,6 +554,9 @@ namespace Ardrone_rrt_avoid{
 	 colli= utils::DubinsTotalCheck(dubin_3d,st_cu,st_next,cfg_target,obs_collect,checkparas_pt,config_pt,spaceLimit_pt,path_pt,&c_length);
          
 	 //cout<<"check colli: "<<colli<<endl;
+	 if(i==idx_sec) 
+	   cout<<"ini: "<<dubin_3d.cfg_start.x<<" "<<dubin_3d.cfg_start.y<<" "<<dubin_3d.cfg_start.z<<endl;
+	 
 	 cout<<"idx "<<i<<" "<<st_next->x <<" "<<st_next->y <<" "<<st_next->z <<" "<< st_next->t <<endl;
 	 cout<<"ideal "<<i<<" "<< it_wp->state_pt->x <<" "<<it_wp->state_pt->y<<" "<< it_wp->state_pt->z <<endl;
 
@@ -727,6 +733,9 @@ namespace Ardrone_rrt_avoid{
 	 TREEIter it= path_total[i];
 	 quadDubins3D db_3d= dubin_collects[it->idx_dubin]; 
 	 ardrone_rrt_avoid::DubinSeg_msg db_msg;//actually a dubin_seg message
+	 if(i== 1) 
+	   cout<<"ini to msg: "<<db_3d.cfg_start.x<<" "<<db_3d.cfg_start.y<<" "<<db_3d.cfg_start.z<<endl;
+
 	    //type
 	    db_msg.d_dubin.type= db_3d.path2D.type;
 	    //start

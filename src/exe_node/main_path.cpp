@@ -2,14 +2,15 @@
 #include "ros/ros.h"
 #include "controller/midlevelCnt/Controller_MidLevelCnt.h"
 #include "systemtime.h"
-
+//other
+#include <cfloat>
 using namespace Ardrone_rrt_avoid;
 
 int main(int argc, char** argv)
 { //overhead
   int idx_uav_state = -1;
   int pre_uav_state = -1;
-  double t_limit= 1.0;
+  double t_limit= 1e8;
   //bool if_reach= false;
   bool if_joy= false;
   //ros started
@@ -75,7 +76,7 @@ int main(int argc, char** argv)
       //get path msg and execute it in a fixed time
       if(  parrot_exe.GetIfRec() 
         && parrot_exe.GetIfReach()!=2
-        && parrot_exe.GetIfNewPath()
+        //&& parrot_exe.GetIfNewPath()
 	&& !if_joy
         )
       //if( parrot_exe.GetIfReach()!=2 && !if_joy)
