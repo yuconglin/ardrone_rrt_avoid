@@ -29,18 +29,20 @@ int main(int argc, char** argv)
    {
       //get path msg and execute it in a fixed time
       if(  parrot_exe.GetIfRec() 
-	&& parrot_exe.GetIfReach() ==0
-	&& parrot_exe.GetIfNewPath()
+	&& parrot_exe.GetIfReach()!=2
+	//&& parrot_exe.GetIfNewPath()
 	)
       {
-	std::cout<<"execute one time"<<std::endl;
+	//std::cout<<"execute one time"<<std::endl;
 	parrot_exe.PathCommand(t_limit);
       }
       //publish its state
       parrot_exe.SimDataUpdate();
       parrot_exe.PubQuadState();
       parrot_exe.PublishFlags();
-      
+
+      if(parrot_exe.GetIfReach()==2)
+        cout<<"please land"<<endl;
       ros::spinOnce();
    }//while ends
    return 0;

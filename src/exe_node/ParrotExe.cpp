@@ -1,4 +1,4 @@
-#define IF_SIM 0
+#define IF_SIM 1
 
 #include "ParrotExe.hpp"
 #include "ticpp.h"
@@ -394,6 +394,7 @@ int ParrotExe::PathCommand(const double _t_limit)
    if(if_reach==2)
    {
      SendControlToDrone(ControlCommand(0,0,0,0) );
+     ros::Duration(dt).sleep();
      cout<<"arrived, try to land"<< endl;
      return 0;
    }
