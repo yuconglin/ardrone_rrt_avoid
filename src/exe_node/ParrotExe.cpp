@@ -193,6 +193,7 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    tkm1= tk;
    yaw_pre= yaw_est;
    zm_pre= z_mea;
+   //cout<<"navdata: "<< x_est<<" "<<y_est<<" "<<z_mea<<endl;
    //log
    log_nav<<tk<<" "<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<" "<<" "<<vzm_est<<" "<<wz_est<<" "<<uav_state_idx<<endl;
 
@@ -348,7 +349,7 @@ void ParrotExe::SendCommand(double cx,double cy,double cz,double cw)
 void ParrotExe::sendLand()
 {
    land_pub.publish(std_msgs::Empty());
-   //cout << "land land" << endl;
+   cout << "land land" << endl;
 }
 
 void ParrotExe::sendTakeoff()
@@ -389,7 +390,14 @@ void ParrotExe::ControllerReset()
 int ParrotExe::PathCommand(const double _t_limit)
 {   //if no path, just stop and hover
    //cout<<"PathCommand"<< endl;
-   cout<<"path t_limit:"<< _t_limit << endl;
+   //cout<<"path t_limit:"<< _t_limit << endl;
+   if(if_reach==2)
+   {
+     SendControlToDrone(ControlCommand(0,0,0,0) );
+     cout<<"arrived, try to land"<< endl;
+     return 0;
+   }
+
    if(if_restart_path && path_msg.dubin_path.size()==0 )
    { //command it to stop. for fixed wing, maybe other mechnism
      SendControlToDrone( ControlCommand(0,0,0,0) );
@@ -513,12 +521,12 @@ int ParrotExe::PathCommand(const double _t_limit)
    }//else ends
    
    //yeah, let's follow that dubin's curve 
-   cout<<"execute one time: "<<"idx_dubin: "<< idx_dubin<< endl; 
+   //cout<<"execute one time: "<<"idx_dubin: "<< idx_dubin<< endl; 
    int result= DubinCommand(dubin_segs[idx_dubin], _t_limit);
    //reaching the end of a dubin's curve
    if(result==1 || result==2)
    {
-     cout<<"kusa kusa"<< endl;
+     //cout<<"kusa kusa"<< endl;
      if(idx_dubin== dubin_segs.size()-1) 
      {//if it is the last dubin's curve
        if_reach= 2; //arived
@@ -840,7 +848,7 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
 int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double dt)
 {
    double de_yaw= atan2(u(1),u(0) );
-   cout<<"StepCommand: "<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<endl; 
+   //cout<<"StepCommand: "<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<endl; 
    yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, de_yaw);
    controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
    controlMid.setReference( 0.0, 0.0, de_yaw, 0.0, u(0), u(1) );

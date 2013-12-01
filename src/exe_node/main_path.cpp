@@ -92,6 +92,7 @@ int main(int argc, char** argv)
     pre_uav_state= idx_uav_state;
     //let it lands
     if( parrot_exe.GetIfReach()==2 && idx_uav_state==4)
+    //if(parrot_exe.GetIfReach()==2)
       parrot_exe.sendLand();
 
     ros::spinOnce(); 

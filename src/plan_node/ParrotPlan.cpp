@@ -192,7 +192,8 @@ namespace Ardrone_rrt_avoid{
 	case ARRIVED:
 	{
            if(pre_case_idx!= ARRIVED)
-	     cout<<"arrived:hohoho"<<endl;
+	     cout<<"*****************ARRIVED***********"<< endl;  
+	   cout<<"arrived:hohoho"<<endl;
 	   pre_case_idx= case_idx;
 	   rrt_pt->ClearToDefault();
 	   rrt_pt->ClearTree();
@@ -379,7 +380,7 @@ namespace Ardrone_rrt_avoid{
 	       //st_root is actually predicted state
 	       if( !rrt_pt->PathCheck(predict_pt,idx,temp_rec,false) )
 	       {
-		 //cout<<"still good path, yeah"<<endl;
+		 cout<<"still good path, yeah"<<endl;
 		 case_idx= PATH_READY;
 		 //st_root needs updating
 	       }
@@ -398,7 +399,8 @@ namespace Ardrone_rrt_avoid{
 	 case ARRIVED:
 	 {
 	   if(pre_case_idx!= ARRIVED)
-	     cout<<"arrived:hohoho"<<endl;
+	     cout<<"************ARRIVED***********"<<endl;  
+	   cout<<"arrived:hohoho"<<endl;
 	   pre_case_idx= case_idx;
 	   rrt_pt->ClearToDefault();
 	   rrt_pt->ClearTree();
