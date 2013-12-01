@@ -91,7 +91,7 @@ class ParrotExe{
    void SimDataUpdate();
    //to access flags
    inline bool GetIfRec(){return this->if_receive;}
-   inline bool GetIfReach(){return this->if_reach;}
+   inline int GetIfReach(){return this->if_reach;}
    inline bool GetIfNewPath(){return this->if_new_path;}
    inline int GetUavStateIdx(){return this->uav_state_idx;}
    inline bool GetIfJoy(){return this->if_joy;}

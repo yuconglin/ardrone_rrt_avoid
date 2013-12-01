@@ -531,6 +531,7 @@ int ParrotExe::PathCommand(const double _t_limit)
      if(idx_dubin== dubin_segs.size()-1) 
      {//if it is the last dubin's curve
        if_reach= 2; //arived
+       cout<<"dubin final ends."<< endl;
        SendControlToDrone( ControlCommand(0,0,0,0) );
      }
      else

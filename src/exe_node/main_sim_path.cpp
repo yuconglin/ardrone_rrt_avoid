@@ -27,6 +27,7 @@ int main(int argc, char** argv)
 
    while(ros::ok() )
    {
+      cout<<"for check: "<<parrot_exe.GetIfReach()<< endl;
       //get path msg and execute it in a fixed time
       if(  parrot_exe.GetIfRec() 
 	&& parrot_exe.GetIfReach()!=2
