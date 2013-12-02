@@ -1,4 +1,4 @@
-#define IF_SIM 1
+#define IF_SIM 0
 
 #include "ParrotExe.hpp"
 #include "ticpp.h"
