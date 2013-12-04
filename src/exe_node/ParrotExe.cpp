@@ -193,7 +193,7 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    tkm1= tk;
    yaw_pre= yaw_est;
    zm_pre= z_mea;
-   //cout<<"navdata: "<< x_est<<" "<<y_est<<" "<<z_mea<<endl;
+   cout<<"navdata: "<< x_est<<" "<<y_est<<" "<<z_mea<<endl;
    //log
    log_nav<<tk<<" "<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<" "<<" "<<vzm_est<<" "<<wz_est<<" "<<uav_state_idx<<endl;
 
@@ -850,7 +850,9 @@ int ParrotExe::SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit)
 int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double dt)
 {
    double de_yaw= atan2(u(1),u(0) );
-   //cout<<"StepCommand: "<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<endl; 
+   cout<<"StepCommand: "<<"u(0): "<<u(0)<<" u(1): "<<u(1)<<" u(2): "<<u(2)<<endl;
+   cout<<"    position: "<< x_est<<" "<<y_est<<" "<<z_mea<<endl;
+   cout<<"    speed: "<< vx_est<<" "<<vy_est<< endl;
    yaw_est = jesus_library::mapAnglesToBeNear_PIrads( yaw_est, de_yaw);
    controlMid.setFeedback( x_est, y_est, vx_est, vy_est, yaw_est, z_mea);
    controlMid.setReference( 0.0, 0.0, de_yaw, 0.0, u(0), u(1) );
@@ -858,10 +860,11 @@ int ParrotExe::StepCommand(const arma::vec::fixed<3> u,double dt)
    //controlMid.setReference(0.0,0.0,de_yaw,0.0,v,0.0);
    //print and test
    controlMid.getOutput( &pitchco, &rollco, &dyawco, &dzco);
-   //cout<<pitchco<<" "<<rollco<<" "<<dzco<<" "<<dyawco<<endl;
+   cout<<"    out: "<<pitchco<<" "<<rollco<<" "<<dzco<<" "<<dyawco<<endl;
 
    SendControlToDrone( ControlCommand( pitchco, rollco, u(2), dyawco ) );
    //last dt
+   cout<<"dt: "<< dt << endl;
    ros::Duration(dt).sleep();
    return 0;
 }//StepCommand ends

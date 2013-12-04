@@ -40,6 +40,7 @@ int main(int argc, char** argv)
 
   //double YAW_STANDARD= 100;//wait to measure
   //while
+  ros::Rate r(10);
   while(ros::ok() )
   {
     idx_uav_state= parrot_exe.GetUavStateIdx();
@@ -68,7 +69,8 @@ int main(int argc, char** argv)
 	 std::cout<<"x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
 	 //controller reset
 	 parrot_exe.ControllerReset();
-         if_start= true;  
+         //ros::Duration(1.0).sleep();
+	 if_start= true; 
       }
     }//if(!if_start) ends
     else
@@ -95,6 +97,7 @@ int main(int argc, char** argv)
     //if(parrot_exe.GetIfReach()==2)
       parrot_exe.sendLand();
 
+    r.sleep();
     ros::spinOnce(); 
   }//while ends
   return 0;
