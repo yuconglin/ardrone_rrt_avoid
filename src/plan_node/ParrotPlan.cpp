@@ -215,12 +215,12 @@ namespace Ardrone_rrt_avoid{
   int ParrotPlan::working()
   {
     //file for navdata
-    string str_time;
-    char file_nav[256];
-    sprintf( file_nav, "data/%s:%s.txt",str_time.c_str(),"plan");
+    //string str_time;
+    //char file_nav[256];
+    //sprintf( file_nav, "data/%s:%s.txt",str_time.c_str(),"plan");
 
-    //ofstream myfile("virtual_replan_rec.txt");
-    ofstream myfile(file_nav);
+    ofstream myfile("virtual_replan_rec.txt");
+    //ofstream myfile(file_nav);
     //messages
     ardrone_rrt_avoid::DubinPath_msg path_msg;
     std_msgs::Bool if_new_msg;

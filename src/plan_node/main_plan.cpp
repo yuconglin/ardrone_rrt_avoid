@@ -33,7 +33,8 @@ int main(int argc, char** argv)
     double h_max= 2., h_min= 0.5;
     yc_rrt.SetGeoFence( new SpaceLimit(h_max,h_min,vec_rect) );
     //set the root and the goal
-    double x_root=0.,y_root=0.,z_root=0.8,yaw_root=0.;
+    double e= 0.6096; 
+    double x_root=0.+e,y_root=0.,z_root=0.8,yaw_root=0.;
     double x_goal=11,y_goal=0.6,z_goal=0.5,yaw_goal=0.;
     //double x_goal= 8., y_goal=0.,z_goal=0.8,yaw_goal=0.; 
     yc_rrt.SetRoot(new ArdroneState(x_root,y_root,z_root,0.,yaw_root) );
