@@ -34,7 +34,7 @@ int main(int argc, char** argv)
     yc_rrt.SetGeoFence( new SpaceLimit(h_max,h_min,vec_rect) );
     //set the root and the goal
     double x_root=0.,y_root=0.,z_root=0.8,yaw_root=0.;
-    double x_goal=10,y_goal=0.6,z_goal=0.5,yaw_goal=0.;
+    double x_goal=11,y_goal=0.6,z_goal=0.5,yaw_goal=0.;
     //double x_goal= 8., y_goal=0.,z_goal=0.8,yaw_goal=0.; 
     yc_rrt.SetRoot(new ArdroneState(x_root,y_root,z_root,0.,yaw_root) );
     yc_rrt.SetGoal(new ArdroneState(x_goal,y_goal,z_goal,0.,yaw_goal) );
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
     yc_rrt.CheckFlagsSet();
     //set the obstacles
     vector<obstacle2D> obs2d;
-    obs2d.push_back( obstacle2D(7.3152-0.6,-0.2032,0.6,0.6) );
+    obs2d.push_back( obstacle2D(7.3152,-0.2032,0.6,0.6) );
     //obs2d.push_back(obstacle2D(4.,0,0.4,0.3) );
     //write the 2D obstacles to a text file
     ofstream obs2d_file("obs2ds.txt");

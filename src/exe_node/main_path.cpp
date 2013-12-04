@@ -29,6 +29,11 @@ int main(int argc, char** argv)
 
   //ParrotExe initialization
   ParrotExe parrot_exe(controlMid,file_nav);
+  //Set initial position
+  double e= 0.6096; 
+  double x0= e, y0= 0.;
+  //parrot_exe.SetInitXY(e,0);
+  //stop for settle down
   ros::Duration(1.0).sleep();
   //flat trim and take off
   parrot_exe.sendFlattrim();
@@ -57,8 +62,8 @@ int main(int argc, char** argv)
 	double yaw_init= cfg_start.theta;
 	parrot_exe.SetYawInit(yaw_init);
 	//set x_est,y_est
-	double x_init_frame= cfg_start.x*cos(yaw_init)-cfg_start.y*sin(yaw_init);
-	double y_init_frame= cfg_start.x*sin(yaw_init)+cfg_start.y*cos(yaw_init);
+	double x_init_frame= cfg_start.x*cos(yaw_init)-cfg_start.y*sin(yaw_init)+x0;
+	double y_init_frame= cfg_start.x*sin(yaw_init)+cfg_start.y*cos(yaw_init)+y0;
 	 //set some
 	 parrot_exe.SetXEst(x_init_frame);
 	 parrot_exe.SetYEst(y_init_frame);

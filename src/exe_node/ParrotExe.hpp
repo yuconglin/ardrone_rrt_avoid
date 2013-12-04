@@ -207,6 +207,8 @@ class ParrotExe{
    double elapsed_time_dbl;
    double x_est, y_est, z_mea;
    double x_pre, y_pre, z_pre, yaw_pre, zm_pre;
+   //initial position
+   double x_ini, y_ini;
    //in body frame
    double vxm_est , vym_est , yaw_est, vzm_est;
    double wz_est;

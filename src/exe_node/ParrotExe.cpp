@@ -122,6 +122,7 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
    x_est = 0.0, y_est = 0.0, z_mea = 0.;
    x_pre = 0.0, y_pre = 0.0, z_pre = 0., yaw_pre = 0.;
    zm_pre = 0.0;
+   x_ini= 0.0, y_ini= 0.0;
 
    vxm_est = 0.0, vym_est = 0.0, vzm_est = 0.0, yaw_est = 0.0; // meter/s
    yawci = 0.0,  vxfi = 0.0, vyfi = 0.0, dzfi=0.; // meter/s
@@ -130,6 +131,12 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
    // For trajectory control
    controlMid.setControlMode(Controller_MidLevel_controlMode::SPEED_CONTROL);
 }
+/*
+void ParrotExe::SetInitXY(double _x,double _y)
+{
+   x_ini= _x;
+   y_ini= _y;
+}*/
 
 void ParrotExe::pathCallback(const ardrone_rrt_avoid::DubinPath_msg::ConstPtr& msg)
 {

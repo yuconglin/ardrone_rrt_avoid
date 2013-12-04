@@ -9,6 +9,8 @@
 #include "ardrone_rrt_avoid/ArdroneState_msg.h"
 //ardrone state
 #include "UavState/ArdroneState.h"
+//utilities
+#include "systemtime.h"
 
 using namespace std;
 namespace Ardrone_rrt_avoid{
@@ -212,7 +214,13 @@ namespace Ardrone_rrt_avoid{
 
   int ParrotPlan::working()
   {
-    ofstream myfile("virtual_replan_rec.txt");
+    //file for navdata
+    string str_time;
+    char file_nav[256];
+    sprintf( file_nav, "data/%s:%s.txt",str_time.c_str(),"plan");
+
+    //ofstream myfile("virtual_replan_rec.txt");
+    ofstream myfile(file_nav);
     //messages
     ardrone_rrt_avoid::DubinPath_msg path_msg;
     std_msgs::Bool if_new_msg;
