@@ -16,7 +16,7 @@ namespace Ardrone_rrt_avoid {
     
      public:
        //constructor
-       ParrotPlan(YlClRRT* _rrt_pt);
+       ParrotPlan(YlClRRT* _rrt_pt,char* file_log="virtual_replan_rec.txt");
        //callback functions
        void receiveCb(const std_msgs::Bool::ConstPtr& msg);
        void recNewCb(const std_msgs::Bool::ConstPtr& msg);
@@ -29,6 +29,8 @@ namespace Ardrone_rrt_avoid {
        int working();
        int PathPlanning();
      private:
+       //for planned path log
+       std::ofstream log_path;
        //the planner
        YlClRRT* rrt_pt;
        //enumerations for different cases:

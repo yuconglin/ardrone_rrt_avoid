@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 //user types
+#include "systemtime.h"
 #include "UavConfig/ArdroneConfig.h"
 #include "point2D.h"
 #include "UavBehavior/ArdroneBehavior.hpp"
@@ -62,10 +63,17 @@ int main(int argc, char** argv)
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(true);
+    //get the system time
+    std::string str_time;
+    utils::getSystemTime(str_time);
+    //set log file name
+    char file_log[256];
+    sprintf( file_log, "data/%s:%s.txt",str_time.c_str(),"plan");
+ 
     //ros start
     ros::init(argc,argv,"planner");
     //initialize the object
-    ParrotPlan planner(&yc_rrt);
+    ParrotPlan planner(&yc_rrt,file_log);
     planner.SetTOffset(1.0); 
     planner.working();    
     //planner.PathPlanning();

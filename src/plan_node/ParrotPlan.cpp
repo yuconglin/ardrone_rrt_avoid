@@ -15,7 +15,7 @@
 using namespace std;
 namespace Ardrone_rrt_avoid{
 
-  ParrotPlan::ParrotPlan(YlClRRT* _rrt_pt):rrt_pt(_rrt_pt),if_receive(false),if_new_rec(false),if_reach(0),if_state(false) 
+  ParrotPlan::ParrotPlan(YlClRRT* _rrt_pt,char* file_log):rrt_pt(_rrt_pt),log_path(file_log),if_receive(false),if_new_rec(false),if_reach(0),if_state(false) 
   {
     //publishers and subscribers
     //publishers
@@ -60,7 +60,7 @@ namespace Ardrone_rrt_avoid{
 
   int ParrotPlan::PathPlanning()
   {
-    ofstream myfile("virtual_replan_rec.txt");
+    //ofstream log_path("virtual_replan_rec.txt");
     //messages
     ardrone_rrt_avoid::DubinPath_msg path_msg;
     std_msgs::Bool if_new_msg;
@@ -136,8 +136,8 @@ namespace Ardrone_rrt_avoid{
 		   for(int i=0;i!= traj_pt->size();++i)
 		   {
 		     user_types::GeneralState* st= traj_pt->at(i);
-		      if(myfile.is_open() )
-			myfile<< st->x <<" "<<st->y<<" "<<st->z<<" "<<st->t<< endl;
+		      if(log_path.is_open() )
+			log_path<< st->x <<" "<<st->y<<" "<<st->z<<" "<<st->t<< endl;
 		   }//for int i ends
 		}
 		if_path_good= true;
@@ -208,7 +208,7 @@ namespace Ardrone_rrt_avoid{
       }//switch ends
       ros::spinOnce();
     }//while ends
-    myfile.close();
+    log_path.close();
     return 0;
   }//PathPlanning ends
 
@@ -219,8 +219,8 @@ namespace Ardrone_rrt_avoid{
     //char file_nav[256];
     //sprintf( file_nav, "data/%s:%s.txt",str_time.c_str(),"plan");
 
-    ofstream myfile("virtual_replan_rec.txt");
-    //ofstream myfile(file_nav);
+    //ofstream log_path("virtual_replan_rec.txt");
+    //ofstream log_path(file_nav);
     //messages
     ardrone_rrt_avoid::DubinPath_msg path_msg;
     std_msgs::Bool if_new_msg;
@@ -329,8 +329,8 @@ namespace Ardrone_rrt_avoid{
 		    for(int i=0;i!= traj_pt->size();++i)
 		    {
 		      user_types::GeneralState* st= traj_pt->at(i);
-		       if(myfile.is_open() )
-			 myfile<< st->x <<" "<<st->y<<" "<<st->z<<" "<<st->t<< endl;
+		       if(log_path.is_open() )
+			 log_path<< st->x <<" "<<st->y<<" "<<st->z<<" "<<st->t<< endl;
 		    }//for int i ends
 		 }
 		 if_path_good= true;
@@ -422,7 +422,7 @@ namespace Ardrone_rrt_avoid{
       //cout<<"once once once"<<endl;
       ros::spinOnce();
     }//while ends
-      myfile.close();
+      log_path.close();
       return 0;
 
   }//working ends
