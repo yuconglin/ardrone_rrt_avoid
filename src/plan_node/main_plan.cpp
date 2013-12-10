@@ -35,8 +35,8 @@ int main(int argc, char** argv)
     yc_rrt.SetGeoFence( new SpaceLimit(h_max,h_min,vec_rect) );
     //set the root and the goal
     double e= 0.6096; 
-    double x_root=0.+e,y_root=0.,z_root=0.8,yaw_root=0.;
-    double x_goal=11,y_goal=0.6,z_goal=0.5,yaw_goal=0.;
+    double x_root=0,y_root=e,z_root=0.7,yaw_root=0.;
+    double x_goal=11,y_goal=1.0,z_goal=0.5,yaw_goal=0.;
     //double x_goal= 8., y_goal=0.,z_goal=0.8,yaw_goal=0.; 
     yc_rrt.SetRoot(new ArdroneState(x_root,y_root,z_root,0.,yaw_root) );
     yc_rrt.SetGoal(new ArdroneState(x_goal,y_goal,z_goal,0.,yaw_goal) );
@@ -63,15 +63,16 @@ int main(int argc, char** argv)
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(true);
+     
+    //ros start
+    ros::init(argc,argv,"planner");
     //get the system time
     std::string str_time;
     utils::getSystemTime(str_time);
     //set log file name
     char file_log[256];
-    sprintf( file_log, "data/%s:%s.txt",str_time.c_str(),"plan");
- 
-    //ros start
-    ros::init(argc,argv,"planner");
+    //sprintf( file_log, "data/%s:%s.txt",str_time.c_str(),"plan");
+    sprintf(file_log,"/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"plan");
     //initialize the object
     ParrotPlan planner(&yc_rrt,file_log);
     planner.SetTOffset(1.0); 
