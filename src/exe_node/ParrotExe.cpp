@@ -77,12 +77,24 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
    pub_vel = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
    pub_reach= nh.advertise<std_msgs::Int16>("quad_reach",1);
    pub_state= nh.advertise<ardrone_rrt_avoid::ArdroneState_msg>("quad_state",1); 
+   pub_stateB= nh.advertise<ardrone_rrt_avoid::ArdroneState_msg>("quad_stateB",1);
+   
    pub_new_rec= nh.advertise<std_msgs::Bool>("if_new_rec",1);
    pub_state_idx= nh.advertise<std_msgs::Int16>("state_id",1);
    //for quad related
    takeoff_pub= nh.advertise<std_msgs::Empty>("ardrone/takeoff",1);
    land_pub= nh.advertise<std_msgs::Empty>("ardrone/land",1);
-   emergency_pub= nh.advertise<std_msgs::Empty>("ardrone/reset",1); 
+   emergency_pub= nh.advertise<std_msgs::Empty>("ardrone/reset",1);
+   //A and B
+   pub_ifoff_A= nh.advertise<std_msgs::Bool>("if_off_A",1);
+   pub_ifoff_B= nh.advertise<std_msgs::Bool>("if_off_B",1);
+   pub_ifstable_A= nh.advertise<std_msgs::Bool>("if_stable_A",1);
+   pub_ifstable_B= nh.advertise<std_msgs::Bool>("if_stable_B",1);
+   
+   sub_ifoff_A= nh.subscribe("if_off_A",1,&ParrotExe::A_ifoffCb,this);
+   sub_ifoff_B= nh.subscribe("if_off_B",1,&ParrotExe::B_ifoffCb,this);
+   sub_ifstable_A= nh.subscribe("if_stable_A",1,&ParrotExe::A_ifstableCb,this);
+   sub_ifstable_B= nh.subscribe("if_stable_B",1,&ParrotExe::B_ifstableCb,this);
 
    //Subscribers
    sub_path = nh.subscribe("path", 1, &ParrotExe::pathCallback,this);
@@ -137,6 +149,61 @@ void ParrotExe::SetInitXY(double _x,double _y)
    x_ini= _x;
    y_ini= _y;
 }*/
+
+void ParrotExe::SetInitTimeNow()
+{
+   t_init= ros::Time::now().toSec();
+}//SetInitTimeNow() ends
+
+void ParrotExe::A_ifoffCb(const std_msgs::Bool::ConstPtr& msg)
+{
+   if_off_A= msg->data; 
+}//A_ifoffCb
+
+void ParrotExe::B_ifoffCb(const std_msgs::Bool::ConstPtr& msg)
+{
+   if_off_B= msg->data;
+}//B_ifoffCb
+
+void ParrotExe::A_ifstableCb(const std_msgs::Bool::ConstPtr& msg)
+{
+   if_stable_A= msg->data;
+}//A_ifstableCb
+
+void ParrotExe::B_ifstableCb(const std_msgs::Bool::ConstPtr& msg)
+{ 
+   if_stable_B= msg->data; 
+}//B_ifstableCb
+
+void ParrotExe::PubIfOff(int idx)
+{
+   std_msgs::Bool msg;
+   
+   if(idx==0){
+     msg.data= if_off_A;
+     pub_ifoff_A.publish(msg);
+   }
+   else if(idx==1){
+     msg.data= if_off_B;
+     pub_ifoff_B.publish(msg);
+   }
+   else {;}
+}//PubIfOff ends
+
+void ParrotExe::PubIfStable(int idx)
+{
+   std_msgs::Bool msg;
+
+   if(idx==0){
+     msg.data= if_stable_A;
+     pub_ifstable_A.publish(msg);
+   }
+   else if(idx==1){
+     msg.data= if_stable_B;
+     pub_ifstable_B.publish(msg);
+   }
+   else {;}
+}//PubIfStable ends
 
 void ParrotExe::pathCallback(const ardrone_rrt_avoid::DubinPath_msg::ConstPtr& msg)
 {
@@ -321,7 +388,7 @@ void ParrotExe::PublishFlags()
    pub_state_idx.publish(state_idx_msg);
 }//PublishFlags ends
 
-void ParrotExe::PubQuadState()
+void ParrotExe::PubQuadState(int idx)
 {
    state_msg.x= x_est;
    state_msg.y= y_est;
@@ -331,9 +398,14 @@ void ParrotExe::PubQuadState()
    state_msg.vy= vy_est;
    state_msg.vz= vzm_est;
    state_msg.yaw_rate= wz_est;
-   state_msg.t= tk.toSec();
+   state_msg.t= tk.toSec()-t_init;
    //pub the state
-   pub_state.publish(state_msg);
+   if(idx==0)
+     pub_state.publish(state_msg);
+   else if(idx==1)
+     pub_stateB.publish(state_msg);
+   else
+     {;}
 }//PubQuadState ends
 
 void ParrotExe::SendControlToDrone(ControlCommand cmd)

@@ -75,7 +75,8 @@ int main(int argc, char** argv)
 	 //controller reset
 	 parrot_exe.ControllerReset();
          //ros::Duration(1.0).sleep();
-	 if_start= true; 
+	 if_start= true;
+	 parrot_exe.SetInitTimeNow();
       }
     }//if(!if_start) ends
     else

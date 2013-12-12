@@ -48,19 +48,9 @@ class ParrotExe{
 
    //constructor
    ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav="ardrone_log_nav.txt");
-   //read basic params from xml file
-   int ParamFromXML(const char* pFilename="/home/yucong/fuerte_workspace/sandbox/yucong_rrt_avoid/src/common/param.xml");
-   //callback functions 
-   void pathCallback(const ardrone_rrt_avoid::DubinPath_msg::ConstPtr& msg);
-   void newCallback(const std_msgs::Bool::ConstPtr& msg);
-   void navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr);
-   void joyCb(const sensor_msgs::JoyConstPtr joy_msg);
-   //to publish flags
+      //to publish flags
    void PublishFlags();
-   //to publish commands
-   void SendControlToDrone(ControlCommand cmd);
-   void SendCommand(double cx,double cy,double cz,double cw);
-   //to take off or land
+      //to take off or land
    void sendLand();
    void sendTakeoff();
    void sendStop();
@@ -71,22 +61,13 @@ class ParrotExe{
    int PathCommand(const double _t_limit);
    //command to execute a dubin's curve
    int DubinCommand(DubinSeg& db_seg, const double _t_limit);
-   //command to execute a segment of dubin line/circle
-   int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit);
-   //command a step with velocity input u,time interval dt
-   int StepCommand(const arma::vec::fixed<3> u,double dt);
-   //get response
-   int StepResponse(const arma::vec::fixed<3> u, geometry_msgs::Twist& c_twist);
-   //command to execute a line.
-   int LineStepCommand(const QuadCfg& start,const QuadCfg& end);
-   //command to execute a circle curve
-   int CircleStepCommand(const QuadCfg& start,const QuadCfg& end,int type,double rho);
    //for test
    int LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_limit); 
    int CircleCommand(const QuadCfg& start,const QuadCfg& end,int type,double rho,double _t_limit);
    
    //to publish quad's state
-   void PubQuadState(); 
+   //void PubQuadState(); 
+   void PubQuadState(int idx=0);
    //data update in simulation
    void SimDataUpdate();
    //to access flags
@@ -99,7 +80,8 @@ class ParrotExe{
    int GetCurrentCfg(QuadCfg& cfg);
    inline ros::NodeHandle* GetHandlePt(){return &nh;} 
    //set init time
-   inline void SetInitTime(ros::Time _t_now) {this->t_init= _t_now.toSec(); }
+   //inline void SetInitTime(ros::Time _t_now) {this->t_init= _t_now.toSec(); }
+   void SetInitTimeNow();
    inline void SetStartTime(ros::Time _t_now){this->t_start= _t_now;}
    inline void SetYawInit(double _yaw){this->YawInit= _yaw;}
    //set some basic elements
@@ -116,6 +98,28 @@ class ParrotExe{
    void ControllerReset();
  
  private:
+   //read basic params from xml file
+   int ParamFromXML(const char* pFilename="/home/yucong/fuerte_workspace/sandbox/yucong_rrt_avoid/src/common/param.xml");
+   //callback functions 
+   void pathCallback(const ardrone_rrt_avoid::DubinPath_msg::ConstPtr& msg);
+   void newCallback(const std_msgs::Bool::ConstPtr& msg);
+   void navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr);
+   void joyCb(const sensor_msgs::JoyConstPtr joy_msg);
+   
+   //to publish commands
+   void SendControlToDrone(ControlCommand cmd);
+   void SendCommand(double cx,double cy,double cz,double cw);
+   //command to execute a segment of dubin line/circle
+   int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit);
+   //command a step with velocity input u,time interval dt
+   int StepCommand(const arma::vec::fixed<3> u,double dt);
+   //get response
+   int StepResponse(const arma::vec::fixed<3> u, geometry_msgs::Twist& c_twist);
+   //command to execute a line.
+   int LineStepCommand(const QuadCfg& start,const QuadCfg& end);
+   //command to execute a circle curve
+   int CircleStepCommand(const QuadCfg& start,const QuadCfg& end,int type,double rho);
+
    //index helps to command the parrot 
    int idx_dubin= -1;//which dubin seg of the path it is in
    int idx_dubin_sub= -1;//which seg of dubin it is in
@@ -151,7 +155,7 @@ class ParrotExe{
    ros::Publisher takeoff_pub;
    ros::Publisher land_pub;
    ros::Publisher emergency_pub;
-
+  
    //subscribers
    ros::Subscriber sub_path;//subscribe to generated path
    ros::Subscriber sub_if_new;//subscribe to see if a new path is generated
@@ -166,6 +170,35 @@ class ParrotExe{
    ros::ServiceClient gmscl;
    gazebo_msgs::GetModelState getmodelstate;
 
+   //between A and B
+   ros::Publisher pub_ifoff_A;//if drone A takes off
+   ros::Publisher pub_ifoff_B;//if drone B takes off
+   ros::Publisher pub_ifstable_A;//if drone A stable
+   ros::Publisher pub_ifstable_B;//if drone B stable
+   ros::Publisher pub_stateB;
+   
+   ros::Subscriber sub_ifoff_A;//if drone A takes off
+   ros::Subscriber sub_ifoff_B;//if drone B takes off
+   ros::Subscriber sub_ifstable_A;//if drone A stable
+   ros::Subscriber sub_ifstable_B;//if drone B stable
+   
+   void A_ifoffCb(const std_msgs::Bool::ConstPtr& msg);
+   void B_ifoffCb(const std_msgs::Bool::ConstPtr& msg);
+   void A_ifstableCb(const std_msgs::Bool::ConstPtr& msg);
+   void B_ifstableCb(const std_msgs::Bool::ConstPtr& msg);
+   
+   bool if_off_A= false;
+   bool if_off_B= false;
+   bool if_stable_A= false;
+   bool if_stable_B= false;
+
+   bool inline GetIfOffA(){return if_off_A;}
+   bool inline GetIfOffB(){return if_off_B;}
+   bool inline GetIfStableA(){return if_stable_A;}
+   bool inline GetIfStableB(){return if_stable_B;}
+   
+   void PubIfOff(int idx=0);
+   void PubIfStable(int idx=0);
    //msgs
    //if a dubins curve is received
    std_msgs::Bool rec_msg;
@@ -193,7 +226,7 @@ class ParrotExe{
    arma::mat K1= 0.1*arma::eye<arma::mat>(3,3); 
    arma::mat K2= 0.1*arma::eye<arma::mat>(3,3);
    //time start the path
-   double t_init;
+   double t_init= 0.;
    //for logging trajectory
    std::ofstream log_path;
    std::ofstream log_nav;
