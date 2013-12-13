@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 	   parrot_exe.SetPreZ(cfg_start.z);
 	    
 	   std::cout<<"A x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
-	   parrot_exe.SetIsStableA(true);
+	   parrot_exe.SetIfStableA(true);
 	    //parrot_exe.SetInitTimeNow();
 	 }
 	 if(parrot_exe.GetIfStableA() && parrot_exe.GetIfStableB() )

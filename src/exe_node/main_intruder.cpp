@@ -11,6 +11,8 @@ int main(int argc, char** argv)
    //overhead
    int idx_uav_state = -1;
    int pre_uav_state = -1;
+   double t_limit= 1e8;
+   bool if_joy= false;
    ros::init(argc,argv,"the other ardrone");
    //the controller
    Controller_MidLevelCnt controlMid;
@@ -36,7 +38,7 @@ int main(int argc, char** argv)
    //flat trim and take off
    parrot_exe.sendFlattrim();
    
-   bool if_start= false,if_stableB= false;
+   bool if_start= false;
    //the start config when switch from takeoff to hover
    QuadCfg cfg_start;
    int reach= -1;
@@ -75,8 +77,7 @@ int main(int argc, char** argv)
 	  parrot_exe.SetPreZ(cfg_start.z);
 	   
 	  std::cout<<"B x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
-	  if_stableB= true;
-	  parrot_exe.SetIsStableB(true);
+	  parrot_exe.SetIfStableB(true);
 	  //parrot_exe.SetInitTimeNow();
         }
         if(parrot_exe.GetIfStableB() && parrot_exe.GetIfStableA() )

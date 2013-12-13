@@ -126,6 +126,12 @@ target_link_libraries(exe_path parrot_exe jesus_codes dubin lib_ticpp lib_utils 
 #path simulation
 rosbuild_add_executable(sim_path src/exe_node/main_sim_path.cpp)
 target_link_libraries(sim_path parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
+#host
+rosbuild_add_executable(exe_host src/exe_node/main_host.cpp)
+target_link_libraries(exe_host parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
+#intruder
+rosbuild_add_executable(exe_intruder src/exe_node/main_intruder.cpp)
+target_link_libraries(exe_intruder parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 
 #the planner
 include_directories("src/tree")

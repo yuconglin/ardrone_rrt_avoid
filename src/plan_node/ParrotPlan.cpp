@@ -311,7 +311,7 @@ namespace Ardrone_rrt_avoid{
 	   
 	   if(st_obs0.t!=0)
 	   {
-	     std::vector<obstacle3D> obs3d(1,st_obs0.toObs3D() );
+	     std::vector<user_types::obstacle3D> obs3d(1,st_obs0.toObs3D() );
 	     rrt_pt->SetObs3D(obs3d);
 	     if_obs0= false;
 	   }
@@ -347,7 +347,7 @@ namespace Ardrone_rrt_avoid{
 
 	       if(st_obs0.t!=0)
 	       {
-		 std::vector<obstacle3D> obs3d(1,st_obs0.toObs3D() );
+		 std::vector<user_types::obstacle3D> obs3d(1,st_obs0.toObs3D() );
 		 rrt_pt->SetObs3D(obs3d);
 	         if_obs0 =false;
 	       }
@@ -428,7 +428,7 @@ namespace Ardrone_rrt_avoid{
 	       //update the obstacle
                if(st_obs0.t!=0)
 	       {
-		 std::vector<obstacle3D> obs3d(1,st_obs0.toObs3D() );
+		 std::vector<user_types::obstacle3D> obs3d(1,st_obs0.toObs3D() );
 		 rrt_pt->SetObs3D(obs3d);
 		 if_obs0 =false;
 	       }

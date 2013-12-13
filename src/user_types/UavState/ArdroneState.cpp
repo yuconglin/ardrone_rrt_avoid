@@ -191,7 +191,7 @@ namespace user_types{
       return new ArdroneState(x_a,y_a,z_a,t_a,yaw_a,vx_a,vy_a,vz_a,yaw_rate_a);
    }//InterPolate ends
    
-   obstacle3D toObs3D()
+   obstacle3D ArdroneState::toObs3D()
    {
      return obstacle3D(x,y,z,vx,vy,vz,t,0.5,0.5);
    }//to Obs3D

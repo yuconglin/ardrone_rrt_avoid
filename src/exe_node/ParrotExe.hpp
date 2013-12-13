@@ -65,7 +65,11 @@ class ParrotExe{
    //for test
    int LineCommand(const QuadCfg& start,const QuadCfg& end, double _t_limit); 
    int CircleCommand(const QuadCfg& start,const QuadCfg& end,int type,double rho,double _t_limit);
-   
+   //get response
+   int StepResponse(const arma::vec::fixed<3> u, geometry_msgs::Twist& c_twist);
+   //command a step with velocity input u,time interval dt
+   int StepCommand(const arma::vec::fixed<3> u,double dt);
+
    //to publish quad's state
    //void PubQuadState(); 
    void PubQuadState(int idx=0);
@@ -97,7 +101,20 @@ class ParrotExe{
    void SetRestartDefault();
    //to reset the controller
    void ControllerReset();
- 
+   //A and B
+   bool inline GetIfOffA(){return if_off_A;}
+   bool inline GetIfOffB(){return if_off_B;}
+   bool inline GetIfStableA(){return if_stable_A;}
+   bool inline GetIfStableB(){return if_stable_B;}
+
+   void inline SetIfOffA(bool if_off){if_off_A= if_off;}
+   void inline SetIfOffB(bool if_off){if_off_B= if_off;}
+   void inline SetIfStableA(bool if_stable){if_stable_A= if_stable;}
+   void inline SetIfStableB(bool if_stable){if_stable_B= if_stable;}
+   
+   void PubIfOff(int idx=0);
+   void PubIfStable(int idx=0);
+
  private:
    //read basic params from xml file
    int ParamFromXML(const char* pFilename="/home/yucong/fuerte_workspace/sandbox/yucong_rrt_avoid/src/common/param.xml");
@@ -112,10 +129,6 @@ class ParrotExe{
    void SendCommand(double cx,double cy,double cz,double cw);
    //command to execute a segment of dubin line/circle
    int SegCommand(DubinSeg& db_seg, int idx_sub, double _t_limit);
-   //command a step with velocity input u,time interval dt
-   int StepCommand(const arma::vec::fixed<3> u,double dt);
-   //get response
-   int StepResponse(const arma::vec::fixed<3> u, geometry_msgs::Twist& c_twist);
    //command to execute a line.
    int LineStepCommand(const QuadCfg& start,const QuadCfg& end);
    //command to execute a circle curve
@@ -193,18 +206,6 @@ class ParrotExe{
    bool if_stable_A= false;
    bool if_stable_B= false;
 
-   bool inline GetIfOffA(){return if_off_A;}
-   bool inline GetIfOffB(){return if_off_B;}
-   bool inline GetIfStableA(){return if_stable_A;}
-   bool inline GetIfStableB(){return if_stable_B;}
-
-   bool inline SetIfOffA(bool if_off){if_off_A= if_off;}
-   bool inline SetIfOffB(bool if_off){if_off_B= if_off;}
-   bool inline SetIfStableA(bool if_stable){if_stable_A= if_stable;}
-   bool inline SetIfStableB(bool if_stable){if_stable_B= if_stable;}
-   
-   void PubIfOff(int idx=0);
-   void PubIfStable(int idx=0);
    //msgs
    //if a dubins curve is received
    std_msgs::Bool rec_msg;
