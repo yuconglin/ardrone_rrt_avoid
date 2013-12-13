@@ -22,6 +22,7 @@ namespace Ardrone_rrt_avoid {
        void recNewCb(const std_msgs::Bool::ConstPtr& msg);
        void reachCb(const std_msgs::Int16::ConstPtr& msg);
        void stateCb(const ardrone_rrt_avoid::ArdroneState_msg::ConstPtr& msg);
+       void stateCb1(const ardrone_rrt_avoid::ArdroneState_msg::ConstPtr& msg);
        //set 
        inline void SetTimeLimit(const double _t_limit){t_limit= _t_limit;}
        inline void SetTOffset(const double _t_offset){t_offset=_t_offset;}
@@ -40,11 +41,14 @@ namespace Ardrone_rrt_avoid {
        double t_offset;
        //current state
        user_types::ArdroneState st_current;
+       //obstacle state
+       user_types::ArdroneState st_obs0;
        //flags
        bool if_receive;
        bool if_new_rec;
        int if_reach;
        bool if_state;
+       bool if_obs0;
        //ros NodeHandle
        ros::NodeHandle nh;
        //publishers
@@ -54,7 +58,8 @@ namespace Ardrone_rrt_avoid {
        ros::Subscriber sub_receive;
        ros::Subscriber sub_if_new_rec;
        ros::Subscriber sub_reach;
-       ros::Subscriber sub_state;	
+       ros::Subscriber sub_state;
+       ros::Subscriber sub_stateB;
   };//class ends
 
 };//namespace ends

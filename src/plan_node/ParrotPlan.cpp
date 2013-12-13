@@ -15,7 +15,7 @@
 using namespace std;
 namespace Ardrone_rrt_avoid{
 
-  ParrotPlan::ParrotPlan(YlClRRT* _rrt_pt,char* file_log):rrt_pt(_rrt_pt),log_path(file_log),if_receive(false),if_new_rec(false),if_reach(0),if_state(false) 
+  ParrotPlan::ParrotPlan(YlClRRT* _rrt_pt,char* file_log):rrt_pt(_rrt_pt),log_path(file_log),if_receive(false),if_new_rec(false),if_reach(0),if_state(false),if_obs0(false) 
   {
     //publishers and subscribers
     //publishers
@@ -25,7 +25,8 @@ namespace Ardrone_rrt_avoid{
     sub_receive=nh.subscribe("path_rec",100,&ParrotPlan::receiveCb,this);
     sub_if_new_rec=nh.subscribe("if_new_rec",100,&ParrotPlan::recNewCb,this);
     sub_reach=nh.subscribe("quad_reach",100,&ParrotPlan::reachCb,this);
-    sub_state =nh.subscribe("quad_state",100,&ParrotPlan::stateCb,this);    
+    sub_state =nh.subscribe("quad_state",100,&ParrotPlan::stateCb,this);
+    sub_stateB= nh.subscribe("quad_stateB",100,&ParrotPlan::stateCb1,this);
   }//ParrotPlan ends
 
   void ParrotPlan::receiveCb(const std_msgs::Bool::ConstPtr& msg)
@@ -56,6 +57,20 @@ namespace Ardrone_rrt_avoid{
     st_current.t= msg->t;
     //update if_state flag
     if_state= true;
+  }
+
+  void ParrotPlan::stateCb1(const ardrone_rrt_avoid::ArdroneState_msg::ConstPtr& msg)
+  {
+    st_obs0.x= msg->x;
+    st_obs0.y= msg->y;
+    st_obs0.z= msg->z;
+    st_obs0.yaw= msg->yaw;
+    st_obs0.vx= msg->vx;
+    st_obs0.vy= msg->vy;
+    st_obs0.vz= msg->vz;
+    st_obs0.yaw_rate= msg->yaw_rate;
+    st_obs0.t= msg->t;
+    if_obs0= true;
   }
 
   int ParrotPlan::PathPlanning()
@@ -230,6 +245,7 @@ namespace Ardrone_rrt_avoid{
     bool if_path_good= false;
   
     if_state= false;
+    if_obs0= false;
     user_types::GeneralState* st_root_pt= NULL;
     //user_types::ArdroneState st_pre;//current quad state and previous quad state
     user_types::ArdroneState st_check, st_recheck;//the state for check

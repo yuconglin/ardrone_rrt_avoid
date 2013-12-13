@@ -1,6 +1,7 @@
 #pragma once
 #include "GeneralState.h"
 #include "armadillo"
+#include "obstacle3D.h"
 
 //declaration of classes used
 class Controller_MidLevelCnt;
@@ -47,6 +48,7 @@ namespace user_types{
     void LogData(std::ofstream& file);
     GeneralState* copy();
     GeneralState* InterPolate(double dt);
+    obstacle3D toObs3D();
   };//ArdroneState ends
 
 };//namespace ends

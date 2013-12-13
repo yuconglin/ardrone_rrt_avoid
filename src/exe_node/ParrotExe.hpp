@@ -29,7 +29,8 @@ class ParrotExe{
    struct ControlCommand
    {  //x,y,yaw, reverse
      inline ControlCommand() {roll = pitch = yaw = gaz = 0;}
-     inline ControlCommand( double pitch, double roll, double gaz, double yaw ) 	 {
+     inline ControlCommand( double pitch, double roll, double gaz, double yaw )
+     {
 	  this->roll = roll;
 	  this->pitch = pitch;
 	  this->yaw = yaw;

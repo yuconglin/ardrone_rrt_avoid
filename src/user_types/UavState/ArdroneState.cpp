@@ -3,6 +3,7 @@
 #include <cmath>
 //controller gains
 #include "controller/config/parrot/config_controller_Parrot.h"
+#include "obstacle3D.h"
 
 namespace user_types{
    /*
@@ -189,5 +190,10 @@ namespace user_types{
       double yaw_rate_a= yaw_rate;
       return new ArdroneState(x_a,y_a,z_a,t_a,yaw_a,vx_a,vy_a,vz_a,yaw_rate_a);
    }//InterPolate ends
+   
+   obstacle3D toObs3D()
+   {
+     return obstacle3D(x,y,z,vx,vy,vz,t,0.5,0.5);
+   }//to Obs3D
 
 };//namespace ends
