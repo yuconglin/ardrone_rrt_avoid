@@ -197,6 +197,11 @@ class ParrotExe{
    bool inline GetIfOffB(){return if_off_B;}
    bool inline GetIfStableA(){return if_stable_A;}
    bool inline GetIfStableB(){return if_stable_B;}
+
+   bool inline SetIfOffA(bool if_off){if_off_A= if_off;}
+   bool inline SetIfOffB(bool if_off){if_off_B= if_off;}
+   bool inline SetIfStableA(bool if_stable){if_stable_A= if_stable;}
+   bool inline SetIfStableB(bool if_stable){if_stable_B= if_stable;}
    
    void PubIfOff(int idx=0);
    void PubIfStable(int idx=0);

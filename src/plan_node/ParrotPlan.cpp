@@ -11,6 +11,8 @@
 #include "UavState/ArdroneState.h"
 //utilities
 #include "systemtime.h"
+//user_types
+#include "obstacle3D.h"
 
 using namespace std;
 namespace Ardrone_rrt_avoid{
@@ -240,7 +242,7 @@ namespace Ardrone_rrt_avoid{
     ardrone_rrt_avoid::DubinPath_msg path_msg;
     std_msgs::Bool if_new_msg;
   
-    int case_idx =PATH_CHECK;
+    int case_idx= WAIT_STATE;
     int pre_case_idx= -1;
     bool if_path_good= false;
   
@@ -259,7 +261,8 @@ namespace Ardrone_rrt_avoid{
     //bool if_recheck_start= false;
     t_limit= rrt_pt->GetTimeLimit();
     //start the process
-    rrt_pt->ExpandTree(); 
+    //rrt_pt->ExpandTree();
+    bool if_start= false;
     //while loop: keep planning and sending
     while(ros::ok() )
     { //if arrived at the goal
@@ -303,9 +306,17 @@ namespace Ardrone_rrt_avoid{
 	   pre_case_idx= case_idx;
 	   //clean previously tree and vectors
 	   //actually, before tree expand we can check if previously path is still collision free, if so, we can still convert it to a message and ready to send if no new path is available.
+	   //reset the obstacles
+           if(!if_obs0) break;
+	   
+	   if(st_obs0.t!=0)
+	   {
+	     std::vector<obstacle3D> obs3d(1,st_obs0.toObs3D() );
+	     rrt_pt->SetObs3D(obs3d);
+	     if_obs0= false;
+	   }
 	   rrt_pt->ClearToDefault();
 	   rrt_pt->ClearTree();
-	   //reset the obstacles
 	   //reset tree root
 	   rrt_pt->SetRoot(st_root_pt);
 	   //reset sample parameters because they are influenced by goal and root
@@ -314,6 +325,7 @@ namespace Ardrone_rrt_avoid{
 	   rrt_pt->ExpandTree();
 	   //tree expanding ends, wait for current quad state and check path
 	   case_idx= PATH_CHECK;
+	   
 	   break;
 	 }
 	 case PATH_CHECK:
@@ -321,6 +333,7 @@ namespace Ardrone_rrt_avoid{
 	   if(pre_case_idx!= PATH_CHECK)   
 	     cout<<"*****************PATH CHECK***************"<<endl;
 	   pre_case_idx= case_idx;
+	   if(!if_obs0) break;
 	   if(if_state)//that means an updated quad state is received
 	   { 
 	     //double d_t= st_current.t-st_pre.t;
@@ -332,6 +345,13 @@ namespace Ardrone_rrt_avoid{
 	     {
 	       if(!if_path_good ) st_check= st_current;
 
+	       if(st_obs0.t!=0)
+	       {
+		 std::vector<obstacle3D> obs3d(1,st_obs0.toObs3D() );
+		 rrt_pt->SetObs3D(obs3d);
+	         if_obs0 =false;
+	       }
+   
 	       if( rrt_pt->PathCheckRepeat(&st_current) )
 	       {//a good path is available
 		 if(st_root_pt) delete st_root_pt;
@@ -371,11 +391,14 @@ namespace Ardrone_rrt_avoid{
 	   if(pre_case_idx!= WAIT_STATE)  
 	      cout<<"*************WAIT STATE*****************"<<endl;
 	   pre_case_idx= case_idx;
+	   if(!if_obs0) break; 
+	   
+	   if_obs0= false;
 	   if(if_state)
 	   {
-	     user_types::GeneralState* temp_pt= &st_current;
+	     //user_types::GeneralState* temp_pt= &st_current;
 	     if(st_root_pt) delete st_root_pt;
-	     st_root_pt= temp_pt->copy();
+	     st_root_pt= st_current.copy();
 	     //st_pre= st_current;
 	     case_idx= TREE_EXPAND;
 	     if_state= false;
@@ -388,6 +411,7 @@ namespace Ardrone_rrt_avoid{
 	   if(pre_case_idx!= PATH_RECHECK)
 	     cout<<"*******************PATH RECHECK*************"<<endl;
 	   pre_case_idx= case_idx;
+	   if(!if_obs0) break;
 	   //sth may happen when it is closet to the last sec
 	   if(if_state)
 	   {
@@ -401,6 +425,13 @@ namespace Ardrone_rrt_avoid{
 	       //reset the obstacles 
 	       int idx;
 	       std::vector<user_types::GeneralState*> temp_rec;
+	       //update the obstacle
+               if(st_obs0.t!=0)
+	       {
+		 std::vector<obstacle3D> obs3d(1,st_obs0.toObs3D() );
+		 rrt_pt->SetObs3D(obs3d);
+		 if_obs0 =false;
+	       }
 	       //st_root is actually predicted state
 	       if( !rrt_pt->PathCheck(predict_pt,idx,temp_rec,false) )
 	       {
