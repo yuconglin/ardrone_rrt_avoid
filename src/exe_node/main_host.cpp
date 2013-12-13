@@ -41,7 +41,7 @@ int main(int argc, char** argv)
     parrot_exe.sendTakeoff();
     parrot_exe.SetIfOffA(true);
        
-    bool if_start= false,if_stableA= false,if_stableB= false;
+    bool if_start= false;
     //the start config when switch from takeoff to hover
     QuadCfg cfg_start;
    
@@ -66,19 +66,18 @@ int main(int argc, char** argv)
 	   //set x_est,y_est
 	   double x_init_frame= cfg_start.x*cos(yaw_init)-cfg_start.y*sin(yaw_init)+x0;
 	   double y_init_frame= cfg_start.x*sin(yaw_init)+cfg_start.y*cos(yaw_init)+y0;
-	    //set some
-	    parrot_exe.SetXEst(x_init_frame);
-	    parrot_exe.SetYEst(y_init_frame);
-	    parrot_exe.SetPreXEst(x_init_frame);
-	    parrot_exe.SetPreYEst(y_init_frame);
-	    parrot_exe.SetPreZ(cfg_start.z);
+	   //set some
+	   parrot_exe.SetXEst(x_init_frame);
+	   parrot_exe.SetYEst(y_init_frame);
+	   parrot_exe.SetPreXEst(x_init_frame);
+	   parrot_exe.SetPreYEst(y_init_frame);
+	   parrot_exe.SetPreZ(cfg_start.z);
 	    
-	    std::cout<<"A x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
-	    if_stableA= true;
-	    parrot_exe.SetIsStableA(true);
+	   std::cout<<"A x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
+	   parrot_exe.SetIsStableA(true);
 	    //parrot_exe.SetInitTimeNow();
 	 }
-	 if(if_stableA && parrot_exe.GetIfStableB() )
+	 if(parrot_exe.GetIfStableA() && parrot_exe.GetIfStableB() )
 	 {
            parrot_exe.ControllerReset();
 	   ros::Duration(1.0).sleep();
