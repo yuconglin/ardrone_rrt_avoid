@@ -87,6 +87,7 @@ class ParrotExe{
    //set init time
    //inline void SetInitTime(ros::Time _t_now) {this->t_init= _t_now.toSec(); }
    void SetInitTimeNow();
+   void SetStartTimeNow();
    inline void SetStartTime(ros::Time _t_now){this->t_start= _t_now;}
    inline void SetYawInit(double _yaw){this->YawInit= _yaw;}
    //set some basic elements

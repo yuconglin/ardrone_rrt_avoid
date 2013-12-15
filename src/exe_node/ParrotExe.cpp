@@ -111,7 +111,8 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
    flattrim_srv= nh.serviceClient<std_srvs::Empty>(nh.resolveName("ardrone/flattrim"),1);
 
    //specify some parameters of the quad
-   if(ParamFromXML("/home/yucong/.ros/param.xml")!=0)
+   //if(ParamFromXML("/home/yucong/.ros/param.xml")!=0)
+   if(ParamFromXML("/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml")!=0)
    {
      try {
         throw std::runtime_error ("ParamFromXML error");
@@ -154,6 +155,12 @@ void ParrotExe::SetInitTimeNow()
 {
    t_init= ros::Time::now().toSec();
 }//SetInitTimeNow() ends
+
+void ParrotExe::SetStartTimeNow()
+{
+   t_start= ros::Time::now();
+   std::cout<<"now t_start: "<<t_start.toSec()<< std::endl;
+}
 
 void ParrotExe::A_ifoffCb(const std_msgs::Bool::ConstPtr& msg)
 {
@@ -267,7 +274,7 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    tkm1= tk;
    yaw_pre= yaw_est;
    zm_pre= z_mea;
-   cout<<"navdata: "<< x_est<<" "<<y_est<<" "<<z_mea<<endl;
+   //cout<<"navdata: "<< x_est<<" "<<y_est<<" "<<z_mea<<endl;
    //log
    log_nav<<tk<<" "<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<" "<<" "<<vzm_est<<" "<<wz_est<<" "<<uav_state_idx<<endl;
 
