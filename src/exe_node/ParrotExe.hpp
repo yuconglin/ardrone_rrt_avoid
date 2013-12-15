@@ -48,7 +48,7 @@ class ParrotExe{
    };
 
    //constructor
-   ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav="ardrone_log_nav.txt");
+   ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav="ardrone_log_nav.txt",char* xmlfilename="/home/yucong/.ros/param.xml");
       //to publish flags
    void PublishFlags();
       //to take off or land
@@ -115,9 +115,10 @@ class ParrotExe{
    
    void PubIfOff(int idx=0);
    void PubIfStable(int idx=0);
-
+   //inline void SetXmlFileName(const char* name){xmlfilename=name;}
  private:
    //read basic params from xml file
+   //char* xmlfilename;
    int ParamFromXML(const char* pFilename="/home/yucong/fuerte_workspace/sandbox/yucong_rrt_avoid/src/common/param.xml");
    //callback functions 
    void pathCallback(const ardrone_rrt_avoid::DubinPath_msg::ConstPtr& msg);

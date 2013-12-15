@@ -59,7 +59,7 @@ int ParrotExe::ParamFromXML(const char* pFilename)
    return 0;
 }//ParamFromXML ends
 
-ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):controlMid(_controlMid),log_path("ardrone_path_rec.txt"),log_nav(file_nav)
+ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav,char* xmlfilename):controlMid(_controlMid),log_path("ardrone_path_rec.txt"),log_nav(file_nav)
 {
    cout<<"initialized"<<endl;
    //flags default
@@ -112,7 +112,8 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav):control
 
    //specify some parameters of the quad
    //if(ParamFromXML("/home/yucong/.ros/param.xml")!=0)
-   if(ParamFromXML("/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml")!=0)
+   //if(ParamFromXML("/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml")!=0)
+   if(ParamFromXML(xmlfilename)!=0)
    {
      try {
         throw std::runtime_error ("ParamFromXML error");
