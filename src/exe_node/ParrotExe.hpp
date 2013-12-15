@@ -48,7 +48,7 @@ class ParrotExe{
    };
 
    //constructor
-   ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav="ardrone_log_nav.txt",char* xmlfilename="/home/yucong/.ros/param.xml");
+   ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav="ardrone_log_nav.txt",const char* xmlfilename="/home/yucong/.ros/param.xml");
       //to publish flags
    void PublishFlags();
       //to take off or land

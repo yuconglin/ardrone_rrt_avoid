@@ -12,7 +12,7 @@ using namespace Ardrone_rrt_avoid;
 int main(int argc, char** argv)
 { //first to get the rho
   double rho= 0;
-  utils::GetRho(rho);
+  utils::GetRho(rho,"/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml");
   std::cout<<"rho= "<<rho<<std::endl;
 
   //construct a dubin's path in 3D
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
   }
   
   //ParrotExe initialization
-  ParrotExe parrot_exe(controlMid,file_nav);
+  ParrotExe parrot_exe(controlMid,file_nav,"/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml");
   std::cout<<"now init: "<<ros::Time::now().toSec()<<std::endl;
   ros::Duration(1.0).sleep();
   
