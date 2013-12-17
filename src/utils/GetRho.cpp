@@ -3,12 +3,13 @@
 
 namespace utils{
 
-int GetRho(double& rho)
+int GetRho(double& rho,const char* pFilename)
 {
   double v,yaw_rate;
   try
   {
-    const char* pFilename="/home/yucong/.ros/param.xml";
+    //const char* pFilename="/home/yucong/.ros/param.xml";
+    //const char* pFilename="/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml";
     ticpp::Document doc(pFilename);
     // actually load the information
     doc.LoadFile();

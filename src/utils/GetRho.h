@@ -3,5 +3,5 @@
 
 namespace utils
 {
-   int GetRho(double& rho);
+   int GetRho(double& rho,const char* filename="/home/yucong/.ros/param.xml");
 }

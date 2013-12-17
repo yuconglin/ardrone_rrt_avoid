@@ -12,7 +12,7 @@ using namespace Ardrone_rrt_avoid;
 int main(int argc, char** argv)
 { //first to get the rho
   double rho= 0;
-  utils::GetRho(rho);
+  utils::GetRho(rho,"/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml");
   std::cout<<"rho= "<<rho<<std::endl;
 
   //construct a dubin's path in 3D
@@ -23,7 +23,7 @@ int main(int argc, char** argv)
   QuadCfg start(x_s,y_s,z_s,the_s);
 
   double x_e= x_s+3.;
-  double y_e= y_s+1.5;
+  double y_e= y_s+0.;
   //double x_e= x_s+ rho;
   //double y_e= y_s+ rho;
   double z_e= z_s+ 0.;
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
   }
   
   //ParrotExe initialization
-  ParrotExe parrot_exe(controlMid,file_nav);
+  ParrotExe parrot_exe(controlMid,file_nav,"/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml");
   std::cout<<"now init: "<<ros::Time::now().toSec()<<std::endl;
   ros::Duration(1.0).sleep();
   
@@ -89,19 +89,21 @@ int main(int argc, char** argv)
     std::cout<<"manual takeoff please!"<<std::endl;
   else
     std::runtime_error("wrong input. should be 0 or 1");
-  
+  bool if_start= false; 
   //while 
   while(ros::ok() )
   {
     idx_uav_state= parrot_exe.GetUavStateIdx();
+    std::cout<< "idx_uav_state= "<< idx_uav_state<< std::endl;
     if_joy= parrot_exe.GetIfJoy();
     //to fix the start moment: takeoff---->hover
-    if(pre_uav_state== 6 && idx_uav_state== 4)
+    if(pre_uav_state!=4 && idx_uav_state== 4)
     //if(pre_uav_state== -1 && idx_uav_state== 6)
     {
       //get the dubin providing segs
       //first in the local frame, then converted to the global reference frame
       //in the global frame, start is (0,0,z_m,0) and end is(10,5,z_m,0)
+      std::cout<<"time to start" << std::endl;
       parrot_exe.GetCurrentCfg(cfg_start);
       parrot_exe.SetStartTime(ros::Time::now() );
       //set YawInit
@@ -117,58 +119,61 @@ int main(int argc, char** argv)
       parrot_exe.SetPreZ(cfg_start.z);
       
       std::cout<<"x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
+      //parrot_exe.SetStartTimeNow();
       //controller reset
       parrot_exe.ControllerReset();
+      if_start= true;
     }
-    
-    if(option==0)
-    {//navigate along a straight line or a circle curve
-      if( (idx_uav_state==3||idx_uav_state==7||idx_uav_state==4)
-          && !if_reach && !if_joy )
-      {
-	//std::cout << "fly phase"<<std::endl;
-	int result= parrot_exe.LineCommand(start,end,t_limit);
-	//int result= parrot_exe.CircleCommand(start,end,type,rho,t_limit);
-	if(result==2)
-	{ 
-	  parrot_exe.sendStop();
-	  std::cout<<"end reached,yeah"<<std::endl;
-	}
-	if(result==0)
-	{
-          parrot_exe.sendStop();
-	  std::cout<<"time limit reached"<<std::endl;
-	}
-	if(result==0||result==2)
-	{
-	  if_reach= true;
-	}
-      }//if
+    if(if_start)
+    {
+	    if(option==0)
+	    {//navigate along a straight line or a circle curve
+	      if( //(idx_uav_state==3||idx_uav_state==7||idx_uav_state==4)
+		  !if_reach && !if_joy )
+	      {
+		//std::cout << "fly phase"<<std::endl;
+		int result= parrot_exe.LineCommand(start,end,t_limit);
+		//int result= parrot_exe.CircleCommand(start,end,type,rho,t_limit);
+		if(result==2)
+		{ 
+		  parrot_exe.sendStop();
+		  std::cout<<"end reached,yeah"<<std::endl;
+		}
+		if(result==0)
+		{
+		  parrot_exe.sendStop();
+		  std::cout<<"time limit reached"<<std::endl;
+		}
+		if(result==0||result==2)
+		{
+		  if_reach= true;
+		}
+	      }//if
+	    }
+	    else if(option==1)
+	    {//the dubin's curve
+	      if( //(idx_uav_state==3||idx_uav_state==7||idx_uav_state==4)
+	      !if_reach && !if_joy )
+	      {
+		int result= parrot_exe.DubinCommand(db_seg,t_limit);
+		//if(result==1) 
+		//  parrot_exe.sendStop();
+		if(result==1||result==2||result==0) 
+		{
+		  if_reach= true;
+		  parrot_exe.sendStop();
+		  if(result==0)
+		    std::cout<<"time up"<<std::endl;
+		  if(result==1)
+		    std::cout<<"target reached"<<std::endl;
+		  else
+		    std::cout<<"end reached"<<std::endl;
+		}//if result ends
+	      }//if ends
+	    }
+	    else
+	     std::runtime_error("wrong input. should be 0 or 1");
     }
-    else if(option==1)
-    {//the dubin's curve
-      if( (idx_uav_state==3||idx_uav_state==7||idx_uav_state==4)
-      && !if_reach && !if_joy )
-      {
-        int result= parrot_exe.DubinCommand(db_seg,t_limit);
-        //if(result==1) 
-	//  parrot_exe.sendStop();
-        if(result==1||result==2||result==0) 
-	{
-	  if_reach= true;
-	  parrot_exe.sendStop();
-	  if(result==0)
-	    std::cout<<"time up"<<std::endl;
-	  if(result==1)
-	    std::cout<<"target reached"<<std::endl;
-	  else
-            std::cout<<"end reached"<<std::endl;
-	}//if result ends
-      }//if ends
-    }
-    else
-     std::runtime_error("wrong input. should be 0 or 1");
-
     pre_uav_state= idx_uav_state;
     //let it lands
     if(if_reach && idx_uav_state==4)
