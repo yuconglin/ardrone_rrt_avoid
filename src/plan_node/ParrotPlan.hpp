@@ -29,6 +29,7 @@ namespace Ardrone_rrt_avoid {
        //working part
        int working();
        int PathPlanning();
+     
      private:
        //for planned path log
        std::ofstream log_path;

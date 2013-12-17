@@ -98,6 +98,8 @@ src/utils/QuatRPY.cpp
            )
 
 #the main part
+#****************the others monitor************************#
+rosbuild_add_library(other_monitor src/OthersMonitor/OthersMonitor.cpp)
 
 #****************the execution node************************#
 #execute of line,circle and a dubin's curve

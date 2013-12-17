@@ -71,8 +71,10 @@ class ParrotExe{
    int StepCommand(const arma::vec::fixed<3> u,double dt);
 
    //to publish quad's state
-   //void PubQuadState(); 
-   void PubQuadState(int idx=0);
+   void PubQuadState();
+   void PubIfOff();
+   void PubIfStable();
+   //void PubQuadState(int idx=0);
    //data update in simulation
    void SimDataUpdate();
    //to access flags
@@ -102,6 +104,7 @@ class ParrotExe{
    //to reset the controller
    void ControllerReset();
    //A and B
+   /*
    bool inline GetIfOffA(){return if_off_A;}
    bool inline GetIfOffB(){return if_off_B;}
    bool inline GetIfStableA(){return if_stable_A;}
@@ -114,6 +117,7 @@ class ParrotExe{
    
    void PubIfOff(int idx=0);
    void PubIfStable(int idx=0);
+   */
 
  private:
    //read basic params from xml file
@@ -154,6 +158,10 @@ class ParrotExe{
    int uav_state_idx= -1;
    bool lastR1Pressed= false;
    bool lastL1Pressed= false;
+   //if already took off
+   bool if_off= false;
+   //if already take-off --> hover
+   bool if_stable= false;
    //ros stuffs
    //ros NodeHandle
    ros::NodeHandle nh;
@@ -184,6 +192,9 @@ class ParrotExe{
    ros::ServiceClient gmscl;
    gazebo_msgs::GetModelState getmodelstate;
 
+   ros::Publisher pub_ifoff;
+   ros::Publisher pub_ifstable;
+   /*
    //between A and B
    ros::Publisher pub_ifoff_A;//if drone A takes off
    ros::Publisher pub_ifoff_B;//if drone B takes off
@@ -205,7 +216,7 @@ class ParrotExe{
    bool if_off_B= false;
    bool if_stable_A= false;
    bool if_stable_B= false;
-
+   */
    //msgs
    //if a dubins curve is received
    std_msgs::Bool rec_msg;

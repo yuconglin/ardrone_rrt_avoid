@@ -74,7 +74,7 @@ namespace Ardrone_rrt_avoid{
     st_obs0.t= msg->t;
     if_obs0= true;
   }
-
+/*
   int ParrotPlan::PathPlanning()
   {
     //ofstream log_path("virtual_replan_rec.txt");
@@ -228,16 +228,10 @@ namespace Ardrone_rrt_avoid{
     log_path.close();
     return 0;
   }//PathPlanning ends
+  */
 
   int ParrotPlan::working()
   {
-    //file for navdata
-    //string str_time;
-    //char file_nav[256];
-    //sprintf( file_nav, "data/%s:%s.txt",str_time.c_str(),"plan");
-
-    //ofstream log_path("virtual_replan_rec.txt");
-    //ofstream log_path(file_nav);
     //messages
     ardrone_rrt_avoid::DubinPath_msg path_msg;
     std_msgs::Bool if_new_msg;
