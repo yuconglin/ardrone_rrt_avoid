@@ -1,4 +1,5 @@
 #include "ros/ros.h"
+#include "std_msgs/Bool.h"
 
 namespace Ardrone_rrt_avoid{
   //to monitor other drones states
@@ -6,6 +7,7 @@ namespace Ardrone_rrt_avoid{
     public:
      OthersMonitor(int _one,int _total);
      bool ifOthersTakeOff();
+     bool ifSomeTakeOff(int _idx);
      bool ifOthersStable();
     private: 
      int one;

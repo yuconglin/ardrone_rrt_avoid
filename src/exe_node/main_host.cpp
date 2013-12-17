@@ -1,4 +1,5 @@
 #include "ParrotExe.hpp"
+#include "OthersMonitor.hpp"
 #include "ros/ros.h"
 #include "controller/midlevelCnt/Controller_MidLevelCnt.h"
 #include "systemtime.h"
@@ -30,6 +31,8 @@ int main(int argc, char** argv)
 
     //ParrotExe initialization
     ParrotExe parrot_exe(controlMid,file_nav);
+    //monitor other drones if any
+    OthersMonitor monitor(0,1);
     //Set initial position
     double e= 0.6096; 
     double x0= 0, y0= e;
@@ -39,7 +42,7 @@ int main(int argc, char** argv)
     //flat trim and take off
     parrot_exe.sendFlattrim();
     parrot_exe.sendTakeoff();
-    parrot_exe.SetIfOffA(true);
+    parrot_exe.SetIfOff(true);
        
     bool if_start= false;
     //the start config when switch from takeoff to hover
@@ -54,10 +57,10 @@ int main(int argc, char** argv)
        
        if(!if_start)
        {
-	 parrot_exe.PubIfOff(0);
-	 parrot_exe.PubIfStable(0);
+	 parrot_exe.PubIfOff();
+	 parrot_exe.PubIfStable();
 	 //find the moment takeoff-->hover
-	 if(pre_uav_state== 6 && idx_uav_state==4)
+	 if(pre_uav_state!= 4 && idx_uav_state==4)
 	 {//set the start 
 	   parrot_exe.GetCurrentCfg(cfg_start);
 	   //set YawInit
@@ -74,10 +77,10 @@ int main(int argc, char** argv)
 	   parrot_exe.SetPreZ(cfg_start.z);
 	    
 	   std::cout<<"A x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
-	   parrot_exe.SetIfStableA(true);
+	   parrot_exe.SetIfStable(true);
 	    //parrot_exe.SetInitTimeNow();
 	 }
-	 if(parrot_exe.GetIfStableA() && parrot_exe.GetIfStableB() )
+	 if( monitor.ifOthersStable() && parrot_exe.GetIfStable() )
 	 {
            parrot_exe.ControllerReset();
 	   ros::Duration(1.0).sleep();

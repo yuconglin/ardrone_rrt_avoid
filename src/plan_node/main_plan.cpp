@@ -74,7 +74,7 @@ int main(int argc, char** argv)
     //sprintf( file_log, "data/%s:%s.txt",str_time.c_str(),"plan");
     sprintf(file_log,"/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"plan");
     //initialize the object
-    ParrotPlan planner(&yc_rrt,file_log);
+    ParrotPlan planner(&yc_rrt,file_log,0,1);
     planner.SetTOffset(1.0); 
     planner.working();    
     //planner.PathPlanning();

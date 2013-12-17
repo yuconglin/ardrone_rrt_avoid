@@ -16,14 +16,7 @@ namespace Ardrone_rrt_avoid {
     
      public:
        //constructor
-       ParrotPlan(YlClRRT* _rrt_pt,char* file_log="virtual_replan_rec.txt");
-       //callback functions
-       void receiveCb(const std_msgs::Bool::ConstPtr& msg);
-       void recNewCb(const std_msgs::Bool::ConstPtr& msg);
-       void reachCb(const std_msgs::Int16::ConstPtr& msg);
-       void stateCb(const ardrone_rrt_avoid::ArdroneState_msg::ConstPtr& msg);
-       void stateCb1(const ardrone_rrt_avoid::ArdroneState_msg::ConstPtr& msg);
-       //set 
+       ParrotPlan(YlClRRT* _rrt_pt,char* file_log="virtual_replan_rec.txt",int _one=0,int _total=0);
        inline void SetTimeLimit(const double _t_limit){t_limit= _t_limit;}
        inline void SetTOffset(const double _t_offset){t_offset=_t_offset;}
        //working part
@@ -43,13 +36,30 @@ namespace Ardrone_rrt_avoid {
        //current state
        user_types::ArdroneState st_current;
        //obstacle state
-       user_types::ArdroneState st_obs0;
+       //user_types::ArdroneState st_obs0;
+       int one, total;//total is the number of other vehicles
+       std::vector<ros::Subscriber> state_subs; 
+       std::vector<bool> if_updates;
+       std::vector<user_types::ArdroneState> state_obs;
+       void state_obCb(const ardrone_rrt_avoid::ArdroneState_msg::ConstPtr& msg,int _idx);
+       void SetObsUpdateFalse();
+       bool SeeObsUpdate();
+       void UpdateObs();
+
+       //callback functions
+       void receiveCb(const std_msgs::Bool::ConstPtr& msg);
+       void recNewCb(const std_msgs::Bool::ConstPtr& msg);
+       void reachCb(const std_msgs::Int16::ConstPtr& msg);
+       void stateCb(const ardrone_rrt_avoid::ArdroneState_msg::ConstPtr& msg);
+       //void stateCb1(const ardrone_rrt_avoid::ArdroneState_msg::ConstPtr& msg);
+       //set 
+
        //flags
        bool if_receive;
        bool if_new_rec;
        int if_reach;
        bool if_state;
-       bool if_obs0;
+       //bool if_obs0;
        //ros NodeHandle
        ros::NodeHandle nh;
        //publishers
@@ -60,7 +70,7 @@ namespace Ardrone_rrt_avoid {
        ros::Subscriber sub_if_new_rec;
        ros::Subscriber sub_reach;
        ros::Subscriber sub_state;
-       ros::Subscriber sub_stateB;
+       //ros::Subscriber sub_stateB;
   };//class ends
 
 };//namespace ends

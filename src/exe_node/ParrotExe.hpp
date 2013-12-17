@@ -115,10 +115,12 @@ class ParrotExe{
    void inline SetIfOffB(bool if_off){if_off_B= if_off;}
    void inline SetIfStableA(bool if_stable){if_stable_A= if_stable;}
    void inline SetIfStableB(bool if_stable){if_stable_B= if_stable;}
-   
-   void PubIfOff(int idx=0);
-   void PubIfStable(int idx=0);
    */
+   inline void SetIfOff(bool _if_off){if_off= _if_off;}
+   inline void SetIfStable(boo _if_stable){if_stable= _if_stable;}
+   bool inline GetIfStable(){return if_stable;}
+   void PubIfOff();
+   void PubIfStable();  
 
    //inline void SetXmlFileName(const char* name){xmlfilename=name;}
  private:

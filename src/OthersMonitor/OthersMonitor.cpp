@@ -1,4 +1,6 @@
 #include "ros/ros.h"
+#include "std_msgs/Bool.h"
+
 #include "OthersMonitor.hpp"
 #include "boost/bind.hpp"
 
@@ -13,17 +15,18 @@ namespace Ardrone_rrt_avoid{
           std::cout << "Caught a runtime_error exception: "
                   << e.what () << '\n';
       }
-    if(total<1||total< one)
+    if(total<0)
       try{
-         throw std::runtime_error ("the argument total must be at least 1 or no less than the argument one");
+         throw std::runtime_error ("the argument total must be no less than 0");
       }
          catch (std::runtime_error &e) {
           std::cout << "Caught a runtime_error exception: "
 	       << e.what () << '\n';
       }
     //initialize
-    for(int i=0;i!=total;++i)
+    for(int i=0; i!=total+1; ++i)
     {
+      if(i==one) continue;
       int idx= i;
       std::ostringstream convert;
       convert<< idx;
@@ -44,7 +47,7 @@ namespace Ardrone_rrt_avoid{
   {
     for(int i=0;i!=total;++i)
     {
-       if(i== one) continue;
+       //if(i== one) continue;
        if(if_offs[i]== false)
 	 return false;
     }
@@ -55,12 +58,28 @@ namespace Ardrone_rrt_avoid{
   {
     for(int i=0;i!=total;++i)
     {
-       if(i==one) continue;
+       //if(i==one) continue;
        if(if_stables[i]== false)
 	 return false;
     }
     return true;
   }//ifOthersStable ends
+
+  bool OthersMonitor::ifSomeTakeOff(int _idx)
+  {
+    if(_idx==one){
+      try {
+        throw std::runtime_error ("the one to inspect shouldn't be the host one");
+      }
+      catch (std::runtime_error &e) {
+        std::cout << "Caught a runtime_error exception: "
+                  << e.what () << '\n';
+      }
+    }
+    //
+    if( _idx< one) return if_offs[_idx];
+    return if_offs[_idx-1];
+  }//ifSomeTakeOff ends
 
   //call back functions
   void OthersMonitor::offCb(std_msgs::Bool::ConstPtr& msg, int _idx)

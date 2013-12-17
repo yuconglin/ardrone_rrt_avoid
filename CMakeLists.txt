@@ -99,6 +99,7 @@ src/utils/QuatRPY.cpp
 
 #the main part
 #****************the others monitor************************#
+include_directories("src/OthersMonitor")
 rosbuild_add_library(other_monitor src/OthersMonitor/OthersMonitor.cpp)
 
 #****************the execution node************************#
@@ -130,10 +131,10 @@ rosbuild_add_executable(sim_path src/exe_node/main_sim_path.cpp)
 target_link_libraries(sim_path parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 #host
 rosbuild_add_executable(exe_host src/exe_node/main_host.cpp)
-target_link_libraries(exe_host parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
+target_link_libraries(exe_host parrot_exe other_monitor jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 #intruder
 rosbuild_add_executable(exe_intruder src/exe_node/main_intruder.cpp)
-target_link_libraries(exe_intruder parrot_exe jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
+target_link_libraries(exe_intruder parrot_exe other_monitor jesus_codes dubin lib_ticpp lib_utils ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 
 #the planner
 include_directories("src/tree")
