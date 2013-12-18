@@ -7,6 +7,7 @@ namespace Ardrone_rrt_avoid{
   class OthersMonitor{
     public:
      OthersMonitor(int _one,int _total);
+     //OthersMonitor(int _one);
      bool ifOthersTakeOff();
      bool ifSomeTakeOff(int _idx);
      bool ifOthersStable();
@@ -17,8 +18,10 @@ namespace Ardrone_rrt_avoid{
      ros::NodeHandle nh;
      //subscribers to see if other vehicles starts to take off
      std::vector<ros::Subscriber> off_subs;
+     //ros::Subscriber off_sub;
      //subscribers to see if other vehicles already finished taking off
      std::vector<ros::Subscriber> stable_subs;
+     //ros::Subscriber stable_sub;
      //flags of take off
      std::vector<bool> if_offs;
      //flags of stable

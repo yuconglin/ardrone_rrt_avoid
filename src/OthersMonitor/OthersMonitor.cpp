@@ -23,6 +23,7 @@ namespace Ardrone_rrt_avoid{
 	       << e.what () << '\n';
       }
     //initialize
+    
     for(int i=0; i!=total+1; ++i)
     {
       if(i==one) continue;
@@ -39,7 +40,16 @@ namespace Ardrone_rrt_avoid{
       stable_subs.push_back(sub_stable);
       if_stables.push_back(false);
     }//for ends
-
+    /*
+    int idx= 1-one;
+    std::ostringstream convert;
+    convert<< idx;
+    std::string idx_str = convert.str();
+    //subscriber to if take off
+    off_sub= nh.subscribe<std_msgs::Bool>(std::string("/drone")+idx_str+"/if_take_off",1,boost::bind(&OthersMonitor::offCb, this, _1, idx) );
+    //subscriber to if stable
+    stable_sub= nh.subscribe<std_msgs::Bool>(std::string("/drone")+idx_str+"/if_stable",1,boost::bind(&OthersMonitor::stableCb, this, _1, idx) );
+   */ 
   }//OthersMonitor ends
   
   bool OthersMonitor::ifOthersTakeOff()
@@ -83,11 +93,13 @@ namespace Ardrone_rrt_avoid{
   //call back functions
   void OthersMonitor::offCb(const std_msgs::Bool::ConstPtr& msg, int _idx)
   {
+    std::cout<<"offCb: "<< _idx<<" "<<msg->data<< std::endl;
     if_offs[_idx]= msg->data;
   }//offCb ends
 
   void OthersMonitor::stableCb(const std_msgs::Bool::ConstPtr& msg, int _idx)
   { 
+    std::cout<<"stableCb: "<< _idx<<" "<< msg->data<< std::endl;
     if_stables[_idx]= msg->data;
   }
 
