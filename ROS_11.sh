@@ -3,12 +3,12 @@
 #don't forget to change ip in ardrone
 NUMID_DRONE= 1
 NETWORK_ROSCORE= ROS_11
-DRONE_IP=192.168.1.10
+DRONE_IP=192.168.1.1
 
-{
-echo ./set_IP.sh $DRONE_IP
-echo exit
-} | telnet 192.168.1.1
+#{
+#echo ./set_IP.sh $DRONE_IP
+#echo exit
+#} | telnet 192.168.1.1
 
 gnome-terminal  \
 	--tab --title "ardrone_driver"	--command "bash -c \"
