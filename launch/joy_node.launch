@@ -1,4 +1,4 @@
-<?xml version= 1.0 ?>
+<?xml version="1.0"?>
 <!-- Launches: rosrun joy joy_node;-->
 <launch>
         <arg name="drone_id_namespace" default="drone0" />
