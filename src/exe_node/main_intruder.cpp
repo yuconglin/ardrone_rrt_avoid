@@ -40,8 +40,6 @@ int main(int argc, char** argv)
    ros::Duration(1.0).sleep();
    //flat trim and take off
    parrot_exe.sendFlattrim();
-   parrot_exe.SetIfOffA(true);
-   parrot_exe.SetIfStableA(true);
 
    bool if_start= false;
    //the start config when switch from takeoff to hover

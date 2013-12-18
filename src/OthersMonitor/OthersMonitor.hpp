@@ -1,3 +1,4 @@
+#pragma once
 #include "ros/ros.h"
 #include "std_msgs/Bool.h"
 
@@ -23,8 +24,8 @@ namespace Ardrone_rrt_avoid{
      //flags of stable
      std::vector<bool> if_stables;
      //callback functions
-     void offCb(std_msgs::Bool::ConstPtr& msg, int _idx);
-     void stableCb(std_msgs::Bool::ConstPtr& msg, int _idx);
-  }//class OthersMonitor ends
+     void offCb(const std_msgs::Bool::ConstPtr& msg, int _idx);
+     void stableCb(const std_msgs::Bool::ConstPtr& msg, int _idx);
+  };//class OthersMonitor ends
 
 }//Ardrone_rrt_avoid ends

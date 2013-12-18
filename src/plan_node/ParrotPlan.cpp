@@ -39,7 +39,7 @@ namespace Ardrone_rrt_avoid{
       convert<< idx;
       std::string idx_str = convert.str();
       //subscriber to other vehicles' states
-      ros::Subscriber sub_st= nh.subscribe(std::string("/drone")+idx_str+"/quad_state",boost::bind(&ParrotPlan::state_obCb, this, _1, idx) );
+      ros::Subscriber sub_st= nh.subscribe<ardrone_rrt_avoid::ArdroneState_msg>(std::string("/drone")+idx_str+"/quad_state",1,boost::bind(&ParrotPlan::state_obCb, this, _1, idx) );
       state_subs.push_back(sub_st);
       if_updates.push_back(false);
       state_obs.push_back(user_types::ArdroneState() );
@@ -103,7 +103,7 @@ namespace Ardrone_rrt_avoid{
   bool ParrotPlan::SeeObsUpdate()
   {
     for(int i=0;i!=total;++i)
-      if(if_update[i]== false) return false;
+      if(if_updates[i]== false) return false;
     return true;
   }//SeeObsUpdate
 
@@ -133,7 +133,6 @@ namespace Ardrone_rrt_avoid{
     bool if_path_good= false;
   
     if_state= false;
-    if_obs0= false;
     user_types::GeneralState* st_root_pt= NULL;
     //user_types::ArdroneState st_pre;//current quad state and previous quad state
     user_types::ArdroneState st_check, st_recheck;//the state for check
@@ -264,9 +263,6 @@ namespace Ardrone_rrt_avoid{
 	   if(pre_case_idx!= WAIT_STATE)  
 	      cout<<"*************WAIT STATE*****************"<<endl;
 	   pre_case_idx= case_idx;
-	   if(!if_obs0) break; 
-	   
-	   if_obs0= false;
 	   if(if_state)
 	   {
 	     //user_types::GeneralState* temp_pt= &st_current;

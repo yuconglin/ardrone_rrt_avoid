@@ -72,9 +72,6 @@ class ParrotExe{
 
    //to publish quad's state
    void PubQuadState();
-   void PubIfOff();
-   void PubIfStable();
-   //void PubQuadState(int idx=0);
    //data update in simulation
    void SimDataUpdate();
    //to access flags
@@ -117,8 +114,9 @@ class ParrotExe{
    void inline SetIfStableB(bool if_stable){if_stable_B= if_stable;}
    */
    inline void SetIfOff(bool _if_off){if_off= _if_off;}
-   inline void SetIfStable(boo _if_stable){if_stable= _if_stable;}
+   inline void SetIfStable(bool _if_stable){if_stable= _if_stable;}
    bool inline GetIfStable(){return if_stable;}
+   bool inline GetIfOff(){return if_off;}
    void PubIfOff();
    void PubIfStable();  
 

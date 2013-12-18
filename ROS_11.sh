@@ -6,7 +6,7 @@ NETWORK_ROSCORE= ROS_11
 DRONE_IP=192.168.1.10
 
 {
-echo ./set_IP_.sh $DRONE_IP
+echo ./set_IP.sh $DRONE_IP
 echo exit
 } | telnet 192.168.1.1
 

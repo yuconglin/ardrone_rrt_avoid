@@ -1,7 +1,6 @@
+#include "OthersMonitor.hpp"
 #include "ros/ros.h"
 #include "std_msgs/Bool.h"
-
-#include "OthersMonitor.hpp"
 #include "boost/bind.hpp"
 
 namespace Ardrone_rrt_avoid{
@@ -32,13 +31,13 @@ namespace Ardrone_rrt_avoid{
       convert<< idx;
       std::string idx_str = convert.str();
       //subscriber to if take off
-      ros::Subscriber sub_off= nh.subscribe(std::string("/drone")+idx_str+"/if_take_off",boost::bind(&OthersMonitor::offCb, this, _1, idx) );
+      ros::Subscriber sub_off= nh.subscribe<std_msgs::Bool>(std::string("/drone")+idx_str+"/if_take_off",1,boost::bind(&OthersMonitor::offCb, this, _1, idx) );
       off_subs.push_back( sub_off);
       if_offs.push_back(false);
       //subscriber to if stable
-      ros::Subscriber sub_stable= nh.subscribe(std::string("/drone")+idx_str+"/if_stable",boost::bind(&OthersMonitor::stableCb, this, _1, idx) );
+      ros::Subscriber sub_stable= nh.subscribe<std_msgs::Bool>(std::string("/drone")+idx_str+"/if_stable",1,boost::bind(&OthersMonitor::stableCb, this, _1, idx) );
       stable_subs.push_back(sub_stable);
-      if_stable.push_back(false);
+      if_stables.push_back(false);
     }//for ends
 
   }//OthersMonitor ends
@@ -82,12 +81,12 @@ namespace Ardrone_rrt_avoid{
   }//ifSomeTakeOff ends
 
   //call back functions
-  void OthersMonitor::offCb(std_msgs::Bool::ConstPtr& msg, int _idx)
+  void OthersMonitor::offCb(const std_msgs::Bool::ConstPtr& msg, int _idx)
   {
     if_offs[_idx]= msg->data;
   }//offCb ends
 
-  void OthersMonitor::stableCb(std_msgs::Bool::ConstPtr& msg, int _idx)
+  void OthersMonitor::stableCb(const std_msgs::Bool::ConstPtr& msg, int _idx)
   { 
     if_stables[_idx]= msg->data;
   }
