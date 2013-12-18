@@ -90,6 +90,7 @@ namespace Ardrone_rrt_avoid{
     st.yaw_rate= msg->yaw_rate;
     st.t= msg->t;
     //push back states
+    if(_idx> one) --_idx;
     state_obs[_idx] =st; 
     if_updates[_idx]= true;
   }//state_obCb ends
