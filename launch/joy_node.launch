@@ -1,0 +1,10 @@
+<?xml version= 1.0 ?>
+<!-- Launches: rosrun joy joy_node;-->
+<launch>
+        <arg name="drone_id_namespace" default="drone0" />
+	<group ns="$(arg drone_id_namespace)">
+		<!--joy stick node -->
+		<node name="joy_node" pkg="joy" type="joy_node" output="screen" clear_param="true" />
+	</group>
+</launch>
+

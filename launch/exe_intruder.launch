@@ -1,14 +1,12 @@
 <?xml version="1.0"?>
-<!-- Launches:: plan_path node;-->
+<!-- Launches:: exe_intruder node;-->
 <launch>
 	<arg name="drone_id_namespace" default="drone0" />
 	<group ns="$(arg drone_id_namespace)">
-		<node name="plan_path"
+		<node name="exe_intruder"
   		      pkg="ardrone_rrt_avoid" 
-  	              type="plan_path"
+  	              type="exe_intruder"
 	              respawn="false" output="screen">
-	              <!--launch-prefix="xterm -e gdb args"-->
-	              <!--launch-prefix="valgrind"-->
-		</node>
+	        </node>
 	</group>
 </launch>
