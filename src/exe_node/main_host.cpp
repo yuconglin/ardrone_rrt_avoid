@@ -54,11 +54,14 @@ int main(int argc, char** argv)
     {
        idx_uav_state= parrot_exe.GetUavStateIdx();
        if_joy= parrot_exe.GetIfJoy();
-       
+      
+       parrot_exe.PubIfOff();
+       parrot_exe.PubIfStable();
+
        if(!if_start)
        {
-	 parrot_exe.PubIfOff();
-	 parrot_exe.PubIfStable();
+	 //parrot_exe.PubIfOff();
+	 //parrot_exe.PubIfStable();
 	 //find the moment takeoff-->hover
 	 if(pre_uav_state!= 4 && idx_uav_state==4)
 	 {//set the start 

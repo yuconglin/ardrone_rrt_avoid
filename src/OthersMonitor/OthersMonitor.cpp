@@ -26,7 +26,7 @@ namespace Ardrone_rrt_avoid{
     
     for(int i=0; i!=total+1; ++i)
     {
-      if(i==one) continue;
+      //if(i==one) continue;
       int idx= i;
       std::ostringstream convert;
       convert<< idx;
@@ -54,9 +54,9 @@ namespace Ardrone_rrt_avoid{
   
   bool OthersMonitor::ifOthersTakeOff()
   {
-    for(int i=0;i!=total;++i)
+    for(int i=0;i!=total+1;++i)
     {
-       //if(i== one) continue;
+       if(i== one) continue;
        if(if_offs[i]== false)
 	 return false;
     }
@@ -65,9 +65,9 @@ namespace Ardrone_rrt_avoid{
 
   bool OthersMonitor::ifOthersStable()
   {
-    for(int i=0;i!=total;++i)
+    for(int i=0;i!=total+1;++i)
     {
-       //if(i==one) continue;
+       if(i==one) continue;
        if(if_stables[i]== false)
 	 return false;
     }
@@ -93,13 +93,13 @@ namespace Ardrone_rrt_avoid{
   //call back functions
   void OthersMonitor::offCb(const std_msgs::Bool::ConstPtr& msg, int _idx)
   {
-    std::cout<<"offCb: "<< _idx<<" "<<msg->data<< std::endl;
+    //std::cout<<"offCb: "<< _idx<<" "<<msg->data<< std::endl;
     if_offs[_idx]= msg->data;
   }//offCb ends
 
   void OthersMonitor::stableCb(const std_msgs::Bool::ConstPtr& msg, int _idx)
   { 
-    std::cout<<"stableCb: "<< _idx<<" "<< msg->data<< std::endl;
+    //std::cout<<"stableCb: "<< _idx<<" "<< msg->data<< std::endl;
     if_stables[_idx]= msg->data;
   }
 
