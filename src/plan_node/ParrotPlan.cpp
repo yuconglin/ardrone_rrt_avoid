@@ -63,7 +63,7 @@ namespace Ardrone_rrt_avoid{
   
   void ParrotPlan::stateCb(const ardrone_rrt_avoid::ArdroneState_msg::ConstPtr& msg)
   {
-    std::cout<<"stateCb"<<std::endl; 
+    //std::cout<<"stateCb"<<std::endl; 
     st_current.x= msg->x;
     st_current.y= msg->y;
     st_current.z= msg->z;
