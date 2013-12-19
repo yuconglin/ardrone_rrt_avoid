@@ -99,7 +99,6 @@ namespace Ardrone_rrt_avoid{
 
   void ParrotPlan::SetObsUpdateFalse()
   {
-    state_obs.clear();
     for(int i=0;i!=total;++i)
       if_updates[i]= false;
   }//SetObsUpdateDefault ends
@@ -192,7 +191,7 @@ namespace Ardrone_rrt_avoid{
 	      case_idx= WAIT_STATE;
 	   }//if (if_receive) ends
 	   break;
-	 }
+	 }//PATH_READY ends
 	 case TREE_EXPAND:
 	 { //tree expand to generate a new path
            if(pre_case_idx!= TREE_EXPAND)
@@ -201,8 +200,8 @@ namespace Ardrone_rrt_avoid{
 	   //clean previously tree and vectors
 	   //actually, before tree expand we can check if previously path is still collision free, if so, we can still convert it to a message and ready to send if no new path is available.
 	   //reset the obstacles
-           if(!SeeObsUpdate() ) break; 
-           UpdateObs();
+           //if(!SeeObsUpdate() ) break; 
+           //UpdateObs();
 	   rrt_pt->ClearToDefault();
 	   rrt_pt->ClearTree();
 	   //reset tree root
@@ -219,13 +218,14 @@ namespace Ardrone_rrt_avoid{
 	   case_idx= PATH_CHECK;
 	   
 	   break;
-	 }
+	 }//TREE_EXPAND ends
 	 case PATH_CHECK:
 	 {
 	   if(pre_case_idx!= PATH_CHECK)   
 	     cout<<"*****************PATH CHECK***************"<<endl;
 	   pre_case_idx= case_idx;
 	   if(!SeeObsUpdate() ) break;
+	   UpdateObs();
 	   if(if_state)//that means an updated quad state is received
 	   { 
 	     //double d_t= st_current.t-st_pre.t;
@@ -236,7 +236,7 @@ namespace Ardrone_rrt_avoid{
 	       )
 	     {
 	       if(!if_path_good ) st_check= st_current;
-               UpdateObs();   
+               //UpdateObs();   
 	       if( rrt_pt->PathCheckRepeat(&st_current) )
 	       {//a good path is available
 		 if(st_root_pt) delete st_root_pt;
@@ -270,12 +270,16 @@ namespace Ardrone_rrt_avoid{
 	     if_state= false;
 	   }//end if_state
 	   break;
-	 }
+	 }//PATH_CHECK ends
 	 case WAIT_STATE:
 	 { 
 	   if(pre_case_idx!= WAIT_STATE)  
 	      cout<<"*************WAIT STATE*****************"<<endl;
 	   pre_case_idx= case_idx;
+           //update obstacles
+           if(!SeeObsUpdate() ) break; 
+           UpdateObs();
+
 	   if(if_state)
 	   {
 	     //user_types::GeneralState* temp_pt= &st_current;
@@ -286,7 +290,7 @@ namespace Ardrone_rrt_avoid{
 	     if_state= false;
 	   }
 	   break;
-	 }
+	 }//WAIT_STATE ends
 	 case PATH_RECHECK:
 	 {
 	   //check the same path with a predicted state after dt
@@ -294,6 +298,7 @@ namespace Ardrone_rrt_avoid{
 	     cout<<"*******************PATH RECHECK*************"<<endl;
 	   pre_case_idx= case_idx;
 	   if(!SeeObsUpdate()) break;
+	   UpdateObs();
 	   //sth may happen when it is closet to the last sec
 	   if(if_state)
 	   {
@@ -308,7 +313,7 @@ namespace Ardrone_rrt_avoid{
 	       int idx;
 	       std::vector<user_types::GeneralState*> temp_rec;
 	       //update the obstacle
-               UpdateObs();
+               //UpdateObs();
 	       //st_root is actually predicted state
 	       if( !rrt_pt->PathCheck(predict_pt,idx,temp_rec,false) )
 	       {
@@ -319,15 +324,15 @@ namespace Ardrone_rrt_avoid{
 	       else
 	       {
 		 //cout<<"sorry,we need a new path"<<endl;
-		 case_idx= TREE_EXPAND;
+		 //case_idx= TREE_EXPAND;
+	         case_idx= WAIT_STATE;
 	       }
 	     }//if d_t ends
 	     if(predict_pt) delete predict_pt;
 	     if_state= false; 
 	   }//if_state
 	   break;
-
-	 }
+	 }//PATH_RECHECK ends
 	 case ARRIVED:
 	 {
 	   if(pre_case_idx!= ARRIVED)
@@ -337,7 +342,7 @@ namespace Ardrone_rrt_avoid{
 	   rrt_pt->ClearToDefault();
 	   rrt_pt->ClearTree();
 	   break;
-	 }
+	 }//ARRIVED ends
 	 default:
 	 {
 	   break;
