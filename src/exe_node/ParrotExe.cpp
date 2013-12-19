@@ -423,6 +423,7 @@ void ParrotExe::PubQuadState()
    state_msg.vz= vzm_est;
    state_msg.yaw_rate= wz_est;
    state_msg.t= tk.toSec()-t_init;
+   std::cout<<"PubQuad: t: "<< state_msg.t<< std::endl;
    //pub the state
    pub_state.publish(state_msg);
 }//PubQuadState ends
