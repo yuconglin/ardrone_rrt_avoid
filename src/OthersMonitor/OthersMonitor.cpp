@@ -6,14 +6,6 @@
 namespace Ardrone_rrt_avoid{
   OthersMonitor::OthersMonitor(int _one,int _total):one(_one),total(_total)
   {
-    if(one< 1)
-      try{
-         throw std::runtime_error ("the argument one must be at least 1");
-      }
-         catch (std::runtime_error &e) {
-          std::cout << "Caught a runtime_error exception: "
-                  << e.what () << '\n';
-      }
     if(total<0)
       try{
          throw std::runtime_error ("the argument total must be no less than 0");

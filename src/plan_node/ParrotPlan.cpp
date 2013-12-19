@@ -44,6 +44,7 @@ namespace Ardrone_rrt_avoid{
       if_updates.push_back(false);
       state_obs.push_back(user_types::ArdroneState() );
     }//for ends
+    cout<<"state_obs size: "<< state_obs.size()<< endl;
   }//ParrotPlan ends
 
   void ParrotPlan::receiveCb(const std_msgs::Bool::ConstPtr& msg)
@@ -89,6 +90,7 @@ namespace Ardrone_rrt_avoid{
     st.vz= msg->vz;
     st.yaw_rate= msg->yaw_rate;
     st.t= msg->t;
+    //cout<<"idx: "<< _idx<<" t: "<< st.t<< endl;
     //push back states
     if(_idx> one) --_idx;
     state_obs[_idx] =st; 
@@ -112,8 +114,13 @@ namespace Ardrone_rrt_avoid{
   void StatesToObs(vector<user_types::ArdroneState> states,vector<user_types::obstacle3D>& obs)
   {
      obs.clear();
+     cout<<"StatesToObs"<< endl;
      for(int i=0;i!=states.size();++i)
+     {
+       cout<< states[i].x<<" "<<states[i].y<<" "<<states[i].z<<" "
+	   << states[i].yaw<<" "<<states[i].vx<<" "<<states[i].vy<<" "<<states[i].vz<<" "<<states[i].t << endl;
        obs.push_back(states[i].toObs3D() );
+     }
   }//StatesToObs ends
   
   void ParrotPlan::UpdateObs()
@@ -199,7 +206,11 @@ namespace Ardrone_rrt_avoid{
 	   rrt_pt->ClearToDefault();
 	   rrt_pt->ClearTree();
 	   //reset tree root
+	   cout<<"st_root: "<< st_root_pt->x <<" "
+	       << st_root_pt->y<<" "<<st_root_pt->z<<" "
+	       << st_root_pt->yaw<<" "<<st_root_pt->t<< endl;
 	   rrt_pt->SetRoot(st_root_pt);
+
 	   //reset sample parameters because they are influenced by goal and root
 	   rrt_pt->SetSampleParas();
 	   //tree expand within time limit

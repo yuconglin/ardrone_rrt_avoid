@@ -257,8 +257,8 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
 {
    //position estimator:x,y ordometry; z altitude measurement but it should be kalman filetered
    //time
-   tk = navdataPtr->header.stamp;
-   
+   //tk = navdataPtr->header.stamp;
+   tk= ros::Time::now();
    elapsed_time = tk - tkm1;
    
    elapsed_time_dbl= elapsed_time.sec+ (double)elapsed_time.nsec/1E9;
