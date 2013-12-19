@@ -285,6 +285,7 @@ namespace Ardrone_rrt_avoid{
 	     //user_types::GeneralState* temp_pt= &st_current;
 	     if(st_root_pt) delete st_root_pt;
 	     st_root_pt= st_current.copy();
+	     cout<<"get root"<< endl;
 	     //st_pre= st_current;
 	     case_idx= TREE_EXPAND;
 	     if_state= false;
