@@ -31,8 +31,10 @@ int main(int argc, char** argv)
     vec_rect.push_back(point2D(0,r) );
     double h_max= 2., h_min= 0.5;
     yc_rrt.SetGeoFence( new SpaceLimit(h_max,h_min,vec_rect) );
+    
+    double e= 0.6096;
     //set the root and the goal
-    double x_root=0.,y_root=0.,z_root=0.8,yaw_root=0.;
+    double x_root=0.,y_root=e,z_root=0.8,yaw_root=0.;
     double x_goal=11.,y_goal=0.,z_goal=0.8,yaw_goal=0.;
     yc_rrt.SetRoot(new ArdroneState(x_root,y_root,z_root,0.,yaw_root) );
     yc_rrt.SetGoal(new ArdroneState(x_goal,y_goal,z_goal,0.,yaw_goal) );
@@ -55,11 +57,16 @@ int main(int argc, char** argv)
     obs2d_file.close();
     //
     yc_rrt.SetObs2D( obs2d );
+
+    vector<obstacle3D> obs3d;
+    obs3d.push_back( obstacle3D(9*e,0,1,0,0,0,0,0.5,0.5) );
+    yc_rrt.SetObs3D( obs3d );
+
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(false);
     yc_rrt.ExpandTree();
-    ArdroneState* st_current= new ArdroneState(x_root+0.4,y_root-0.4,z_root+0.1,0,0);
+    ArdroneState* st_current= new ArdroneState(x_root+0.1,y_root-0.1,z_root,0,0);
     yc_rrt.PathCheckRepeat(st_current);
     GeneralState* st_time= yc_rrt.TimeStateEstimate(1.0);
     std::cout<<"st_time: "<<st_time->x<<" "<<st_time->y<<" "<<st_time->z<<" "<< std::endl;
