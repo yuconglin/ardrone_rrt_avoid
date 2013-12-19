@@ -47,11 +47,12 @@ int main(int argc, char** argv)
    int reach= -1;
 
    //while
-   //ros::Rate r(10);
+   ros::Rate r(10);
    while(ros::ok() )
    {
      idx_uav_state= parrot_exe.GetUavStateIdx();
      if_joy= parrot_exe.GetIfJoy();
+     parrot_exe.PubIfStable();
      //take off coordination
      if(!parrot_exe.GetIfOff() && monitor.ifSomeTakeOff(0) )
      {//take off when it knows A takes off
@@ -61,7 +62,7 @@ int main(int argc, char** argv)
      //waiting until stable
      if(!if_start)
      {
-       parrot_exe.PubIfStable();
+       //parrot_exe.PubIfStable();
        //find the moment takeoff-->hover
        if(pre_uav_state!= 4 && idx_uav_state==4)
        {//set the start 
@@ -95,18 +96,21 @@ int main(int argc, char** argv)
      }//!if_start ends
      else
      {
+        /*
         if(reach!=2 && !if_joy)
 	{
            reach= parrot_exe.LineCommand(start,end,t_limit);
 	}
 	if(reach==2) parrot_exe.sendStop();
         if(reach==2&&idx_uav_state==4) parrot_exe.sendLand();
+	*/
         //publish its state
 	parrot_exe.PubQuadState();
 	parrot_exe.PublishFlags();
 
      }
      ros::spinOnce();
+     r.sleep();
    }//while ends
    return 0;
 }//main ends
