@@ -47,7 +47,7 @@ int main(int argc, char** argv)
    int reach= -1;
 
    //while
-   //ros::Rate r(10);
+   ros::Rate r(10);
    while(ros::ok() )
    {
      idx_uav_state= parrot_exe.GetUavStateIdx();
@@ -104,9 +104,9 @@ int main(int argc, char** argv)
         //publish its state
 	parrot_exe.PubQuadState();
 	parrot_exe.PublishFlags();
-
-     }
+     }//else(!if_start) ends
      ros::spinOnce();
+     r.sleep();
    }//while ends
    return 0;
 }//main ends
