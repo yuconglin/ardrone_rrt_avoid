@@ -91,6 +91,9 @@ int main(int argc, char** argv)
 	  ros::Duration(1.0).sleep();
 	  if_start= true;
 	  parrot_exe.SetInitTimeNow();
+          //get current absolute time
+	  utils::getSystemTime(str_time);
+	  std::cout<<"str_time: "<< str_time<< std::endl;
 	}
 
      }//!if_start ends
