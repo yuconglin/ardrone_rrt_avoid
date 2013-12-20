@@ -81,12 +81,15 @@ int main(int argc, char** argv)
 	    
 	   std::cout<<"A x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
 	   parrot_exe.SetIfStable(true);
+	   //get current absolute time
+	   utils::getSystemTime(str_time);
+	   std::cout<<"str_time: "<< str_time<< std::endl;
 	    //parrot_exe.SetInitTimeNow();
 	 }
 	 if( monitor.ifOthersStable() && parrot_exe.GetIfStable() )
 	 {
            parrot_exe.ControllerReset();
-	   ros::Duration(1.0).sleep();
+	   //ros::Duration(1.0).sleep();
 	   if_start= true;
 	   parrot_exe.SetInitTimeNow();
            //get current absolute time
