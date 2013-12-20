@@ -88,9 +88,12 @@ int main(int argc, char** argv)
         if(parrot_exe.GetIfStable() && monitor.ifOthersStable() )
 	{
 	  parrot_exe.ControllerReset();
-	  ros::Duration(1.0).sleep();
+	  //ros::Duration(1.0).sleep();
 	  if_start= true;
 	  parrot_exe.SetInitTimeNow();
+          //get current absolute time
+	  utils::getSystemTime(str_time);
+	  std::cout<<"str_time: "<< str_time<< std::endl;
 	}
 
      }//!if_start ends
@@ -107,8 +110,7 @@ int main(int argc, char** argv)
         //publish its state
 	parrot_exe.PubQuadState();
 	parrot_exe.PublishFlags();
-
-     }
+     }//else(!if_start) ends
      ros::spinOnce();
      r.sleep();
    }//while ends

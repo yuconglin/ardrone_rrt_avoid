@@ -18,6 +18,7 @@ namespace user_types{
      virtual void LogData(std::ofstream& file )= 0;
      virtual GeneralState* copy()=0;
      virtual GeneralState* InterPolate(double dt)= 0;
+     virtual void Print()= 0;
   };//GeneralState ends
 
 };//namespace ends
