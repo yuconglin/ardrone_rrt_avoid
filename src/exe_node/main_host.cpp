@@ -116,9 +116,8 @@ int main(int argc, char** argv)
 	//if(parrot_exe.GetIfReach()==2)
 	  parrot_exe.sendLand();
 
-	r.sleep();
 	ros::spinOnce(); 
-      
+        r.sleep();      
     }//while ends
     return 0;
 }//main ends
