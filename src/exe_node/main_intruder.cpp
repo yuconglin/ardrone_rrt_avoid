@@ -88,7 +88,7 @@ int main(int argc, char** argv)
         if(parrot_exe.GetIfStable() && monitor.ifOthersStable() )
 	{
 	  parrot_exe.ControllerReset();
-	  ros::Duration(1.0).sleep();
+	  //ros::Duration(1.0).sleep();
 	  if_start= true;
 	  parrot_exe.SetInitTimeNow();
           //get current absolute time

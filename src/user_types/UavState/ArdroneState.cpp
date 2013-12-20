@@ -4,6 +4,7 @@
 //controller gains
 #include "controller/config/parrot/config_controller_Parrot.h"
 #include "obstacle3D.h"
+#include <iostream>
 
 namespace user_types{
    /*
@@ -191,6 +192,11 @@ namespace user_types{
       return new ArdroneState(x_a,y_a,z_a,t_a,yaw_a,vx_a,vy_a,vz_a,yaw_rate_a);
    }//InterPolate ends
    
+   void ArdroneState::Print()
+   {
+      std::cout<<"ArdroneState print: "<<x<<","<<y<<","<<z<<","<<t<<","<<yaw<<","<<vx<<","<<vy<<","<<vz<<","<<yaw_rate<< std::endl;
+   }//Print() ends
+
    obstacle3D ArdroneState::toObs3D()
    {
      return obstacle3D(x,y,z,vx,vy,vz,t,0.5,0.5);

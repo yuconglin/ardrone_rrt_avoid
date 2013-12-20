@@ -80,7 +80,7 @@ namespace Ardrone_rrt_avoid{
        bool PathCheck(user_types::GeneralState* st_init,int& it_idx,std::vector<user_types::GeneralState*>& traj_rec,bool if_log);
        bool PathCheckRepeat(user_types::GeneralState* st_current);
        //state prediction
-       user_types::GeneralState* TimeStateEstimate(double Dt);
+       user_types::GeneralState* TimeStateEstimate(double now_t,double Dt);
        //Path to Msg
        void PathToMsg(ardrone_rrt_avoid::DubinPath_msg& path_msg);
      private:

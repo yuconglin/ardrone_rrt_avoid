@@ -698,7 +698,7 @@ namespace Ardrone_rrt_avoid{
             
    }//InsertDubinsNode ends
 
-   user_types::GeneralState* YlClRRT::TimeStateEstimate(double Dt)
+   user_types::GeneralState* YlClRRT::TimeStateEstimate(double now_t,double Dt)
    {//to estimate the state >from the initial state after time interval Dt and assign it to st
      if( traj_rec.empty() )
      {
@@ -710,19 +710,19 @@ namespace Ardrone_rrt_avoid{
                   << e.what () << '\n';
        } 
      }
-
+     double dt=now_t-st_start->t+ Dt;
      user_types::GeneralState* st_start= traj_rec.front();
-     if(Dt> config_pt->dt*traj_rec.size() )
+     if(dt > config_pt->dt*traj_rec.size() )
      {
        user_types::GeneralState* st_end= traj_rec.back();
-       double dt_a= Dt-st_end->t + st_start->t;
+       double dt_a= dt-st_end->t + st_start->t;
        return st_end->InterPolate(dt_a);  
      }
      else
      {
-       user_types::GeneralState* st_close= traj_rec[floor(Dt/config_pt->dt)]; 
+       user_types::GeneralState* st_close= traj_rec[floor(dt/config_pt->dt)]; 
        //std::cout<<"t close: "<< st_close->t<<" t start: "<<st_start->t << std::endl;
-       double dt_a= Dt-st_close->t + st_start->t;
+       double dt_a= dt-st_close->t + st_start->t;
        return st_close->InterPolate(dt_a);
      }//if else ends
 
