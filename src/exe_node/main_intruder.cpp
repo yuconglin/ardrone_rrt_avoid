@@ -84,6 +84,9 @@ int main(int argc, char** argv)
 	  std::cout<<"B x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
 	  parrot_exe.SetIfStable(true);
 	  //parrot_exe.SetInitTimeNow();
+          //get current absolute time
+	  utils::getSystemTime(str_time);
+	  std::cout<<"str_time: "<< str_time<< std::endl;
         }
         if(parrot_exe.GetIfStable() && monitor.ifOthersStable() )
 	{
