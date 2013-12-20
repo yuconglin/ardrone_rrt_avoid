@@ -229,7 +229,7 @@ namespace Ardrone_rrt_avoid{
 	       if( rrt_pt->PathCheckRepeat(&st_current) )
 	       {//a good path is available
 		 if(st_root_pt) delete st_root_pt;
-		 st_root_pt= rrt_pt->TimeStateEstimate(st_current,t_limit);
+		 st_root_pt= rrt_pt->TimeStateEstimate(st_current.t,t_limit);
 		 //for logging
 		 if(if_first)
 		 {
@@ -294,7 +294,7 @@ namespace Ardrone_rrt_avoid{
 
 	     if(st_current.t-st_recheck.t>= t_limit)
 	     {
-	       predict_pt= rrt_pt->TimeStateEstimate(st_current,t_limit);
+	       predict_pt= rrt_pt->TimeStateEstimate(st_current.t,t_limit);
 	       cout<<"predict_pt: "<< endl;
 	       predict_pt->Print();
 	        

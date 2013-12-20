@@ -72,7 +72,7 @@ int main(int argc, char** argv)
     yc_rrt.ExpandTree();
     ArdroneState* st_current= new ArdroneState(x_root+0.1,y_root-0.1,z_root,0,0);
     yc_rrt.PathCheckRepeat(st_current);
-    GeneralState* st_time= yc_rrt.TimeStateEstimate(1.0);
+    GeneralState* st_time= yc_rrt.TimeStateEstimate(0,1.0);
     std::cout<<"st_time: "<<st_time->x<<" "<<st_time->y<<" "<<st_time->z<<" "<< std::endl;
     delete st_current;
     //yc_rrt.PathGen();

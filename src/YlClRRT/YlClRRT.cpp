@@ -710,8 +710,10 @@ namespace Ardrone_rrt_avoid{
                   << e.what () << '\n';
        } 
      }
-     double dt=now_t-st_start->t+ Dt;
+     
      user_types::GeneralState* st_start= traj_rec.front();
+     double dt=now_t-st_start->t+ Dt;
+     
      if(dt > config_pt->dt*traj_rec.size() )
      {
        user_types::GeneralState* st_end= traj_rec.back();
