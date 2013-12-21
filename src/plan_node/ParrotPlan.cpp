@@ -110,22 +110,22 @@ namespace Ardrone_rrt_avoid{
 
   void StatesToObs(vector<user_types::ArdroneState> states,vector<user_types::obstacle3D>& obs)
   {
-     obs.clear();
-     cout<<"StatesToObs"<< endl;
-     for(int i=0;i!=states.size();++i)
-     {
-       cout<< states[i].x<<","<<states[i].y<<","<<states[i].z<<","
-	   << states[i].vx<<","<<states[i].vy<<","<<states[i].vz<<","<< states[i].t << endl;
-       obs.push_back(states[i].toObs3D() );
-     }
+    obs.clear();
+    cout<<"StatesToObs"<< endl;
+    for(int i=0;i!=states.size();++i)
+    {
+      cout<< states[i].x<<","<<states[i].y<<","<<states[i].z<<","
+          << states[i].vx<<","<<states[i].vy<<","<<states[i].vz<<","<< states[i].t << endl;
+      obs.push_back(states[i].toObs3D() );
+    }
   }//StatesToObs ends
   
   void ParrotPlan::UpdateObs()
   {
-     std::vector<user_types::obstacle3D> obs3d;
-     StatesToObs(state_obs,obs3d);
-     rrt_pt->SetObs3D(obs3d);
-     SetObsUpdateFalse();
+    std::vector<user_types::obstacle3D> obs3d;
+    StatesToObs(state_obs,obs3d);
+    rrt_pt->SetObs3D(obs3d);
+    SetObsUpdateFalse();
   }//UpdateObs() ends
 
   int ParrotPlan::working()
@@ -213,19 +213,18 @@ namespace Ardrone_rrt_avoid{
 	     cout<<"*****************PATH CHECK***************"<<endl;
 	   pre_case_idx= case_idx;
 	   if(!SeeObsUpdate() ) break;
-	   UpdateObs();
+	   //UpdateObs();
 	   if(if_state)//that means an updated quad state is received
 	   { 
 	     //only check when a travelled state is received
-	     if( st_current.t-st_check.t>=t_limit && if_path_good
-	       ||!if_path_good
+	     if( st_current.t-st_check.t>=t_limit && if_path_good 
+		||!if_path_good
 	       )
 	     {
                cout<<"st_current: "<< endl;
                st_current.Print();
-
-	       if(!if_path_good ) st_check= st_current;
-               //UpdateObs();   
+               UpdateObs();
+	       if(!if_path_good ) st_check= st_current; 
 	       if( rrt_pt->PathCheckRepeat(&st_current) )
 	       {//a good path is available
 		 if(st_root_pt) delete st_root_pt;
@@ -265,14 +264,14 @@ namespace Ardrone_rrt_avoid{
 	   pre_case_idx= case_idx;
            //update obstacles
            if(!SeeObsUpdate() ) break; 
-           UpdateObs();
-
-	   if(if_state)
+           
+	   if(if_state )
 	   {
 	     if(st_root_pt) delete st_root_pt;
 	     //st_root_pt= st_current.copy();
 	     st_root_pt= st_current.InterPolate(t_limit);
 	     cout<<"get root"<< endl;
+             UpdateObs();
 	     //st_pre= st_current;
 	     case_idx= TREE_EXPAND;
 	     if_state= false;
@@ -286,7 +285,7 @@ namespace Ardrone_rrt_avoid{
 	     cout<<"*******************PATH RECHECK*************"<<endl;
 	   pre_case_idx= case_idx;
 	   if(!SeeObsUpdate()) break;
-	   UpdateObs();
+	   //UpdateObs();
 	   //sth may happen when it is closet to the last sec
 	   if(if_state)
 	   {
@@ -294,6 +293,7 @@ namespace Ardrone_rrt_avoid{
 
 	     if(st_current.t-st_recheck.t>= t_limit)
 	     {
+	       UpdateObs();
 	       predict_pt= rrt_pt->TimeStateEstimate(st_current.t,t_limit);
 	       cout<<"predict_pt: "<< endl;
 	       predict_pt->Print();
