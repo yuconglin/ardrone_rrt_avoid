@@ -36,7 +36,6 @@ namespace Ardrone_rrt_avoid {
        //current state
        user_types::ArdroneState st_current;
        //obstacle state
-       //user_types::ArdroneState st_obs0;
        int one, total;//total is the number of other vehicles
        std::vector<ros::Subscriber> state_subs; 
        std::vector<bool> if_updates;
