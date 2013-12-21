@@ -45,7 +45,7 @@ namespace Ardrone_rrt_avoid {
        void SetObsUpdateFalse();
        bool SeeObsUpdate();
        void UpdateObs();
-
+       
        //callback functions
        void receiveCb(const std_msgs::Bool::ConstPtr& msg);
        void recNewCb(const std_msgs::Bool::ConstPtr& msg);
