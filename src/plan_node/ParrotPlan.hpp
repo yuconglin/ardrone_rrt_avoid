@@ -36,7 +36,6 @@ namespace Ardrone_rrt_avoid {
        //current state
        user_types::ArdroneState st_current;
        //obstacle state
-       //user_types::ArdroneState st_obs0;
        int one, total;//total is the number of other vehicles
        std::vector<ros::Subscriber> state_subs; 
        std::vector<bool> if_updates;
@@ -45,7 +44,7 @@ namespace Ardrone_rrt_avoid {
        void SetObsUpdateFalse();
        bool SeeObsUpdate();
        void UpdateObs();
-
+       
        //callback functions
        void receiveCb(const std_msgs::Bool::ConstPtr& msg);
        void recNewCb(const std_msgs::Bool::ConstPtr& msg);

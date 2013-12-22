@@ -26,7 +26,7 @@ int main(int argc, char** argv)
     yc_rrt.SetCheckParas();
     //seg geo fence
     vector<point2D> vec_rect;
-    double h=19*0.6096,r=2*0.6,l=-2*0.6;
+    double h=19*0.6096,r=4,l=-1;
     vec_rect.push_back(point2D(0,l) );
     vec_rect.push_back(point2D(h,l) );
     vec_rect.push_back(point2D(h,r) );
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
     }//for ends
     obs2d_file.close();
     //
-    yc_rrt.SetObs2D( obs2d );
+    //yc_rrt.SetObs2D( obs2d );
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(true);

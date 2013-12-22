@@ -75,7 +75,7 @@ int main(int argc, char** argv)
         if(parrot_exe.GetIfStable() && monitor.ifOthersStable() )
 	{
 	  parrot_exe.GetCurrentCfg(cfg_start);
-	  parrot_exe.SetStartTime(ros::Time::now() );
+	  //parrot_exe.SetStartTime(ros::Time::now() );
 	  //set YawInit
 	  double yaw_init= cfg_start.theta- M_PI;
 	  parrot_exe.SetYawInit(yaw_init);
