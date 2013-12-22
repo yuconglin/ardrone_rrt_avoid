@@ -64,7 +64,16 @@ int main(int argc, char** argv)
 	 //parrot_exe.PubIfStable();
 	 //find the moment takeoff-->hover
 	 if(pre_uav_state!= 4 && idx_uav_state==4)
-	 {//set the start 
+	 {	   
+	   parrot_exe.SetIfStable(true);
+	   //get current absolute time
+	   utils::getSystemTime(str_time);
+	   std::cout<<"str_time: "<< str_time<< std::endl;
+	    //parrot_exe.SetInitTimeNow();
+	 }
+	 if( monitor.ifOthersStable() && parrot_exe.GetIfStable() )
+	 {
+           //set the start 
 	   parrot_exe.GetCurrentCfg(cfg_start);
 	   //set YawInit
 	   double yaw_init= cfg_start.theta;
@@ -80,18 +89,11 @@ int main(int argc, char** argv)
 	   parrot_exe.SetPreZ(cfg_start.z);
 	    
 	   std::cout<<"A x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
-	   parrot_exe.SetIfStable(true);
-	   //get current absolute time
-	   utils::getSystemTime(str_time);
-	   std::cout<<"str_time: "<< str_time<< std::endl;
-	    //parrot_exe.SetInitTimeNow();
-	 }
-	 if( monitor.ifOthersStable() && parrot_exe.GetIfStable() )
-	 {
-           parrot_exe.ControllerReset();
+
+	   parrot_exe.ControllerReset();
 	   //ros::Duration(1.0).sleep();
 	   if_start= true;
-	   parrot_exe.SetInitTimeNow();
+	   //parrot_exe.SetInitTimeNow();
            //get current absolute time
            utils::getSystemTime(str_time);
            std::cout<<"str_time: "<< str_time<< std::endl;

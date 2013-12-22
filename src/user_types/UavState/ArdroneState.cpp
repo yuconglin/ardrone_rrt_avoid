@@ -199,7 +199,7 @@ namespace user_types{
 
    obstacle3D ArdroneState::toObs3D()
    {
-     return obstacle3D(x,y,z,vx,vy,vz,t,0.5,0.5);
+     return obstacle3D(x,y,z,vx,vy,vz,t,2,0.5);
    }//to Obs3D
 
 };//namespace ends
