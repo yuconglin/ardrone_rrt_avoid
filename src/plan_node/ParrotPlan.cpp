@@ -175,6 +175,7 @@ namespace Ardrone_rrt_avoid{
 	   {
 	     if(if_path_good){
 	       //first check if the previous path is still collision free
+	       cout<<"path_ready good"<< endl;
 	       st_recheck= st_current;
 	       case_idx= PATH_RECHECK; 
 	     }//if_path_good ends
