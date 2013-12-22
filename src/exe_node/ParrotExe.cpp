@@ -86,18 +86,6 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav,const ch
    emergency_pub= nh.advertise<std_msgs::Empty>("ardrone/reset",1);
    pub_ifoff= nh.advertise<std_msgs::Bool>("if_take_off",1);
    pub_ifstable= nh.advertise<std_msgs::Bool>("if_stable",1);
-   //A and B
-   /*
-   pub_ifoff_A= nh.advertise<std_msgs::Bool>("if_off_A",1);
-   pub_ifoff_B= nh.advertise<std_msgs::Bool>("if_off_B",1);
-   pub_ifstable_A= nh.advertise<std_msgs::Bool>("if_stable_A",1);
-   pub_ifstable_B= nh.advertise<std_msgs::Bool>("if_stable_B",1);
-   
-   sub_ifoff_A= nh.subscribe("if_off_A",1,&ParrotExe::A_ifoffCb,this);
-   sub_ifoff_B= nh.subscribe("if_off_B",1,&ParrotExe::B_ifoffCb,this);
-   sub_ifstable_A= nh.subscribe("if_stable_A",1,&ParrotExe::A_ifstableCb,this);
-   sub_ifstable_B= nh.subscribe("if_stable_B",1,&ParrotExe::B_ifstableCb,this);
-   */
    //Subscribers
    sub_path = nh.subscribe("path", 1, &ParrotExe::pathCallback,this);
    sub_if_new= nh.subscribe("if_new_path",1, &ParrotExe::newCallback,this);
@@ -172,63 +160,7 @@ void ParrotExe::PubIfStable()
    msg.data= if_stable;
    pub_ifstable.publish(msg);
 }
-/*
-void ParrotExe::SetStartTimeNow()
-{
-   t_start= ros::Time::now();
-   std::cout<<"now t_start: "<<t_start.toSec()<< std::endl;
-}
 
-void ParrotExe::A_ifoffCb(const std_msgs::Bool::ConstPtr& msg)
-{
-   if_off_A= msg->data; 
-}//A_ifoffCb
-
-void ParrotExe::B_ifoffCb(const std_msgs::Bool::ConstPtr& msg)
-{
-   if_off_B= msg->data;
-}//B_ifoffCb
-
-void ParrotExe::A_ifstableCb(const std_msgs::Bool::ConstPtr& msg)
-{
-   if_stable_A= msg->data;
-}//A_ifstableCb
-
-void ParrotExe::B_ifstableCb(const std_msgs::Bool::ConstPtr& msg)
-{ 
-   if_stable_B= msg->data; 
-}//B_ifstableCb
-
-void ParrotExe::PubIfOff(int idx)
-{
-   std_msgs::Bool msg;
-   
-   if(idx==0){
-     msg.data= if_off_A;
-     pub_ifoff_A.publish(msg);
-   }
-   else if(idx==1){
-     msg.data= if_off_B;
-     pub_ifoff_B.publish(msg);
-   }
-   else {;}
-}//PubIfOff ends
-
-void ParrotExe::PubIfStable(int idx)
-{
-   std_msgs::Bool msg;
-
-   if(idx==0){
-     msg.data= if_stable_A;
-     pub_ifstable_A.publish(msg);
-   }
-   else if(idx==1){
-     msg.data= if_stable_B;
-     pub_ifstable_B.publish(msg);
-   }
-   else {;}
-}//PubIfStable ends
-*/
 void ParrotExe::pathCallback(const ardrone_rrt_avoid::DubinPath_msg::ConstPtr& msg)
 {
    if(!if_receive)

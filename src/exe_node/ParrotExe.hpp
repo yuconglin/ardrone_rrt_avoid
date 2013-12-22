@@ -101,18 +101,7 @@ class ParrotExe{
    void SetRestartDefault();
    //to reset the controller
    void ControllerReset();
-   //A and B
-   /*
-   bool inline GetIfOffA(){return if_off_A;}
-   bool inline GetIfOffB(){return if_off_B;}
-   bool inline GetIfStableA(){return if_stable_A;}
-   bool inline GetIfStableB(){return if_stable_B;}
-
-   void inline SetIfOffA(bool if_off){if_off_A= if_off;}
-   void inline SetIfOffB(bool if_off){if_off_B= if_off;}
-   void inline SetIfStableA(bool if_stable){if_stable_A= if_stable;}
-   void inline SetIfStableB(bool if_stable){if_stable_B= if_stable;}
-   */
+   
    inline void SetIfOff(bool _if_off){if_off= _if_off;}
    inline void SetIfStable(bool _if_stable){if_stable= _if_stable;}
    bool inline GetIfStable(){return if_stable;}
@@ -197,29 +186,6 @@ class ParrotExe{
 
    ros::Publisher pub_ifoff;
    ros::Publisher pub_ifstable;
-   /*
-   //between A and B
-   ros::Publisher pub_ifoff_A;//if drone A takes off
-   ros::Publisher pub_ifoff_B;//if drone B takes off
-   ros::Publisher pub_ifstable_A;//if drone A stable
-   ros::Publisher pub_ifstable_B;//if drone B stable
-   ros::Publisher pub_stateB;
-   
-   ros::Subscriber sub_ifoff_A;//if drone A takes off
-   ros::Subscriber sub_ifoff_B;//if drone B takes off
-   ros::Subscriber sub_ifstable_A;//if drone A stable
-   ros::Subscriber sub_ifstable_B;//if drone B stable
-   
-   void A_ifoffCb(const std_msgs::Bool::ConstPtr& msg);
-   void B_ifoffCb(const std_msgs::Bool::ConstPtr& msg);
-   void A_ifstableCb(const std_msgs::Bool::ConstPtr& msg);
-   void B_ifstableCb(const std_msgs::Bool::ConstPtr& msg);
-   
-   bool if_off_A= false;
-   bool if_off_B= false;
-   bool if_stable_A= false;
-   bool if_stable_B= false;
-   */
    //msgs
    //if a dubins curve is received
    std_msgs::Bool rec_msg;
