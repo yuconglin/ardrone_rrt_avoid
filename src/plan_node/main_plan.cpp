@@ -26,7 +26,7 @@ int main(int argc, char** argv)
     yc_rrt.SetCheckParas();
     //seg geo fence
     vector<point2D> vec_rect;
-    double h=19*0.6096,r=4,l=-1;
+    double h=19*0.6096,r=4,l=-4;
     vec_rect.push_back(point2D(0,l) );
     vec_rect.push_back(point2D(h,l) );
     vec_rect.push_back(point2D(h,r) );
@@ -49,8 +49,7 @@ int main(int argc, char** argv)
     yc_rrt.CheckFlagsSet();
     //set the obstacles
     vector<obstacle2D> obs2d;
-    obs2d.push_back( obstacle2D(7.3152,-0.2032,0.6,0.6) );
-    //obs2d.push_back(obstacle2D(4.,0,0.4,0.3) );
+    //obs2d.push_back( obstacle2D(7.3152,-0.2032,0.6,0.6) );
     //write the 2D obstacles to a text file
     ofstream obs2d_file("obs2ds.txt");
     for(int i=0;i!=obs2d.size();++i)

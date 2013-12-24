@@ -197,9 +197,9 @@ namespace user_types{
       std::cout<<"ArdroneState print: "<<x<<","<<y<<","<<z<<","<<t<<","<<yaw<<","<<vx<<","<<vy<<","<<vz<<","<<yaw_rate<< std::endl;
    }//Print() ends
 
-   obstacle3D ArdroneState::toObs3D()
+   obstacle3D ArdroneState::toObs3D(double r,double dr)
    {
-     return obstacle3D(x,y,z,vx,vy,vz,t,2,0.5);
+     return obstacle3D(x,y,z,vx,vy,vz,t,r,dr);
    }//to Obs3D
 
 };//namespace ends

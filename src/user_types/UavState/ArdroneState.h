@@ -49,7 +49,7 @@ namespace user_types{
     GeneralState* copy();
     GeneralState* InterPolate(double dt);
     void Print();
-    obstacle3D toObs3D();
+    obstacle3D toObs3D(double r,double dr);
   };//ArdroneState ends
 
 };//namespace ends

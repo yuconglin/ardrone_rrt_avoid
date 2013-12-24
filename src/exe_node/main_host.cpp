@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     
     //file for navdata
     char file_nav[256];
-    sprintf( file_nav, "data/%s:%s.txt",str_time.c_str(),"path");
+    sprintf( file_nav, "/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"path");
 
     //ParrotExe initialization
     ParrotExe parrot_exe(controlMid,file_nav);
