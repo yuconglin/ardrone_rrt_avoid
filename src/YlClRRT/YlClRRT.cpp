@@ -593,9 +593,16 @@ namespace Ardrone_rrt_avoid{
    {//if collided, re-select path. True if path is good
       bool if_colli= false,if_path= false;
       TREEIter it_block;
-      
+      ros::Time t_start= ros::Time::now(); 
       while(1)
       {
+	if(ros::Time::now()- t_start >= ros::Duration(0.1))
+        {
+          cout<<"PathCheckRepeat time up"<< endl;
+	  if_path= false;
+	  break;
+	}//for time's sake
+
 	if(!PathGen() ) 
 	{//no path to the goal
 	  cout<<"no path, stop or local avoidance"<<endl;
@@ -627,6 +634,10 @@ namespace Ardrone_rrt_avoid{
 	}//if-else ends
 	cout<<"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"<<endl;
       }//while ends
+
+      ros::Duration du= ros::Time::now()- t_start;
+      cout<< "CheckRepeat time total:+++++++++++++++++++++++ "<< du.toSec() << endl;
+
       return if_path;
    }//PathCheckRepeat() ends
 

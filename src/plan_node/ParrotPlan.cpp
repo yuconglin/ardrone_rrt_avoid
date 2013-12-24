@@ -116,7 +116,7 @@ namespace Ardrone_rrt_avoid{
     {
       cout<< states[i].x<<","<<states[i].y<<","<<states[i].z<<","
           << states[i].vx<<","<<states[i].vy<<","<<states[i].vz<<","<< states[i].t << endl;
-      obs.push_back(states[i].toObs3D() );
+      obs.push_back(states[i].toObs3D(2.,0.5) );
     }
   }//StatesToObs ends
   
@@ -180,7 +180,10 @@ namespace Ardrone_rrt_avoid{
 	       case_idx= PATH_RECHECK; 
 	     }//if_path_good ends
 	     else
-	      case_idx= WAIT_STATE;
+	     {
+	       cout<<"then wait state"<<endl;
+	       case_idx= WAIT_STATE;
+	     }
 	   }//if (if_receive) ends
 	   break;
 	 }//PATH_READY ends
