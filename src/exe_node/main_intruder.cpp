@@ -5,6 +5,8 @@
 #include "systemtime.h"
 //other
 #include <cfloat>
+#include "armadillo"
+
 using namespace Ardrone_rrt_avoid;
 
 int main(int argc, char** argv)
@@ -23,7 +25,7 @@ int main(int argc, char** argv)
     
    //file for navdata
    char file_nav[256];
-   sprintf( file_nav, "data/%s:%s.txt",str_time.c_str(),"other");
+   sprintf( file_nav, "home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"other");
   
    //ParrotExe initialization
    const char* xmlfile= "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml"; 
@@ -31,8 +33,8 @@ int main(int argc, char** argv)
    OthersMonitor monitor(1,1);
    //Set initial position
    double e= 0.6096; 
-   double x0=9*e+1.,y0=0*e,z0=0.7,the0=M_PI;
-   double x1=2*e,y1=0,z1=0.7,the1=M_PI;
+   double x0=9*e+1,y0=0*e,z0=0.7,the0=M_PI;
+   double x1=0,y1=0,z1=0.7,the1=M_PI;
    QuadCfg start(x0,y0,z0,the0);
    QuadCfg end(x1,y1,z1,the1);
    //parrot_exe.SetInitXY(e,0);
@@ -45,6 +47,10 @@ int main(int argc, char** argv)
    //the start config when switch from takeoff to hover
    QuadCfg cfg_start;
    int reach= -1;
+   ros::Time t_start= ros::Time::now();
+   arma::vec::fixed<3> u;
+   u<<0.5<<0.<<0.;
+   double dt= 0.1;
 
    //while
    ros::Rate r(10);
@@ -102,15 +108,20 @@ int main(int argc, char** argv)
 
      }//!if_start ends
      else
-     {
-        
+     {  
         if(reach!=2 && !if_joy)
 	{
            reach= parrot_exe.LineCommand(start,end,t_limit);
 	}
 	if(reach==2) parrot_exe.sendStop();
-        if(reach==2&&idx_uav_state==4) parrot_exe.sendLand();
-	
+        /* 
+	parrot_exe.StepCommand(u,dt);
+	if(ros::Time::now()-t_start>= ros::Duration(4) )
+	{  
+	  reach= 2;
+	  parrot_exe.sendStop();
+	}*/
+	//if(reach==2&&idx_uav_state==4) parrot_exe.sendLand();
         //publish its state
 	parrot_exe.PubQuadState();
 	parrot_exe.PublishFlags();
