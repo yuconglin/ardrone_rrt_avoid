@@ -1,10 +1,9 @@
 close all;
 
-<<<<<<< HEAD
-log_data =fopen('../../data/20131111-160035:0.5:0.0:0.0:test.txt','r');
-=======
-log_data =fopen('../../data/20131111-142239:1.0:0.0:0.0:test.txt','r');
->>>>>>> 025624cadf7cae967175f5b6b2712c1f5a80e0fa
+%log_data =fopen('../../data/20131111-160035:0.5:0.0:0.0:test.txt','r');
+%log_data =fopen('../../data/20131111-154548:1.0:0.0:0.0:good.txt','r');
+log_data =fopen('../../data/20131108-231624:1.0:1.0:0.0:test.txt','r');
+
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -79,7 +78,7 @@ end
 % plot( reg(:,1), reg(:,7), '--r' );
 % legend('wz','yaw');
 
-<<<<<<< HEAD
+
 % compare_data= fopen('../../data/update_rec.txt','r');
 % if compare_data == -1
 %      error('File compare_data could not be opened, check name or path.')
@@ -129,7 +128,6 @@ end
 % plot( reg(:,1), reg(:,12), '-g' );
 % plot( reg(:,1), reg(:,2), '-b' );
 % legend('x_c','y_c','z_c','x','y','z');
-=======
 compare_data= fopen('../../data/update_rec.txt','r');
 if compare_data == -1
      error('File compare_data could not be opened, check name or path.')
@@ -186,4 +184,3 @@ plot( reg(:,1), reg(:,11), '-r' );
 plot( reg(:,1), reg(:,12), '-g' );
 plot( reg(:,1), reg(:,2), '-b' );
 legend('x_c','y_c','z_c','x','y','z');
->>>>>>> 025624cadf7cae967175f5b6b2712c1f5a80e0fa
