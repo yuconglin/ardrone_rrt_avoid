@@ -26,7 +26,7 @@ int main(int argc, char** argv)
     yc_rrt.SetCheckParas();
     //seg geo fence
     vector<point2D> vec_rect;
-    double h=19*0.6096,r=4,l=-4;
+    double h=19*0.6096,r=10,l=-10;
     vec_rect.push_back(point2D(0,l) );
     vec_rect.push_back(point2D(h,l) );
     vec_rect.push_back(point2D(h,r) );

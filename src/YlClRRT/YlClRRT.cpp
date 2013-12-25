@@ -184,7 +184,11 @@ namespace Ardrone_rrt_avoid{
        //check
        //if in radius range
        double if_radius= utils::NotInRadius(x_root,y_root,the_a,x_a,y_a,rho);
-       if(!if_radius) continue;
+       if(!if_radius) 
+       {
+	 std::cout<<"in radius"<< std::endl;
+	 continue;
+       }
        //if too steep
        DubinsPath path;
        double q0[]={x_root,y_root,the_a};
@@ -195,10 +199,14 @@ namespace Ardrone_rrt_avoid{
        double h= fabs(z_a-z_root);
        double gamma_d= atan2(h,length);
        bool if_ga= (gamma_d<= config_pt->MaxAscend() );
-       if(!if_ga) continue;
-       //if out of geo fence
+       if(!if_ga) 
+       {	
+	 std::cout<<"ga too large"<< std::endl;
+	 continue;
+       }//if out of geo fence
        bool if_in= spaceLimit_pt->TellIn(x_a,y_a,z_a);
-       if(if_in) break;
+       if(!if_in) std::cout<<"out fence"<<std::endl;
+       else break;
      }//while ends
      //std::cout<<x_a <<" "<<y_a <<" "<<z_a<< " "<< the_a*180./M_PI<< std::endl; 
      //assign to sample node
@@ -298,8 +306,8 @@ namespace Ardrone_rrt_avoid{
            GeneralState* st_final= start->copy();
 
 	   QuadCfg cfg_start(start->x,start->y,start->z,start->yaw);
-	   if(sample_count==0)
-             cout<<"expand first: "<< start->x<<" "<<start->y<<" "<<start->z<< endl;
+	   //if(sample_count==0)
+           //  cout<<"expand first: "<< start->x<<" "<<start->y<<" "<<start->z<< endl;
 
 	   QuadCfg cfg_end(sample_node.state_pt->x,sample_node.state_pt->y,sample_node.state_pt->z,sample_node.state_pt->yaw);
 	   //create a dubins curve connecting the node to the sampling node
@@ -307,7 +315,7 @@ namespace Ardrone_rrt_avoid{
 
 	   if(asin( fabs(sample_node.state_pt->z-start->z)/(dubin_3d.GetHeuriLength()) ) >= config_pt->MaxAscend() )
 	   {
-	      //cout<<"too steep"<<endl;
+	      cout<<"too steep"<<endl;
 	      continue;
 	   }
 	   else
@@ -326,6 +334,8 @@ namespace Ardrone_rrt_avoid{
 		delete st_final;
 		break;
 	      } //if check ends
+	      else
+		cout<<"sample collision"<< endl;
 	   } //else ends
 	   TempLogClear();
            delete st_final;

@@ -209,6 +209,7 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    
    vx_est = vxm_est*cos(yaw_est) - vym_est*sin(yaw_est); 
    vy_est = vxm_est*sin(yaw_est) + vym_est*cos(yaw_est);
+   
    //yaw rate
    wz_est = (yaw_est-yaw_pre)/elapsed_time_dbl;
    //position
@@ -217,6 +218,11 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    z_mea = navdataPtr->altd/1000.;
    //vz from differention
    vzm_est =(z_mea-zm_pre)/elapsed_time_dbl;
+   
+   if(fabs(vx_est)<0.01) vx_est= 0.;
+   if(fabs(vy_est)<0.01) vy_est= 0.;
+   if(fabs(vzm_est)<0.01) vzm_est= 0.;
+
    //which state the quad is
    uav_state_idx= navdataPtr->state;
 
@@ -442,7 +448,7 @@ int ParrotExe::PathCommand(const double _t_limit)
      cout<<"no path,stop"<<endl;
      return 0;
    }
-   
+   cout<<"yes,there is path."<<endl; 
    //first see if the current position is already at the goal
    ardrone_rrt_avoid::DubinSeg_msg dubin_last = path_msg.dubin_path.back();
    
