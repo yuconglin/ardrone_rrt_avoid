@@ -245,6 +245,20 @@ namespace Ardrone_rrt_avoid{
      return false;
    }//CheckGoalReach ends
 
+   void YlClRRT::PrintPath(const char* pFilename)
+   {
+     std::ofstream myfile(pFilename);
+     if(myfile.is_open())
+     {
+       for(int i=0;i!=traj_rec.size();++i)
+       {
+	 user_types::GeneralState* st= traj_rec[i];
+	 myfile<< st->x <<" "<<st->y<<" "<<st->z<<" "<<st->t<< endl;
+       }
+     }//if ends
+     myfile.close();
+   }//PrintPath ends
+
    void YlClRRT::ExpandTree()
    {
      if(!if_in_ros)

@@ -19,7 +19,7 @@
 using namespace std;
 namespace Ardrone_rrt_avoid{
 
-  ParrotPlan::ParrotPlan(YlClRRT* _rrt_pt,char* file_log,int _one,int _total):rrt_pt(_rrt_pt),log_path(file_log),if_receive(false),if_new_rec(false),if_reach(0),if_state(false),one(_one),total(_total) 
+  ParrotPlan::ParrotPlan(YlClRRT* _rrt_pt,char* file_prefix,int _one,int _total):rrt_pt(_rrt_pt),file_pre(file_prefix),if_receive(false),if_new_rec(false),if_reach(0),if_state(false),one(_one),total(_total) 
   {
     //publishers and subscribers
     //publishers
@@ -144,7 +144,8 @@ namespace Ardrone_rrt_avoid{
     //ros sleep for msgs to be stable
     ros::Duration(t_offset).sleep();
     
-    bool if_first= true;
+    //bool if_first= true;
+    int count_replan=0;
     //bool if_recheck_start= false;
     t_limit= rrt_pt->GetTimeLimit();
     //start the process
@@ -234,17 +235,10 @@ namespace Ardrone_rrt_avoid{
 		 if(st_root_pt) delete st_root_pt;
 		 st_root_pt= rrt_pt->TimeStateEstimate(st_current.t,t_limit);
 		 //for logging
-		 if(if_first)
-		 {
-		    if_first= false;
-		    vector<user_types::GeneralState*>* traj_pt= rrt_pt->GetTrajRecPt();
-		    for(int i=0;i!= traj_pt->size();++i)
-		    {
-		      user_types::GeneralState* st= traj_pt->at(i);
-		       if(log_path.is_open() )
-			 log_path<< st->x <<" "<<st->y<<" "<<st->z<<" "<<st->t<< endl;
-		    }//for int i ends
-		 }
+		 char filename[256];
+                 sprintf(filename,"%s_%d.txt",file_pre,count_replan);
+		 rrt_pt->PrintPath(filename);
+		 ++count_replan;
 		 if_path_good= true;
 	       }
 	       else
@@ -341,7 +335,6 @@ namespace Ardrone_rrt_avoid{
       //cout<<"once once once"<<endl;
       ros::spinOnce();
     }//while ends
-      log_path.close();
       return 0;
 
   }//working ends

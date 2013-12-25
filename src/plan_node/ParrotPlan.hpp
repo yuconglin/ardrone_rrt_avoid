@@ -16,7 +16,7 @@ namespace Ardrone_rrt_avoid {
     
      public:
        //constructor
-       ParrotPlan(YlClRRT* _rrt_pt,char* file_log="virtual_replan_rec.txt",int _one=0,int _total=0);
+       ParrotPlan(YlClRRT* _rrt_pt,char* file_prefix="data/file",int _one=0,int _total=0);
        inline void SetTimeLimit(const double _t_limit){t_limit= _t_limit;}
        inline void SetTOffset(const double _t_offset){t_offset=_t_offset;}
        //working part
@@ -25,7 +25,8 @@ namespace Ardrone_rrt_avoid {
      
      private:
        //for planned path log
-       std::ofstream log_path;
+       //std::ofstream log_path;
+       const char* file_pre;
        //the planner
        YlClRRT* rrt_pt;
        //enumerations for different cases:
