@@ -217,6 +217,11 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    z_mea = navdataPtr->altd/1000.;
    //vz from differention
    vzm_est =(z_mea-zm_pre)/elapsed_time_dbl;
+   
+   if(fabs(vx_est)<0.01) vx_est= 0.;
+   if(fabs(vy_est)<0.01) vy_est= 0.;
+   if(fabs(vzm_est)<0.01) vzm_est= 0.;
+   
    //which state the quad is
    uav_state_idx= navdataPtr->state;
 
