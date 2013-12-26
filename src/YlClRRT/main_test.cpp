@@ -10,7 +10,8 @@
 #include "SpaceLimit.h"
 #include "UavState/ArdroneState.h"
 #include "ObsCollect.h"
-#include "Sampler3D/Sampler3D.hpp"
+//#include "Sampler3D/Sampler3D.hpp"
+#include "Sampler3Da/Sampler3Da.hpp"
 //quad related
 #include "QuadCfg.h"
 #include "quadDubins3D.h"
@@ -44,8 +45,8 @@ int main(int argc, char** argv)
    //set the uav behavior
    yc_rrt.SetBehavior(new ArdroneBehavior() );
    //set the sampler
-   yc_rrt.SetSampler(new Sampler3D() );
-   yc_rrt.SetSampleParas();
+   yc_rrt.SetSampler(new Sampler3Da() );
+   yc_rrt.SetSampleParas(8,2);
    //check all the flags
    yc_rrt.CheckFlagsSet();
    //try to sample a node

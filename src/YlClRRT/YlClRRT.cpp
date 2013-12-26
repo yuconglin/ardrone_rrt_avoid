@@ -11,7 +11,8 @@
 #include "UavState/GeneralState.h"
 #include "UavState/GSnode.h"
 #include "SpaceLimit.h"
-#include "Sampler3D/Sampler3D.hpp"
+//#include "Sampler3D/Sampler3D.hpp"
+#include "Sampler3Da/Sampler3Da.hpp"
 #include "checkParas.h"
 //ros
 #include "ros/ros.h"
@@ -118,7 +119,7 @@ namespace Ardrone_rrt_avoid{
      if_behavior_set= true;
    }
 
-   void YlClRRT::SetSampler( Sampler3D* _sampler_pt)
+   void YlClRRT::SetSampler( Sampler3Da* _sampler_pt)
    {
      this->sampler_pt= _sampler_pt;
    }
@@ -133,7 +134,7 @@ namespace Ardrone_rrt_avoid{
      obs_collect.obs_3ds= _obs3ds;
    }//SetObs3D ends
 
-   void YlClRRT::SetSampleParas()
+   void YlClRRT::SetSampleParas(double _width,double _height)
    {
      CheckGoalSet();
      CheckRootSet();     
@@ -146,8 +147,9 @@ namespace Ardrone_rrt_avoid{
      double z_goal= goal_node.state_pt->z;
      
      sampler_pt->SetSampleMethod(1);
-     sampler_pt->SetParams(x_root, y_root, z_root, x_goal, y_goal, z_goal);
-     sampler_pt->SetSigmaGa( config_pt->MaxAscend()*0.25 );
+     //sampler_pt->SetParams(x_root, y_root, z_root, x_goal, y_goal, z_goal);
+     sampler_pt->SetParams(root_node.state_pt,goal_node.state_pt,spaceLimit_pt,_width,_height);
+     //sampler_pt->SetSigmaGa( config_pt->MaxAscend()*0.25 );
      if_sampler_para_set= true;
    }//SetSampleParas()
 
@@ -184,7 +186,11 @@ namespace Ardrone_rrt_avoid{
        //check
        //if in radius range
        double if_radius= utils::NotInRadius(x_root,y_root,the_a,x_a,y_a,rho);
-       if(!if_radius) continue;
+       if(!if_radius) 
+       {
+	 std::cout<<"in radius"<< std::endl;
+	 continue;
+       }
        //if too steep
        DubinsPath path;
        double q0[]={x_root,y_root,the_a};
@@ -195,10 +201,14 @@ namespace Ardrone_rrt_avoid{
        double h= fabs(z_a-z_root);
        double gamma_d= atan2(h,length);
        bool if_ga= (gamma_d<= config_pt->MaxAscend() );
-       if(!if_ga) continue;
-       //if out of geo fence
+       if(!if_ga) 
+       {	
+	 std::cout<<"ga too large"<< std::endl;
+	 continue;
+       }//if out of geo fence
        bool if_in= spaceLimit_pt->TellIn(x_a,y_a,z_a);
-       if(if_in) break;
+       if(!if_in) std::cout<<"out fence"<<std::endl;
+       else break;
      }//while ends
      //std::cout<<x_a <<" "<<y_a <<" "<<z_a<< " "<< the_a*180./M_PI<< std::endl; 
      //assign to sample node
@@ -298,8 +308,8 @@ namespace Ardrone_rrt_avoid{
            GeneralState* st_final= start->copy();
 
 	   QuadCfg cfg_start(start->x,start->y,start->z,start->yaw);
-	   if(sample_count==0)
-             cout<<"expand first: "<< start->x<<" "<<start->y<<" "<<start->z<< endl;
+	   //if(sample_count==0)
+           //  cout<<"expand first: "<< start->x<<" "<<start->y<<" "<<start->z<< endl;
 
 	   QuadCfg cfg_end(sample_node.state_pt->x,sample_node.state_pt->y,sample_node.state_pt->z,sample_node.state_pt->yaw);
 	   //create a dubins curve connecting the node to the sampling node
@@ -307,7 +317,7 @@ namespace Ardrone_rrt_avoid{
 
 	   if(asin( fabs(sample_node.state_pt->z-start->z)/(dubin_3d.GetHeuriLength()) ) >= config_pt->MaxAscend() )
 	   {
-	      //cout<<"too steep"<<endl;
+	      cout<<"too steep"<<endl;
 	      continue;
 	   }
 	   else
@@ -326,6 +336,8 @@ namespace Ardrone_rrt_avoid{
 		delete st_final;
 		break;
 	      } //if check ends
+	      else
+		cout<<"sample collision"<< endl;
 	   } //else ends
 	   TempLogClear();
            delete st_final;

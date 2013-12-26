@@ -25,8 +25,8 @@ int main(int argc, char** argv)
     
    //file for navdata
    char file_nav[256];
-   sprintf( file_nav, "home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"other");
-  
+   sprintf( file_nav, "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"other");
+   
    //ParrotExe initialization
    const char* xmlfile= "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml"; 
    ParrotExe parrot_exe(controlMid,file_nav,xmlfile);
