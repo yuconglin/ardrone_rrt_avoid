@@ -27,17 +27,18 @@ int main(int argc, char** argv)
     yc_rrt.SetCheckParas();
     //seg geo fence
     vector<point2D> vec_rect;
-    double h=19*0.6096,r=10,l=-10;
-    vec_rect.push_back(point2D(0,l) );
+    //double h=21*0.6096,r=1.2,l=-1.2;
+    double h= 30,r= 5, l= -5;
+    vec_rect.push_back(point2D(-h,l) );
     vec_rect.push_back(point2D(h,l) );
     vec_rect.push_back(point2D(h,r) );
-    vec_rect.push_back(point2D(0,r) );
+    vec_rect.push_back(point2D(-h,r) );
     double h_max= 2., h_min= 0.5;
     yc_rrt.SetGeoFence( new SpaceLimit(h_max,h_min,vec_rect) );
     //set the root and the goal
     double e= 0.6096; 
     double x_root=0,y_root=e,z_root=0.7,yaw_root=0.;
-    double x_goal=11,y_goal=1.0,z_goal=0.5,yaw_goal=0.;
+    double x_goal=12,y_goal=1.0,z_goal=0.8,yaw_goal=0.;
     //double x_goal= 8., y_goal=0.,z_goal=0.8,yaw_goal=0.; 
     yc_rrt.SetRoot(new ArdroneState(x_root,y_root,z_root,0.,yaw_root) );
     yc_rrt.SetGoal(new ArdroneState(x_goal,y_goal,z_goal,0.,yaw_goal) );
@@ -45,12 +46,12 @@ int main(int argc, char** argv)
     yc_rrt.SetBehavior(new ArdroneBehavior() );
     //set the sampler
     yc_rrt.SetSampler(new Sampler3Da() );
-    yc_rrt.SetSampleParas(8,2);
+    yc_rrt.SetSampleParas(10,2);
     //check all the flags
     yc_rrt.CheckFlagsSet();
     //set the obstacles
     vector<obstacle2D> obs2d;
-    //obs2d.push_back( obstacle2D(7.3152,-0.2032,0.6,0.6) );
+    obs2d.push_back( obstacle2D(7.3152,-0.2032,0.6,0.6) );
     //write the 2D obstacles to a text file
     ofstream obs2d_file("obs2ds.txt");
     for(int i=0;i!=obs2d.size();++i)
@@ -59,7 +60,7 @@ int main(int argc, char** argv)
     }//for ends
     obs2d_file.close();
     //
-    //yc_rrt.SetObs2D( obs2d );
+    yc_rrt.SetObs2D( obs2d );
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(true);

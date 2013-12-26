@@ -12,7 +12,7 @@ int main(int argc, char** argv)
     //overhead
     int idx_uav_state = -1;
     int pre_uav_state = -1;
-    double t_limit= 1e8;
+    double t_limit= 1;
     //bool if_reach= false;
     bool if_joy= false;
     //ros started

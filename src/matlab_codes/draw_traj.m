@@ -1,5 +1,5 @@
 %load the file
-log_data =fopen('../../data/20131127-202642:path.txt','r');
+log_data =fopen('../../data/20131226-043954:path.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -31,7 +31,7 @@ while ischar(log_line)
       
    pre_state= state;
    
-   if(if_log== 1 && state== 3 || state== 7)
+   if(if_log== 1 && (state== 3 || state== 7) )
       t= t-t0;
       reg= [reg; [t,vx,vy,vz,vw,yaw,state,x,y,z] ]; 
    end
