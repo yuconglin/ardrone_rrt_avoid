@@ -203,7 +203,7 @@ namespace Ardrone_rrt_avoid{
 	   rrt_pt->SetRoot(st_root_pt);
 
 	   //reset sample parameters because they are influenced by goal and root
-	   rrt_pt->SetSampleParas();
+	   rrt_pt->SetSampleParas(8,2);
 	   //tree expand within time limit
 	   rrt_pt->SetStartTime( ros::Time::now() );
 	   rrt_pt->ExpandTree();

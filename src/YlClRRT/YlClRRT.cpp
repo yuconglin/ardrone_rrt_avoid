@@ -11,7 +11,8 @@
 #include "UavState/GeneralState.h"
 #include "UavState/GSnode.h"
 #include "SpaceLimit.h"
-#include "Sampler3D/Sampler3D.hpp"
+//#include "Sampler3D/Sampler3D.hpp"
+#include "Sampler3Da/Sampler3Da.hpp"
 #include "checkParas.h"
 //ros
 #include "ros/ros.h"
@@ -118,7 +119,7 @@ namespace Ardrone_rrt_avoid{
      if_behavior_set= true;
    }
 
-   void YlClRRT::SetSampler( Sampler3D* _sampler_pt)
+   void YlClRRT::SetSampler( Sampler3Da* _sampler_pt)
    {
      this->sampler_pt= _sampler_pt;
    }
@@ -133,7 +134,7 @@ namespace Ardrone_rrt_avoid{
      obs_collect.obs_3ds= _obs3ds;
    }//SetObs3D ends
 
-   void YlClRRT::SetSampleParas()
+   void YlClRRT::SetSampleParas(double _width,double _height)
    {
      CheckGoalSet();
      CheckRootSet();     
@@ -147,7 +148,7 @@ namespace Ardrone_rrt_avoid{
      
      sampler_pt->SetSampleMethod(1);
      //sampler_pt->SetParams(x_root, y_root, z_root, x_goal, y_goal, z_goal);
-     sampler_pt->SetParams(root_node.state_pt,goal_node.state_pt,spaceLimit_pt,8,2);
+     sampler_pt->SetParams(root_node.state_pt,goal_node.state_pt,spaceLimit_pt,_width,_height);
      //sampler_pt->SetSigmaGa( config_pt->MaxAscend()*0.25 );
      if_sampler_para_set= true;
    }//SetSampleParas()

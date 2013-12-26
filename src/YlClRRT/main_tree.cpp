@@ -9,7 +9,8 @@
 #include "SpaceLimit.h"
 #include "UavState/ArdroneState.h"
 #include "obstacle3D.h"
-#include "Sampler3D/Sampler3D.hpp"
+//#include "Sampler3D/Sampler3D.hpp"
+#include "Sampler3Da/Sampler3Da.hpp"
 
 using namespace std;
 using namespace Ardrone_rrt_avoid;
@@ -40,7 +41,7 @@ int main(int argc, char** argv)
     //set the uav behavior
     yc_rrt.SetBehavior(new ArdroneBehavior() );
     //set the sampler
-    yc_rrt.SetSampler(new Sampler3D() );
+    yc_rrt.SetSampler(new Sampler3Da() );
     //yc_rrt.SetSampleParas();
     //check all the flags
     //yc_rrt.CheckFlagsSet();
@@ -68,7 +69,7 @@ int main(int argc, char** argv)
     yc_rrt.ClearToDefault();
     yc_rrt.ClearTree();
     yc_rrt.SetRoot(new ArdroneState(-0.107024,-0.118648,0.736,5.93662e-05,-0.0126186,0.0168764,0.00381639,0.0299871,-0.0083747) );
-    yc_rrt.SetSampleParas();
+    yc_rrt.SetSampleParas(8,2);
     yc_rrt.ExpandTree();
     ArdroneState* st_current= new ArdroneState(x_root+0.1,y_root-0.1,z_root,0,0);
     yc_rrt.PathCheckRepeat(st_current);

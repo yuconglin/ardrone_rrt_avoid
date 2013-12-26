@@ -59,7 +59,7 @@ namespace Ardrone_rrt_avoid{
        void SetRoot( user_types::GeneralState* state_pt );
        void SetGoal( user_types::GeneralState* state_pt );
        //about sample
-       void SetSampleParas();
+       void SetSampleParas(double _width,double _height);
        void SampleNode();
        //set obstacles
        void SetObs2D(const std::vector<user_types::obstacle2D>& _obs2ds);
