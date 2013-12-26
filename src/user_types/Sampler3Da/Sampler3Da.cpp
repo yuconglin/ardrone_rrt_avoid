@@ -3,41 +3,55 @@
 //#include "UavConfig/GeneralConfig.h"
 #include <boost/random.hpp>
 #include <ctime>
+#include <iostream>
 
 namespace user_types {
    
-   Sampler3Da::Sampler3Da():xl(0),yl(0),x_len(0),y_len(0),the(0),ga0(0),sigma_ga(0){ };
+   Sampler3Da::Sampler3Da():x_bot(0),y_bot(0),x_len(0),y_len(0),theta(0){ };
 
-   Sampler3Da::SetParams(double x_root,double y_root,double z_root,double x_goal,double y_goal,double z_goal,user_types::SpaceLimit* spaceLimit_pt,double _len,double _width):x_len(_len),y_len(_len)
+   void Sampler3Da::SetParams(GeneralState* root_state_pt,GeneralState* goal_state_pt,SpaceLimit* spaceLimit_pt,double _width,double _height)
    {
-     double Dx= fabs(x_goal-x_root);
-     double Dy= fabs(y_goal-y_root);
-     double Dz= fabs(z_goal-z_root);
+     double x_root= root_state_pt->x;
+     double y_root= root_state_pt->y;
+     double z_root= root_state_pt->z;
+     double x_goal= goal_state_pt->x;
+     double y_goal= goal_state_pt->y;
+     double z_goal= goal_state_pt->z; 
+
+     double Dx= x_goal-x_root;
+     double Dy= y_goal-y_root;
+     double Dz= z_goal-z_root;
      double r0= sqrt(Dx*Dx+Dy*Dy);
+     x_len= r0;
+     y_len= _width;
+     z_len= _height;
      theta= atan2(Dy,Dx);
      
      x_bot= x_root;
      y_bot= y_root;
      z_bot= z_root;
  
-     ga0= atan2(Dz,r0);
      //get the four corners
      //left lower
      double x0= x_root+ y_len/2*sin(theta);
      double y0= y_root- y_len/2*cos(theta);
      double z0= z_root;
+     std::cout<<"x0: "<<x0<<" y0: "<<y0<<" z0: "<<z0<<std::endl;
      //right lower
      double x1= x_root+ x_len*cos(theta)+ y_len/2*sin(theta);
      double y1= y_root+ x_len*sin(theta)- y_len/2*cos(theta);
      double z1= z_goal;
+     std::cout<<"x1: "<<x1<<" y1: "<<y1<<" z1: "<<z1<<std::endl;
      //right upper
      double x2= x_root+ x_len*cos(theta)- y_len/2*sin(theta);
      double y2= y_root+ x_len*sin(theta)+ y_len/2*cos(theta);
      double z2= z_goal;
+     std::cout<<"x2: "<<x2<<" y2: "<<y2<<" z2: "<<z2<<std::endl;
      //left upper
      double x3= x_root- y_len/2*sin(theta);
      double y3= y_root+ y_len/2*cos(theta);
      double z3= z_root;
+     std::cout<<"x3: "<<x3<<" y3: "<<y3<<" z3: "<<z3<<std::endl;
      //compare with spacelimit
      if( !spaceLimit_pt->TellIn(x0,y0,z0)
        ||!spaceLimit_pt->TellIn(x1,y1,z1)
@@ -45,35 +59,39 @@ namespace user_types {
        ||!spaceLimit_pt->TellIn(x3,y3,z3)
        )
      {
-       x_bot= 0.5*(spaceLimit_pt->vertex[0].x+spaceLimit_pt->vertex[1].x);
-       y_bot= 0.5*(spaceLimit_pt->vertex[0].y+spaceLimit_pt->vertex[1].x);
+       std::cout<<"out out"<< std::endl;
+       x_bot= 0.5*(spaceLimit_pt->vertex[0].x+spaceLimit_pt->vertex[3].x);
+       y_bot= 0.5*(spaceLimit_pt->vertex[1].y+spaceLimit_pt->vertex[2].y);
        z_bot= 0.5*(spaceLimit_pt->h_lower+spaceLimit_pt->h_upper);
        x_len= fabs(spaceLimit_pt->vertex[1].x-spaceLimit_pt->vertex[0].x);
-       y_len= fabs(spaceLimit_pt->vertex[1].y-spaceLimit_pt->vertex[0].y);
+       y_len= fabs(spaceLimit_pt->vertex[0].y-spaceLimit_pt->vertex[3].y);
        z_len= fabs(spaceLimit_pt->h_upper-spaceLimit_pt->h_lower);
+       std::cout<<"x_bot: "<<x_bot<<" y_bot: "<<y_bot<<" z_bot: "<<z_bot<<std::endl;
+       std::cout<<"x_len: "<<x_len<<" y_len: "<<y_len<<" z_len: "<<z_len<<std::endl;
        theta= 0;
      }//judge ends
    
    }//SetParams ends
 
-   Sampler3Da::GetSample(double& x_a,double& y_a,double& z_a,GeneralState* root_state_pt,GeneralState* goal_state_pt)
+   void Sampler3Da::GetSample(double& x_a,double& y_a,double& z_a,GeneralState* root_state_pt,GeneralState* goal_state_pt)
    {
       boost::mt19937 generator;
       static unsigned int seed = 0;
       generator.seed(static_cast<unsigned int>(std::time(0))+(++seed));
       //sample x,y
       //x
-      boost::uniform_real<> x_uniform(-x_len/2, x_len/2);
+      boost::uniform_real<> x_uniform(0, x_len);
       boost::variate_generator<boost::mt19937&,boost::uniform_real<> > x_uni(generator, x_uniform);
       double xc= x_uni();
       //y
-      boost::uniform_real<> y_uniform(0, y_len);
+      boost::uniform_real<> y_uniform(-y_len/2, y_len/2);
       boost::variate_generator<boost::mt19937&,boost::uniform_real<> > y_uni(generator, y_uniform);
       double yc= y_uni();
       //transform
-      x_a= x_bot+ xc*cos(theta)+ yc*sin(theta);
-      y_a= y_bot- xc*sin(theta)+ yc*cos(theta);
-      
+      x_a= x_bot+ xc*cos(theta)- yc*sin(theta);
+      y_a= y_bot+ xc*sin(theta)+ yc*cos(theta);
+      //x_a= x_bot+xc;
+      //y_a= y_bot+yc;
       if(sample_method== 0)
       {
         //y
@@ -103,7 +121,7 @@ namespace user_types {
 
    }//GetSample ends
    
-   void Sampler3D::SetSampleMethod(int _method)
+   void Sampler3Da::SetSampleMethod(int _method)
    {
      if( _method!=0&& _method!=1)
      {

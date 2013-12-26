@@ -18,7 +18,8 @@
 //forward declaration
 namespace user_types{
    struct GeneralState;
-   class Sampler3D;
+   //class Sampler3D;
+   class Sampler3Da;
    struct GeneralBehavior;
    struct GeneralConfig;
    struct SpaceLimit;
@@ -43,7 +44,8 @@ namespace Ardrone_rrt_avoid{
        void SetCheckParas();
         //set user-defined types
        void SetBehavior(user_types::GeneralBehavior* _behavior_pt );
-       void SetSampler(user_types::Sampler3D* _sampler_pt );
+       //void SetSampler(user_types::Sampler3D* _sampler_pt );
+       void SetSampler(user_types::Sampler3Da* _sampler_pt);
        //about geo-fencing
        void SetGeoFence(user_types::SpaceLimit* _space_pt);
        //access
@@ -100,7 +102,8 @@ namespace Ardrone_rrt_avoid{
        //std::vector<user_types::obstacle3D> obstacles;
        user_types::ObsCollect obs_collect; 
        //user defined types
-       user_types::Sampler3D* sampler_pt;
+       //user_types::Sampler3D* sampler_pt;
+       user_types::Sampler3Da* sampler_pt;
        user_types::SpaceLimit* spaceLimit_pt;
        user_types::GeneralConfig* config_pt;
        user_types::GeneralBehavior* behavior_pt;

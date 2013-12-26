@@ -146,8 +146,9 @@ namespace Ardrone_rrt_avoid{
      double z_goal= goal_node.state_pt->z;
      
      sampler_pt->SetSampleMethod(1);
-     sampler_pt->SetParams(x_root, y_root, z_root, x_goal, y_goal, z_goal);
-     sampler_pt->SetSigmaGa( config_pt->MaxAscend()*0.25 );
+     //sampler_pt->SetParams(x_root, y_root, z_root, x_goal, y_goal, z_goal);
+     sampler_pt->SetParams(root_node.state_pt,goal_node.state_pt,spaceLimit_pt,8,2);
+     //sampler_pt->SetSigmaGa( config_pt->MaxAscend()*0.25 );
      if_sampler_para_set= true;
    }//SetSampleParas()
 
