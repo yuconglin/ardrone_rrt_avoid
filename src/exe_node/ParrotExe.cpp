@@ -117,7 +117,7 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav,const ch
    rho= v/yaw_rate;
    speed= sqrt(v*v+vz*vz);
    //end_r= max(speed*dt,0.2);
-   end_r= speed*dt;
+   end_r= 10*speed*dt;
    //controller related
    tkm1 = ros::Time::now();
    tk = ros::Time::now();
@@ -438,7 +438,7 @@ int ParrotExe::PathCommand(const double _t_limit)
 
    if(if_restart_path && path_msg.dubin_path.size()==0 )
    { //command it to stop. for fixed wing, maybe other mechnism
-     //SendControlToDrone( ControlCommand(0,0,0,0) );
+     SendControlToDrone( ControlCommand(0,0,0,0) );
      //require a new path
      if_receive= false;
      if_new_path= false;

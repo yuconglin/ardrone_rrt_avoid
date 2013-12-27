@@ -11,7 +11,9 @@
 #include "SpaceLimit.h"
 #include "UavState/ArdroneState.h"
 #include "obstacle2D.h"
+
 #include "Sampler/SamplerPole.hpp"
+#include "Sampler/SamplerRect.hpp"
 
 using namespace std;
 using namespace Ardrone_rrt_avoid;
@@ -26,7 +28,7 @@ int main(int argc, char** argv)
     yc_rrt.SetCheckParas();
     //seg geo fence
     vector<point2D> vec_rect;
-    double h=21*0.6096,r=1.2,l=-1.2;
+    double h=400,r=100,l=-100;
     //double h= 30,r= 2, l= -2;
     vec_rect.push_back(point2D(-h,l) );
     vec_rect.push_back(point2D(h,l) );
@@ -36,8 +38,8 @@ int main(int argc, char** argv)
     yc_rrt.SetGeoFence( new SpaceLimit(h_max,h_min,vec_rect) );
     //set the root and the goal
     double e= 0.6096; 
-    double x_root=0,y_root=e,z_root=0.7,yaw_root=0.;
-    double x_goal=12,y_goal=1.0,z_goal=0.8,yaw_goal=0.;
+    double x_root=0,y_root=0,z_root=0.7,yaw_root=0.;
+    double x_goal=12,y_goal=0,z_goal=0.8,yaw_goal=0.;
     //double x_goal= 8., y_goal=0.,z_goal=0.8,yaw_goal=0.; 
     yc_rrt.SetRoot(new ArdroneState(x_root,y_root,z_root,0.,yaw_root) );
     yc_rrt.SetGoal(new ArdroneState(x_goal,y_goal,z_goal,0.,yaw_goal) );
@@ -45,6 +47,7 @@ int main(int argc, char** argv)
     yc_rrt.SetBehavior(new ArdroneBehavior() );
     //set the sampler
     yc_rrt.SetSampler(new SamplerPole() );
+    //yc_rrt.SetSampler(new SamplerRect() );
     yc_rrt.SetSampleParas();
     //check all the flags
     yc_rrt.CheckFlagsSet();
@@ -59,7 +62,7 @@ int main(int argc, char** argv)
     }//for ends
     obs2d_file.close();
     //
-    yc_rrt.SetObs2D( obs2d );
+    //yc_rrt.SetObs2D( obs2d );
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(true);

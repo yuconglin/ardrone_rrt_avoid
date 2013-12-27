@@ -116,7 +116,7 @@ namespace Ardrone_rrt_avoid{
     {
       cout<< states[i].x<<","<<states[i].y<<","<<states[i].z<<","
           << states[i].vx<<","<<states[i].vy<<","<<states[i].vz<<","<< states[i].t << endl;
-      obs.push_back(states[i].toObs3D(0.5,0.5) );
+      obs.push_back(states[i].toObs3D(1.,0.5) );
     }
   }//StatesToObs ends
   
