@@ -33,8 +33,9 @@ int main(int argc, char** argv)
    OthersMonitor monitor(1,1);
    //Set initial position
    double e= 0.6096; 
-   double x0=9*e+1,y0=0*e,z0=0.7,the0=M_PI;
-   double x1=0,y1=0,z1=0.7,the1=M_PI;
+   double x0=9*e,y0=0*e,z0=0.7,the0=M_PI;
+   //double x0= 10,y0=0,z0=0.8,the0=M_PI;
+   double x1=e,y1=0,z1=0.7,the1=M_PI;
    QuadCfg start(x0,y0,z0,the0);
    QuadCfg end(x1,y1,z1,the1);
    //parrot_exe.SetInitXY(e,0);
@@ -81,7 +82,7 @@ int main(int argc, char** argv)
         if(parrot_exe.GetIfStable() && monitor.ifOthersStable() )
 	{
 	  parrot_exe.GetCurrentCfg(cfg_start);
-	  //parrot_exe.SetStartTime(ros::Time::now() );
+	  parrot_exe.SetStartTime(ros::Time::now() );
 	  //set YawInit
 	  double yaw_init= cfg_start.theta- M_PI;
 	  parrot_exe.SetYawInit(yaw_init);
@@ -108,21 +109,22 @@ int main(int argc, char** argv)
 
      }//!if_start ends
      else
-     {  
+     {  /*
         if(reach!=2 && !if_joy)
 	{
            reach= parrot_exe.LineCommand(start,end,t_limit);
 	}
 	if(reach==2) parrot_exe.sendStop();
-        /* 
+         
 	parrot_exe.StepCommand(u,dt);
 	if(ros::Time::now()-t_start>= ros::Duration(4) )
 	{  
 	  reach= 2;
 	  parrot_exe.sendStop();
-	}*/
-	//if(reach==2&&idx_uav_state==4) parrot_exe.sendLand();
-        //publish its state
+	}
+	if(reach==2&&idx_uav_state==4) parrot_exe.sendLand();
+        */
+	//publish its state
 	parrot_exe.PubQuadState();
 	parrot_exe.PublishFlags();
      }//else(!if_start) ends
