@@ -34,7 +34,7 @@ int main(int argc, char** argv)
    //Set initial position
    double e= 0.6096; 
    double x0=9*e,y0=0*e,z0=0.7,the0=M_PI;
-   //double x0= 10,y0=0,z0=0.8,the0=M_PI;
+   //double x0= 7.5,y0=0,z0=0.8,the0=M_PI;
    double x1=e,y1=0,z1=0.7,the1=M_PI;
    QuadCfg start(x0,y0,z0,the0);
    QuadCfg end(x1,y1,z1,the1);
@@ -99,9 +99,9 @@ int main(int argc, char** argv)
 	  std::cout<<"B x_init: "<<x_init_frame<<" y_init: "<<y_init_frame<<" z_init: "<<cfg_start.z<<" the_init: "<<cfg_start.theta*180/M_PI<< std::endl;
 
 	  parrot_exe.ControllerReset();
-	  //ros::Duration(1.0).sleep();
+	  ros::Duration(1.0).sleep();
 	  if_start= true;
-	  //parrot_exe.SetInitTimeNow();
+	  parrot_exe.SetInitTimeNow();
           //get current absolute time
 	  utils::getSystemTime(str_time);
 	  std::cout<<"str_time: "<< str_time<< std::endl;
@@ -116,13 +116,7 @@ int main(int argc, char** argv)
 	}
 	if(reach==2) parrot_exe.sendStop();
          
-	parrot_exe.StepCommand(u,dt);
-	if(ros::Time::now()-t_start>= ros::Duration(4) )
-	{  
-	  reach= 2;
-	  parrot_exe.sendStop();
-	}
-	if(reach==2&&idx_uav_state==4) parrot_exe.sendLand();
+        if(reach==2&&idx_uav_state==4) parrot_exe.sendLand();
         */
 	//publish its state
 	parrot_exe.PubQuadState();
