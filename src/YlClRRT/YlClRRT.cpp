@@ -11,9 +11,10 @@
 #include "UavState/GeneralState.h"
 #include "UavState/GSnode.h"
 #include "SpaceLimit.h"
-//#include "Sampler3D/Sampler3D.hpp"
-#include "Sampler3Da/Sampler3Da.hpp"
 #include "checkParas.h"
+#include "Sampler/Sampler.hpp"
+//#include "Sampler/SamplerPole.hpp"
+//#include "Sampler/SamplerRect.hpp"
 //ros
 #include "ros/ros.h"
 //std lib
@@ -119,7 +120,7 @@ namespace Ardrone_rrt_avoid{
      if_behavior_set= true;
    }
 
-   void YlClRRT::SetSampler( Sampler3Da* _sampler_pt)
+   void YlClRRT::SetSampler( Sampler* _sampler_pt)
    {
      this->sampler_pt= _sampler_pt;
    }
@@ -134,22 +135,14 @@ namespace Ardrone_rrt_avoid{
      obs_collect.obs_3ds= _obs3ds;
    }//SetObs3D ends
 
-   void YlClRRT::SetSampleParas(double _width,double _height)
+   void YlClRRT::SetSampleParas()
    {
      CheckGoalSet();
      CheckRootSet();     
      CheckConfigSet();          
-     double x_root= root_node.state_pt->x;
-     double y_root= root_node.state_pt->y;
-     double z_root= root_node.state_pt->z;
-     double x_goal= goal_node.state_pt->x;
-     double y_goal= goal_node.state_pt->y;
-     double z_goal= goal_node.state_pt->z;
-     
+          
      sampler_pt->SetSampleMethod(1);
-     //sampler_pt->SetParams(x_root, y_root, z_root, x_goal, y_goal, z_goal);
-     sampler_pt->SetParams(root_node.state_pt,goal_node.state_pt,spaceLimit_pt,_width,_height);
-     //sampler_pt->SetSigmaGa( config_pt->MaxAscend()*0.25 );
+     sampler_pt->SetParams(root_node.state_pt,goal_node.state_pt,config_pt->MaxAscend()*0.25 );
      if_sampler_para_set= true;
    }//SetSampleParas()
 
@@ -172,7 +165,7 @@ namespace Ardrone_rrt_avoid{
 
    void YlClRRT::SampleNode()
    {//sample and check
-     //sampler_pt->SetSampleMethod(1);   
+      
      double x_root= root_node.state_pt->x;
      double y_root= root_node.state_pt->y;
      double z_root= root_node.state_pt->z;

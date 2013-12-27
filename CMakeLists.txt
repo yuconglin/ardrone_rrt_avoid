@@ -148,9 +148,12 @@ target_link_libraries(test_update lib_state ${ARMADILLO_LIBRARIES} )
   
 #user_types
 add_library(lib_user_types
-            src/user_types/Sampler3D/Sampler3D.cpp
-	    src/user_types/Sampler3Da/Sampler3Da.cpp
-            src/user_types/UavBehavior/ArdroneBehavior.cpp
+	#src/user_types/Sampler3D/Sampler3D.cpp
+	#src/user_types/Sampler3Da/Sampler3Da.cpp
+	src/user_types/Sampler/Sampler.cpp
+	src/user_types/Sampler/SamplerRect.cpp
+	src/user_types/Sampler/SamplerPole.cpp
+	    src/user_types/UavBehavior/ArdroneBehavior.cpp
             src/user_types/UavConfig/ArdroneConfig.cpp
             src/user_types/UavState/ArdroneState.cpp
            )
@@ -161,8 +164,10 @@ add_library(lib_clrrt
      src/YlClRRT/YlClRRT.cpp
   )
 
-rosbuild_add_executable(test_sampleA src/user_types/Sampler3Da/main_test.cpp)
-target_link_libraries(test_sampleA lib_user_types lib_utils)
+#rosbuild_add_executable(test_sampleA src/user_types/Sampler3Da/main_test.cpp)
+#target_link_libraries(test_sampleA lib_user_types lib_utils)
+rosbuild_add_executable(test_sampler src/user_types/Sampler/main_test.cpp)
+target_link_libraries(test_sampler lib_user_types lib_utils)
 rosbuild_add_executable(test_sample src/YlClRRT/main_test.cpp)
 target_link_libraries(test_sample lib_clrrt lib_user_types lib_utils lib_ticpp dubin ${ARMADILLO_LIBRARIES} )
 rosbuild_add_executable(test_tree src/YlClRRT/main_tree.cpp)

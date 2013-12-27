@@ -116,7 +116,7 @@ namespace Ardrone_rrt_avoid{
     {
       cout<< states[i].x<<","<<states[i].y<<","<<states[i].z<<","
           << states[i].vx<<","<<states[i].vy<<","<<states[i].vz<<","<< states[i].t << endl;
-      obs.push_back(states[i].toObs3D(2.,0.5) );
+      obs.push_back(states[i].toObs3D(0.5,0.5) );
     }
   }//StatesToObs ends
   
@@ -203,7 +203,7 @@ namespace Ardrone_rrt_avoid{
 	   rrt_pt->SetRoot(st_root_pt);
 
 	   //reset sample parameters because they are influenced by goal and root
-	   rrt_pt->SetSampleParas(8,2);
+	   rrt_pt->SetSampleParas();
 	   //tree expand within time limit
 	   rrt_pt->SetStartTime( ros::Time::now() );
 	   rrt_pt->ExpandTree();
