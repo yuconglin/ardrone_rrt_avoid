@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     OthersMonitor monitor(0,1);
     //Set initial position
     double e= 0.6096; 
-    double x0= 0, y0= 0;
+    double x0= 0, y0= -e;
     //parrot_exe.SetInitXY(e,0);
     //stop for settle down
     ros::Duration(1.0).sleep();

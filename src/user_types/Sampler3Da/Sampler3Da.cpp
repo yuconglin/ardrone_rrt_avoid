@@ -30,7 +30,7 @@ namespace user_types {
      x_bot= x_root;
      y_bot= y_root;
      z_bot= z_root;
- 
+     /*
      //get the four corners
      //left lower
      double x0= x_root+ y_len/2*sin(theta);
@@ -53,6 +53,7 @@ namespace user_types {
      double z3= z_root;
      std::cout<<"x3: "<<x3<<" y3: "<<y3<<" z3: "<<z3<<std::endl;
      //compare with spacelimit
+     
      if( !spaceLimit_pt->TellIn(x0,y0,z0)
        ||!spaceLimit_pt->TellIn(x1,y1,z1)
        ||!spaceLimit_pt->TellIn(x2,y2,z2)
@@ -70,7 +71,7 @@ namespace user_types {
        std::cout<<"x_len: "<<x_len<<" y_len: "<<y_len<<" z_len: "<<z_len<<std::endl;
        theta= 0;
      }//judge ends
-   
+     */   
    }//SetParams ends
 
    void Sampler3Da::GetSample(double& x_a,double& y_a,double& z_a,GeneralState* root_state_pt,GeneralState* goal_state_pt)

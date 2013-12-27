@@ -11,13 +11,12 @@
 #include "SpaceLimit.h"
 #include "UavState/ArdroneState.h"
 #include "obstacle2D.h"
-//#include "Sampler3D/Sampler3D.hpp"
-#include "Sampler3Da/Sampler3Da.hpp"
+#include "Sampler/SamplerPole.hpp"
 
 using namespace std;
 using namespace Ardrone_rrt_avoid;
 using namespace user_types;
-
+//change, spaceLimit width, sampling width
 int main(int argc, char** argv)
 {
     YlClRRT yc_rrt;
@@ -27,8 +26,8 @@ int main(int argc, char** argv)
     yc_rrt.SetCheckParas();
     //seg geo fence
     vector<point2D> vec_rect;
-    //double h=21*0.6096,r=1.2,l=-1.2;
-    double h= 30,r= 5, l= -5;
+    double h=21*0.6096,r=1.2,l=-1.2;
+    //double h= 30,r= 2, l= -2;
     vec_rect.push_back(point2D(-h,l) );
     vec_rect.push_back(point2D(h,l) );
     vec_rect.push_back(point2D(h,r) );
@@ -45,8 +44,8 @@ int main(int argc, char** argv)
     //set the uav behavior
     yc_rrt.SetBehavior(new ArdroneBehavior() );
     //set the sampler
-    yc_rrt.SetSampler(new Sampler3Da() );
-    yc_rrt.SetSampleParas(10,2);
+    yc_rrt.SetSampler(new SamplerPole() );
+    yc_rrt.SetSampleParas();
     //check all the flags
     yc_rrt.CheckFlagsSet();
     //set the obstacles

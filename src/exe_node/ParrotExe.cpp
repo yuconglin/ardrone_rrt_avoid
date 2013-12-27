@@ -438,7 +438,7 @@ int ParrotExe::PathCommand(const double _t_limit)
 
    if(if_restart_path && path_msg.dubin_path.size()==0 )
    { //command it to stop. for fixed wing, maybe other mechnism
-     SendControlToDrone( ControlCommand(0,0,0,0) );
+     //SendControlToDrone( ControlCommand(0,0,0,0) );
      //require a new path
      if_receive= false;
      if_new_path= false;
