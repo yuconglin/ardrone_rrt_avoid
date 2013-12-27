@@ -12,7 +12,7 @@ int main(int argc, char** argv)
     //overhead
     int idx_uav_state = -1;
     int pre_uav_state = -1;
-    double t_limit= 1;
+    double t_limit= 1e8;
     //bool if_reach= false;
     bool if_joy= false;
     //ros started
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     OthersMonitor monitor(0,1);
     //Set initial position
     double e= 0.6096; 
-    double x0= 0, y0= -e;
+    double x0= 0, y0= 0;
     //parrot_exe.SetInitXY(e,0);
     //stop for settle down
     ros::Duration(1.0).sleep();
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 	   parrot_exe.ControllerReset();
 	   //ros::Duration(1.0).sleep();
 	   if_start= true;
-	   //parrot_exe.SetInitTimeNow();
+	   parrot_exe.SetInitTimeNow();
            //get current absolute time
            utils::getSystemTime(str_time);
            std::cout<<"str_time: "<< str_time<< std::endl;
