@@ -82,22 +82,4 @@ int main(int argc, char** argv)
     planner.working();    
     //planner.PathPlanning();
     return 0; 
-    /*
-    yc_rrt.ExpandTree();
-    ArdroneState* st_current= new ArdroneState(x_root+0.4,y_root-0.4,z_root+0.1,0,0);
-    yc_rrt.PathCheckRepeat(st_current);
-    delete st_current;
-    //yc_rrt.PathGen();
-    //clear the tree
-    yc_rrt.ClearTree();
-    vector<GeneralState*>* traj_pt= yc_rrt.GetTrajRecPt();
-    ofstream myfile("traj_rec.txt");
-    for(int i=0;i!= traj_pt->size();++i)
-    {
-       GeneralState* st= traj_pt->at(i);
-       myfile<< st->x<<" "<< st->y<<" "<< st->z<<" "<< st->t << endl;
-       delete st;
-    }//for ends
-    myfile.close();
-    */
 }//main ends

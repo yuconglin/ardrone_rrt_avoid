@@ -32,16 +32,7 @@ namespace Ardrone_rrt_avoid{
       stable_subs.push_back(sub_stable);
       if_stables.push_back(false);
     }//for ends
-    /*
-    int idx= 1-one;
-    std::ostringstream convert;
-    convert<< idx;
-    std::string idx_str = convert.str();
-    //subscriber to if take off
-    off_sub= nh.subscribe<std_msgs::Bool>(std::string("/drone")+idx_str+"/if_take_off",1,boost::bind(&OthersMonitor::offCb, this, _1, idx) );
-    //subscriber to if stable
-    stable_sub= nh.subscribe<std_msgs::Bool>(std::string("/drone")+idx_str+"/if_stable",1,boost::bind(&OthersMonitor::stableCb, this, _1, idx) );
-   */ 
+   
   }//OthersMonitor ends
   
   bool OthersMonitor::ifOthersTakeOff()
@@ -68,6 +59,7 @@ namespace Ardrone_rrt_avoid{
 
   bool OthersMonitor::ifSomeTakeOff(int _idx)
   {
+    if(total==0) return true;
     if(_idx==one){
       try {
         throw std::runtime_error ("the one to inspect shouldn't be the host one");

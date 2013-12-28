@@ -60,8 +60,6 @@ int main(int argc, char** argv)
 
        if(!if_start)
        {
-	 //parrot_exe.PubIfOff();
-	 //parrot_exe.PubIfStable();
 	 //find the moment takeoff-->hover
 	 if(pre_uav_state!= 4 && idx_uav_state==4)
 	 {	   
@@ -108,7 +106,6 @@ int main(int argc, char** argv)
 	    //&& parrot_exe.GetIfNewPath()
 	    && !if_joy
 	    )
-	  //if( parrot_exe.GetIfReach()!=2 && !if_joy)
 	  {
 	    //std::cout<<"execute one time"<<std::endl;
 	    parrot_exe.PathCommand(t_limit);
