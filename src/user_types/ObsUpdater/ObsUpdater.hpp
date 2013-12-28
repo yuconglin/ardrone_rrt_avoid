@@ -11,6 +11,6 @@ namespace user_types{
     private:
       std::vector<bool> if_updates;
 
-  }//class ObsUpdater ends
+  };//class ObsUpdater ends
 
 };//namespace ends
