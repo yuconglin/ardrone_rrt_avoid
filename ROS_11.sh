@@ -1,5 +1,6 @@
 #setup
 . setup.sh ROS_10
+#. setup.sh ROS_11
 #don't forget to change ip in ardrone
 NUMID_DRONE=1
 NETWORK_ROSCORE=ROS_11

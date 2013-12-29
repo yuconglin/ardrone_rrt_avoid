@@ -37,6 +37,7 @@ namespace Ardrone_rrt_avoid{
   
   bool OthersMonitor::ifOthersTakeOff()
   {
+    if(total==0) return true;
     for(int i=0;i!=total+1;++i)
     {
        if(i== one) continue;
@@ -48,6 +49,7 @@ namespace Ardrone_rrt_avoid{
 
   bool OthersMonitor::ifOthersStable()
   {
+    if(total==0) return true;
     for(int i=0;i!=total+1;++i)
     {
        if(i==one) continue;
