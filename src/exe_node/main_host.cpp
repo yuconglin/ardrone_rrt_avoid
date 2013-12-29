@@ -32,7 +32,7 @@ int main(int argc, char** argv)
     //ParrotExe initialization
     ParrotExe parrot_exe(controlMid,file_nav);
     //monitor other drones if any
-    OthersMonitor monitor(0,0);
+    OthersMonitor monitor(0,1);
     //Set initial position
     double e= 0.6096; 
     double x0= 0, y0= 0;

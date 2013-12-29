@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     }//for ends
     obs2d_file.close();
     //
-    //yc_rrt.SetObs2D( obs2d );
+    yc_rrt.SetObs2D( obs2d );
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(true);
@@ -81,12 +81,12 @@ int main(int argc, char** argv)
     sprintf(file_log,"/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s",str_time.c_str());
     //initialize the object
     ParrotPlan planner(&yc_rrt,file_log);
-    //planner.SetObsUpdater(new ObsUpdaterReal(0,1) );
-      
+    planner.SetObsUpdater(new ObsUpdaterReal(0,1) );
+    /*  
     std::vector<std::string> filenames;
     filenames.push_back(std::string("/home/yucong/ros_workspace/ardrone_rrt_avoid/record_4.txt") );
     planner.SetObsUpdater(new ObsUpdaterVirtual(filenames,1.,0.5) );
-    
+    */  
     planner.SetTOffset(1.0); 
     planner.working();    
     //planner.PathPlanning();
