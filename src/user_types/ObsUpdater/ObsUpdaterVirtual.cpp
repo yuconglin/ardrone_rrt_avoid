@@ -39,6 +39,7 @@ namespace user_types{
     {
       obstacle3D obs3d;  
       obslogs[i]->t_obstacle(t,obs3d);
+      std::cout<<"virtual obs: "<<obs3d.x1<<" "<<obs3d.x2<<" "<<obs3d.x3<<" "<<obs3d.v1<<" "<<obs3d.v2<<" "<< obs3d.v3<<" "<<obs3d.t<<std::endl;
       obs3ds.push_back(obs3d);
     }//for ends
   
