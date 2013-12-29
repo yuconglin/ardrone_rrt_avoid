@@ -19,7 +19,7 @@
 using namespace std;
 namespace Ardrone_rrt_avoid{
 
-  ParrotPlan::ParrotPlan(YlClRRT* _rrt_pt,char* file_prefix,int _one,int _total):rrt_pt(_rrt_pt),file_pre(file_prefix),if_receive(false),if_new_rec(false),if_reach(0),if_state(false),one(_one),total(_total) 
+  ParrotPlan::ParrotPlan(YlClRRT* _rrt_pt,char* file_prefix):rrt_pt(_rrt_pt),file_pre(file_prefix),if_receive(false),if_new_rec(false),if_reach(0),if_state(false) 
   {
     //publishers and subscribers
     //publishers
@@ -31,21 +31,12 @@ namespace Ardrone_rrt_avoid{
     sub_reach=nh.subscribe("quad_reach",100,&ParrotPlan::reachCb,this);
     sub_state =nh.subscribe("quad_state",100,&ParrotPlan::stateCb,this);
     
-    for(int i=0;i!= total+1;++i)
-    {
-      if(i==one) continue;
-      int idx= i;
-      std::ostringstream convert;
-      convert<< idx;
-      std::string idx_str = convert.str();
-      //subscriber to other vehicles' states
-      ros::Subscriber sub_st= nh.subscribe<ardrone_rrt_avoid::ArdroneState_msg>(std::string("/drone")+idx_str+"/quad_state",1,boost::bind(&ParrotPlan::state_obCb, this, _1, idx) );
-      state_subs.push_back(sub_st);
-      if_updates.push_back(false);
-      state_obs.push_back(user_types::ArdroneState() );
-    }//for ends
-    cout<<"state_obs size: "<< state_obs.size()<< endl;
   }//ParrotPlan ends
+
+  ParrotPlan::~ParrotPlan()
+  {
+    delete updater_pt;
+  }
 
   void ParrotPlan::receiveCb(const std_msgs::Bool::ConstPtr& msg)
   {
@@ -77,55 +68,17 @@ namespace Ardrone_rrt_avoid{
     if_state= true;
   }
 
-  void ParrotPlan::state_obCb(const ardrone_rrt_avoid::ArdroneState_msg::ConstPtr& msg,int _idx)
-  {
-    user_types::ArdroneState st;
-    st.x= msg->x;
-    st.y= msg->y;
-    st.z= msg->z;
-    st.yaw= msg->yaw;
-    st.vx= msg->vx;
-    st.vy= msg->vy;
-    st.vz= msg->vz;
-    st.yaw_rate= msg->yaw_rate;
-    st.t= msg->t;
-    //push back states
-    if(_idx> one) --_idx;
-    state_obs[_idx] =st; 
-    if_updates[_idx]= true;
-  }//state_obCb ends
-
-  void ParrotPlan::SetObsUpdateFalse()
-  {
-    for(int i=0;i!=total;++i)
-      if_updates[i]= false;
-  }//SetObsUpdateDefault ends
-
   bool ParrotPlan::SeeObsUpdate()
   {
-    for(int i=0;i!=total;++i)
-      if(if_updates[i]== false) return false;
-    return true;
+    return updater_pt->SeeObsUpdate();  
   }//SeeObsUpdate
 
-  void StatesToObs(vector<user_types::ArdroneState> states,vector<user_types::obstacle3D>& obs)
-  {
-    obs.clear();
-    cout<<"StatesToObs"<< endl;
-    for(int i=0;i!=states.size();++i)
-    {
-      cout<< states[i].x<<","<<states[i].y<<","<<states[i].z<<","
-          << states[i].vx<<","<<states[i].vy<<","<<states[i].vz<<","<< states[i].t << endl;
-      obs.push_back(states[i].toObs3D(1.,0.5) );
-    }
-  }//StatesToObs ends
-  
-  void ParrotPlan::UpdateObs()
+  void ParrotPlan::UpdateObs(double t)
   {
     std::vector<user_types::obstacle3D> obs3d;
-    StatesToObs(state_obs,obs3d);
+    updater_pt->UpdateObs(obs3d,t);
     rrt_pt->SetObs3D(obs3d);
-    SetObsUpdateFalse();
+    updater_pt->SetObsUpdateFalse();
   }//UpdateObs() ends
 
   int ParrotPlan::working()
@@ -218,7 +171,7 @@ namespace Ardrone_rrt_avoid{
 	     cout<<"*****************PATH CHECK***************"<<endl;
 	   pre_case_idx= case_idx;
 	   if(!SeeObsUpdate() ) break;
-	   //UpdateObs();
+	   
 	   if(if_state)//that means an updated quad state is received
 	   { 
 	     //only check when a travelled state is received
@@ -228,7 +181,7 @@ namespace Ardrone_rrt_avoid{
 	     {
                cout<<"st_current: "<< endl;
                st_current.Print();
-               UpdateObs();
+               UpdateObs(st_current.t);
 	       if(!if_path_good ) st_check= st_current; 
 	       if( rrt_pt->PathCheckRepeat(&st_current) )
 	       {//a good path is available
@@ -269,7 +222,7 @@ namespace Ardrone_rrt_avoid{
 	     //st_root_pt= st_current.copy();
 	     st_root_pt= st_current.InterPolate(t_limit);
 	     cout<<"get root"<< endl;
-             UpdateObs();
+             UpdateObs(st_current.t);
 	     //st_pre= st_current;
 	     case_idx= TREE_EXPAND;
 	     if_state= false;
@@ -283,7 +236,7 @@ namespace Ardrone_rrt_avoid{
 	     cout<<"*******************PATH RECHECK*************"<<endl;
 	   pre_case_idx= case_idx;
 	   if(!SeeObsUpdate()) break;
-	   //UpdateObs();
+
 	   //sth may happen when it is closet to the last sec
 	   if(if_state)
 	   {
@@ -291,7 +244,7 @@ namespace Ardrone_rrt_avoid{
 
 	     if(st_current.t-st_recheck.t>= t_limit)
 	     {
-	       UpdateObs();
+	       UpdateObs(st_current.t);
 	       predict_pt= rrt_pt->TimeStateEstimate(st_current.t,t_limit);
 	       cout<<"predict_pt: "<< endl;
 	       predict_pt->Print();

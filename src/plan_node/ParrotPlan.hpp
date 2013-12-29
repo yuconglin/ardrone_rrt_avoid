@@ -8,7 +8,8 @@
 #include "ardrone_rrt_avoid/ArdroneState_msg.h"
 //ardrone state
 #include "UavState/ArdroneState.h"
-
+//obstacle updater
+#include "ObsUpdater/ObsUpdater.hpp"
 
 namespace Ardrone_rrt_avoid {
   class YlClRRT;
@@ -16,9 +17,12 @@ namespace Ardrone_rrt_avoid {
     
      public:
        //constructor
-       ParrotPlan(YlClRRT* _rrt_pt,char* file_prefix="data/file",int _one=0,int _total=0);
+       ParrotPlan(YlClRRT* _rrt_pt,char* file_prefix="data/file");
+       ~ParrotPlan();
+
        inline void SetTimeLimit(const double _t_limit){t_limit= _t_limit;}
        inline void SetTOffset(const double _t_offset){t_offset=_t_offset;}
+       inline void SetObsUpdater(user_types::ObsUpdater* _updater_pt){this->updater_pt= _updater_pt;}
        //working part
        int working();
        int PathPlanning();
@@ -37,14 +41,9 @@ namespace Ardrone_rrt_avoid {
        //current state
        user_types::ArdroneState st_current;
        //obstacle state
-       int one, total;//total is the number of other vehicles
-       std::vector<ros::Subscriber> state_subs; 
-       std::vector<bool> if_updates;
-       std::vector<user_types::ArdroneState> state_obs;
-       void state_obCb(const ardrone_rrt_avoid::ArdroneState_msg::ConstPtr& msg,int _idx);
-       void SetObsUpdateFalse();
+       user_types::ObsUpdater* updater_pt;     
        bool SeeObsUpdate();
-       void UpdateObs();
+       void UpdateObs(double t);
        
        //callback functions
        void receiveCb(const std_msgs::Bool::ConstPtr& msg);

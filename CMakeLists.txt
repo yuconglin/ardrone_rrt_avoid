@@ -148,14 +148,14 @@ target_link_libraries(test_update lib_state ${ARMADILLO_LIBRARIES} )
   
 #user_types
 add_library(lib_user_types
-	#src/user_types/Sampler3D/Sampler3D.cpp
-	#src/user_types/Sampler3Da/Sampler3Da.cpp
-	src/user_types/Sampler/Sampler.cpp
-	src/user_types/Sampler/SamplerRect.cpp
-	src/user_types/Sampler/SamplerPole.cpp
+            src/user_types/Sampler/Sampler.cpp
+	    src/user_types/Sampler/SamplerRect.cpp
+	    src/user_types/Sampler/SamplerPole.cpp
 	    src/user_types/UavBehavior/ArdroneBehavior.cpp
             src/user_types/UavConfig/ArdroneConfig.cpp
             src/user_types/UavState/ArdroneState.cpp
+	    src/user_types/ObsUpdater/ObsUpdaterVirtual.cpp
+	    src/user_types/ObsUpdater/ObsUpdaterReal.cpp
            )
 
 #rrt planner

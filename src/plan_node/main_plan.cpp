@@ -11,9 +11,11 @@
 #include "SpaceLimit.h"
 #include "UavState/ArdroneState.h"
 #include "obstacle2D.h"
-
+//sampler
 #include "Sampler/SamplerPole.hpp"
 #include "Sampler/SamplerRect.hpp"
+//updater
+#include "ObsUpdater/ObsUpdaterReal.hpp"
 
 using namespace std;
 using namespace Ardrone_rrt_avoid;
@@ -77,7 +79,8 @@ int main(int argc, char** argv)
     //sprintf( file_log, "data/%s:%s.txt",str_time.c_str(),"plan");
     sprintf(file_log,"/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s",str_time.c_str());
     //initialize the object
-    ParrotPlan planner(&yc_rrt,file_log,0,1);
+    ParrotPlan planner(&yc_rrt,file_log);
+    planner.SetObsUpdater(new ObsUpdaterReal(0,1) );
     planner.SetTOffset(1.0); 
     planner.working();    
     //planner.PathPlanning();

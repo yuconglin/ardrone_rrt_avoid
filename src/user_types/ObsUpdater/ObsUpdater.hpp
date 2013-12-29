@@ -5,10 +5,11 @@
 namespace user_types{
   class ObsUpdater{
     public:
+
       virtual bool SeeObsUpdate()= 0;
       virtual void SetObsUpdateFalse()= 0;
-      virtual void UpdateObs(std::vector<obstacle3D>& obs3ds); 
-    private:
+      virtual void UpdateObs(std::vector<obstacle3D>& obs3ds,double t)=0; 
+    protected:
       std::vector<bool> if_updates;
 
   };//class ObsUpdater ends
