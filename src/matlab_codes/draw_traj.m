@@ -1,5 +1,5 @@
 %load the file
-log_data =fopen('../../data/20131227-043700:path.txt','r');
+log_data =fopen('../../data/20131227-044240:other.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -37,6 +37,17 @@ while ischar(log_line)
    end
    
 end
+
+x_obs=7.5;
+y_obs=0;
+z_obs=0;
+
+rec_dis= [];
+for i=1:size(reg,1)
+   dis= sqrt( (reg(i,8)-x_obs)^2+(reg(i,9)-y_obs)^2+(reg(i,10)-z_obs)^2 );
+   rec_dis= [rec_dis; dis];
+end
+min(rec_dis)
 
 figure;
 hold on;
