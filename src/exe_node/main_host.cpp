@@ -27,10 +27,14 @@ int main(int argc, char** argv)
     
     //file for navdata
     char file_nav[256];
-    sprintf( file_nav, "/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"path");
+    //sprintf( file_nav, "/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"path");
+    sprintf( file_nav, "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"path");
 
     //ParrotExe initialization
-    ParrotExe parrot_exe(controlMid,file_nav);
+    //ParrotExe parrot_exe(controlMid,file_nav);
+    const char* xmlfile= "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml"; 
+    ParrotExe parrot_exe(controlMid,file_nav,xmlfile);
+   
     //monitor other drones if any
     OthersMonitor monitor(0,1);
     //Set initial position
@@ -42,7 +46,7 @@ int main(int argc, char** argv)
     //flat trim and take off
     parrot_exe.sendFlattrim();
     parrot_exe.sendTakeoff();
-    parrot_exe.SetIfOff(true);
+    //parrot_exe.SetIfOff(true);
        
     bool if_start= false;
     //the start config when switch from takeoff to hover
@@ -58,11 +62,17 @@ int main(int argc, char** argv)
        parrot_exe.PubIfOff();
        parrot_exe.PubIfStable();
 
+       if(!parrot_exe.GetIfOff())
+       {
+         parrot_exe.sendTakeoff();
+       }
+
        if(!if_start)
        {
 	 //find the moment takeoff-->hover
 	 if(pre_uav_state!= 4 && idx_uav_state==4)
 	 {	   
+	   parrot_exe.SetIfOff(true);
 	   parrot_exe.SetIfStable(true);
 	   //get current absolute time
 	   utils::getSystemTime(str_time);

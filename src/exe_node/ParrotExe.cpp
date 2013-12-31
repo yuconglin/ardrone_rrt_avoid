@@ -392,7 +392,7 @@ void ParrotExe::sendLand()
 void ParrotExe::sendTakeoff()
 {
    takeoff_pub.publish(std_msgs::Empty());
-   //cout << "take off" << endl;
+   cout << "take off" << endl;
 }
 
 void ParrotExe::sendStop()

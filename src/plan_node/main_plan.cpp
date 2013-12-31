@@ -27,7 +27,8 @@ int main(int argc, char** argv)
     YlClRRT yc_rrt;
     //set config
     yc_rrt.SetConfig( new ArdroneConfig() );
-    yc_rrt.ConfigFill("/home/yucong/.ros/param.xml");
+    //yc_rrt.ConfigFill("/home/yucong/.ros/param.xml");
+    yc_rrt.ConfigFill("/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml");
     yc_rrt.SetCheckParas();
     //seg geo fence
     vector<point2D> vec_rect;
@@ -65,7 +66,7 @@ int main(int argc, char** argv)
     }//for ends
     obs2d_file.close();
     //
-    yc_rrt.SetObs2D( obs2d );
+    //yc_rrt.SetObs2D( obs2d );
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(true);
@@ -78,7 +79,8 @@ int main(int argc, char** argv)
     //set log file name
     char file_log[256];
     //sprintf( file_log, "data/%s:%s.txt",str_time.c_str(),"plan");
-    sprintf(file_log,"/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s",str_time.c_str());
+    //sprintf(file_log,"/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s",str_time.c_str());
+    sprintf(file_log,"/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/data/%s",str_time.c_str() );
     //initialize the object
     ParrotPlan planner(&yc_rrt,file_log);
     planner.SetObsUpdater(new ObsUpdaterReal(0,1) );
