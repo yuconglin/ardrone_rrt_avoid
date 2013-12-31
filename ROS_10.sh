@@ -1,5 +1,5 @@
 #Setup
-. setup.sh
+. setup.sh ROS_10
 #don't forget to change ip in ardrone
 #NUMID_DRONE=$1
 NUMID_DRONE=0
