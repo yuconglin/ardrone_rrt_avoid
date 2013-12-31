@@ -3,7 +3,7 @@
 #. setup.sh ROS_11
 #don't forget to change ip in ardrone
 NUMID_DRONE=1
-NETWORK_ROSCORE=ROS_11
+#NETWORK_ROSCORE=ROS_11
 DRONE_IP=192.168.1.1
 LAPTOP_IDX=1
 #{

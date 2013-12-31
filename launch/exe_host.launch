@@ -5,7 +5,8 @@
 	<group ns="$(arg drone_id_namespace)">
 		<node name="exe_host"
   		      pkg="ardrone_rrt_avoid" 
-  	              type="exe_host"
+		      type="exe_host"
+		      args="$(arg idx)" 
 	              respawn="false" output="screen">
 	        </node>
 	</group>
