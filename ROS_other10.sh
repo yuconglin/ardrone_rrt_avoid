@@ -1,15 +1,11 @@
-#Setup
-. setup.sh
+. setup.sh ROS_11
 #don't forget to change ip in ardrone
-#NUMID_DRONE=$1
-NUMID_DRONE=0
-#NETWORK_ROSCORE=$2
-NETWORK_ROSCORE=ROS_10
-#DRONE_IP=$3
+NUMID_DRONE=1
+#NETWORK_ROSCORE=ROS_11
 DRONE_IP=192.168.1.1
 
 #{
-#echo ./set_IP_.sh $DRONE_IP
+#echo ./set_IP.sh $DRONE_IP
 #echo exit
 #} | telnet 192.168.1.1
 
@@ -20,9 +16,6 @@ gnome-terminal  \
 	--tab --title "joystick"  --command "bash -c \"
 		roslaunch ./launch/joy_node.launch --wait drone_id_namespace:=drone$NUMID_DRONE;
 		exec bash\""  \
-	--tab --title "planner"  --command "bash -c \"
-		roslaunch ./launch/parrot_plan.launch --wait drone_id_namespace:=drone$NUMID_DRONE >host_plan.txt;
-		exec bash\""  \
-	--tab --title "exe_host" --command "bash -c \"
-		roslaunch ./launch/exe_host.launch --wait drone_id_namespace:=drone$NUMID_DRONE >host_rec.txt;
+	--tab --title "exe_intruder" --command "bash -c \"
+		roslaunch ./launch/exe_intruder.launch --wait drone_id_namespace:=drone$NUMID_DRONE >intruder_rec.txt;
 		exec bash\""  \
