@@ -6,7 +6,8 @@
 		<node name="exe_host"
   		      pkg="ardrone_rrt_avoid" 
   	              type="exe_host"
-	              respawn="false" output="screen">
+                      args="$(arg idx)"
+		      respawn="false" output="screen">
 	        </node>
 	</group>
 </launch>
