@@ -1,6 +1,7 @@
 . setup.sh
 NUMID_DRONE=0
 NETWORK_ROSCORE=ROS_11
+LAPTOP_IDX=1
 DRONE_IP=192.168.1.1
 
 gnome-terminal  \
@@ -11,8 +12,8 @@ gnome-terminal  \
 	roslaunch ./launch/joy_node.launch --wait drone_id_namespace:=drone$NUMID_DRONE;
 	exec bash\""  \
 --tab --title "planner"  --command "bash -c \"
-	roslaunch ./launch/parrot_plan.launch --wait drone_id_namespace:=drone$NUMID_DRONE >host_plan.txt;
+	roslaunch ./launch/parrot_plan.launch --wait drone_id_namespace:=drone$NUMID_DRONE idx=$LAPTOP_IDX>host_plan.txt;
 	exec bash\""  \
 --tab --title "exe_host" --command "bash -c \"
-	roslaunch ./launch/exe_host.launch --wait drone_id_namespace:=drone$NUMID_DRONE >host_rec.txt;
+	roslaunch ./launch/exe_host.launch --wait drone_id_namespace:=drone$NUMID_DRONE idx=$LAPTOP_IDX>host_rec.txt;
 	exec bash\""  \

@@ -9,6 +9,25 @@ using namespace Ardrone_rrt_avoid;
 
 int main(int argc, char** argv)
 {
+    //get the system time
+    std::string str_time;
+    utils::getSystemTime(str_time);
+
+    int laptop_idx= atoi(argv[1]);
+    //file for navdata
+    char file_nav[256],*xmlfile;
+    if(laptop_idx== 0)
+    {
+      sprintf( file_nav, "/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"other");
+      xmlfile= "/home/yucong/.ros/param.xml";
+    }
+    else if(laptop_idx==1)
+    {
+      sprintf( file_nav, "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"other");
+      xmlfile= "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml";
+    }
+    else {std::cout<<"idx wrong,should be 0 or 1"<<std::endl;}
+
     //overhead
     int idx_uav_state = -1;
     int pre_uav_state = -1;
@@ -21,16 +40,9 @@ int main(int argc, char** argv)
     
     //the controller
     Controller_MidLevelCnt controlMid;
-    //get the system time
-    std::string str_time;
-    utils::getSystemTime(str_time);
-    
-    //file for navdata
-    char file_nav[256];
-    sprintf( file_nav, "/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"path");
-
+        
     //ParrotExe initialization
-    ParrotExe parrot_exe(controlMid,file_nav);
+    ParrotExe parrot_exe(controlMid,file_nav,xmlfile);
     //monitor other drones if any
     OthersMonitor monitor(0,1);
     //Set initial position
@@ -42,8 +54,7 @@ int main(int argc, char** argv)
     //flat trim and take off
     parrot_exe.sendFlattrim();
     parrot_exe.sendTakeoff();
-    parrot_exe.SetIfOff(true);
-       
+           
     bool if_start= false;
     //the start config when switch from takeoff to hover
     QuadCfg cfg_start;
@@ -57,6 +68,12 @@ int main(int argc, char** argv)
       
        parrot_exe.PubIfOff();
        parrot_exe.PubIfStable();
+
+       if(!parrot_exe.GetIfOff() )
+	  parrot_exe.sendTakeoff();
+       if(idx_uav_state!=2)
+          parrot_exe.SetIfOff(true);
+
 
        if(!if_start)
        {

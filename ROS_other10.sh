@@ -2,6 +2,7 @@
 #don't forget to change ip in ardrone
 NUMID_DRONE=1
 #NETWORK_ROSCORE=ROS_11
+LAPTOP_IDX=0
 DRONE_IP=192.168.1.1
 
 #{
@@ -17,5 +18,5 @@ gnome-terminal  \
 		roslaunch ./launch/joy_node.launch --wait drone_id_namespace:=drone$NUMID_DRONE;
 		exec bash\""  \
 	--tab --title "exe_intruder" --command "bash -c \"
-		roslaunch ./launch/exe_intruder.launch --wait drone_id_namespace:=drone$NUMID_DRONE >intruder_rec.txt;
+		roslaunch ./launch/exe_intruder.launch --wait drone_id_namespace:=drone$NUMID_DRONE idx:=$LAPTOP_IDX>intruder_rec.txt;
 		exec bash\""  \

@@ -24,10 +24,30 @@ using namespace user_types;
 //change, spaceLimit width, sampling width
 int main(int argc, char** argv)
 {
+    //get the system time
+    std::string str_time;
+    utils::getSystemTime(str_time);
+
+    int laptop_idx= atoi(argv[1]);
+    //file for navdata
+    char file_log[256],*xmlfile;
+    if(laptop_idx== 0)
+    {
+      sprintf( file_log, "/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s",str_time.c_str() );
+      xmlfile= "/home/yucong/.ros/param.xml";
+    }
+    else if(laptop_idx==1)
+    {
+      sprintf( file_log, "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/data/%s",str_time.c_str() );
+      xmlfile= "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml";
+    }
+    else {std::cout<<"idx wrong,should be 0 or 1"<<std::endl;}
+ 
+    //the planner
     YlClRRT yc_rrt;
     //set config
     yc_rrt.SetConfig( new ArdroneConfig() );
-    yc_rrt.ConfigFill("/home/yucong/.ros/param.xml");
+    yc_rrt.ConfigFill(xmlfile);
     yc_rrt.SetCheckParas();
     //seg geo fence
     vector<point2D> vec_rect;
@@ -72,13 +92,7 @@ int main(int argc, char** argv)
      
     //ros start
     ros::init(argc,argv,"planner");
-    //get the system time
-    std::string str_time;
-    utils::getSystemTime(str_time);
-    //set log file name
-    char file_log[256];
-    //sprintf( file_log, "data/%s:%s.txt",str_time.c_str(),"plan");
-    sprintf(file_log,"/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s",str_time.c_str());
+        
     //initialize the object
     ParrotPlan planner(&yc_rrt,file_log);
     planner.SetObsUpdater(new ObsUpdaterReal(0,1) );

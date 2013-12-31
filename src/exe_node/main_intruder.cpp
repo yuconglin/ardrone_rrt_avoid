@@ -11,7 +11,26 @@ using namespace Ardrone_rrt_avoid;
 
 int main(int argc, char** argv)
 {
+   //get the system time
+   std::string str_time;
+   utils::getSystemTime(str_time);
+
    //overhead
+   int laptop_idx= atoi(argv[1]);
+   //file for navdata
+   char file_nav[256],*xmlfile;
+   if(laptop_idx== 0)
+   {
+     sprintf( file_nav, "/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"other");
+     xmlfile= "/home/yucong/.ros/param.xml";
+   }
+   else if(laptop_idx==1)
+   {
+   sprintf( file_nav, "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"other");
+   xmlfile= "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml";
+   }
+   else {std::cout<<"idx wrong,should be 0 or 1"<<std::endl;}
+    
    int idx_uav_state = -1;
    int pre_uav_state = -1;
    double t_limit= 1e8;
@@ -19,16 +38,8 @@ int main(int argc, char** argv)
    ros::init(argc,argv,"the_other_ardrone");
    //the controller
    Controller_MidLevelCnt controlMid;
-   //get the system time
-   std::string str_time;
-   utils::getSystemTime(str_time);
-    
-   //file for navdata
-   char file_nav[256];
-   sprintf( file_nav, "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"other");
-   
+      
    //ParrotExe initialization
-   const char* xmlfile= "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml"; 
    ParrotExe parrot_exe(controlMid,file_nav,xmlfile);
    OthersMonitor monitor(1,1);
    //Set initial position
@@ -69,6 +80,9 @@ int main(int argc, char** argv)
        //parrot_exe.SetIfOff(true);
      }
 
+     if(idx_uav_state!=2)
+       parrot_exe.SetIfOff(true);
+
      //waiting until stable
      if(!if_start)
      {
@@ -76,7 +90,7 @@ int main(int argc, char** argv)
        if(pre_uav_state!= 4 && idx_uav_state==4)
        {//set the start 
 	  parrot_exe.SetIfStable(true);
-	  parrot_exe.SetIfOff(true);
+	  //parrot_exe.SetIfOff(true);
 	  //get current absolute time
 	  utils::getSystemTime(str_time);
 	  std::cout<<"str_time: "<< str_time<< std::endl;
