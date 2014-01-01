@@ -62,7 +62,7 @@ int main(int argc, char** argv)
     //set the root and the goal
     double e= 0.6096; 
     double x_root=0,y_root=0,z_root=0.7,yaw_root=0.;
-    double x_goal=15,y_goal=0,z_goal=0.8,yaw_goal=0.;
+    double x_goal=16,y_goal=0,z_goal=0.8,yaw_goal=0.;
     //double x_goal= 8., y_goal=0.,z_goal=0.8,yaw_goal=0.; 
     yc_rrt.SetRoot(new ArdroneState(x_root,y_root,z_root,0.,yaw_root) );
     yc_rrt.SetGoal(new ArdroneState(x_goal,y_goal,z_goal,0.,yaw_goal) );
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
     }//for ends
     obs2d_file.close();
     //
-    yc_rrt.SetObs2D( obs2d );
+    //yc_rrt.SetObs2D( obs2d );
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(true);
