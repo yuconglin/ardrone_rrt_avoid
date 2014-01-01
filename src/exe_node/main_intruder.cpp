@@ -69,19 +69,18 @@ int main(int argc, char** argv)
    while(ros::ok() )
    {
      idx_uav_state= parrot_exe.GetUavStateIdx();
+     //std::cout<<"uav_state: "<< idx_uav_state<< std::endl;
      if_joy= parrot_exe.GetIfJoy();
      parrot_exe.PubIfStable();
      //take off coordination
      //if(!parrot_exe.GetIfOff() )
-     std::cout<<"if off other: "<<monitor.ifSomeTakeOff(0)<< std::endl;
      if(!parrot_exe.GetIfOff() && monitor.ifSomeTakeOff(0) )
      {//take off when it knows A takes off
        std::cout<<"take off"<< std::endl;
        parrot_exe.sendTakeoff();
-       //parrot_exe.SetIfOff(true);
      }
 
-     if(idx_uav_state!=2)
+     if(idx_uav_state!=2 && idx_uav_state!=-1)
        parrot_exe.SetIfOff(true);
 
      //waiting until stable
@@ -91,7 +90,6 @@ int main(int argc, char** argv)
        if(pre_uav_state!= 4 && idx_uav_state==4)
        {//set the start 
 	  parrot_exe.SetIfStable(true);
-	  //parrot_exe.SetIfOff(true);
 	  //get current absolute time
 	  utils::getSystemTime(str_time);
 	  std::cout<<"str_time: "<< str_time<< std::endl;
