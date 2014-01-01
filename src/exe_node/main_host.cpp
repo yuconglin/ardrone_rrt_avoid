@@ -19,12 +19,12 @@ int main(int argc, char** argv)
     char file_nav[256],*xmlfile;
     if(laptop_idx== 0)
     {
-      sprintf( file_nav, "/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"other");
+      sprintf( file_nav, "/home/yucong/ros_workspace/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"path");
       xmlfile= "/home/yucong/.ros/param.xml";
     }
     else if(laptop_idx==1)
     {
-      sprintf( file_nav, "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"other");
+      sprintf( file_nav, "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/data/%s:%s.txt",str_time.c_str(),"path");
       xmlfile= "/home/uav/yucong_ros_workspace/sandbox/ardrone_rrt_avoid/param.xml";
     }
     else {std::cout<<"idx wrong,should be 0 or 1"<<std::endl;}
@@ -54,8 +54,7 @@ int main(int argc, char** argv)
     ros::Duration(1.0).sleep();
     //flat trim and take off
     parrot_exe.sendFlattrim();
-    parrot_exe.sendTakeoff();
-           
+              
     bool if_start= false;
     //the start config when switch from takeoff to hover
     QuadCfg cfg_start;
@@ -67,14 +66,14 @@ int main(int argc, char** argv)
        idx_uav_state= parrot_exe.GetUavStateIdx();
        if_joy= parrot_exe.GetIfJoy();
       
+
        parrot_exe.PubIfOff();
        parrot_exe.PubIfStable();
 
        if(!parrot_exe.GetIfOff() )
 	  parrot_exe.sendTakeoff();
-       if(idx_uav_state!=2)
+       if(idx_uav_state!=2 && idx_uav_state!=-1)
           parrot_exe.SetIfOff(true);
-
 
        if(!if_start)
        {

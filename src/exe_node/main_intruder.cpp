@@ -45,7 +45,7 @@ int main(int argc, char** argv)
    //Set initial position
    double e= 0.6096; 
    //double x0=9*e,y0=0*e,z0=0.7,the0=M_PI;
-   double x0= 7.5,y0=0,z0=0.8,the0=M_PI;
+   double x0= 10.,y0=0,z0=0.8,the0=M_PI;
    double x1=e,y1=0,z1=0.7,the1=M_PI;
    QuadCfg start(x0+5,y0,z0,the0);
    QuadCfg end(x1,y1,z1,the1);
@@ -69,6 +69,7 @@ int main(int argc, char** argv)
    while(ros::ok() )
    {
      idx_uav_state= parrot_exe.GetUavStateIdx();
+     //std::cout<<"uav_state: "<< idx_uav_state<< std::endl;
      if_joy= parrot_exe.GetIfJoy();
      parrot_exe.PubIfStable();
      //take off coordination
@@ -77,10 +78,9 @@ int main(int argc, char** argv)
      {//take off when it knows A takes off
        std::cout<<"take off"<< std::endl;
        parrot_exe.sendTakeoff();
-       //parrot_exe.SetIfOff(true);
      }
 
-     if(idx_uav_state!=2)
+     if(idx_uav_state!=2 && idx_uav_state!=-1)
        parrot_exe.SetIfOff(true);
 
      //waiting until stable
@@ -90,7 +90,6 @@ int main(int argc, char** argv)
        if(pre_uav_state!= 4 && idx_uav_state==4)
        {//set the start 
 	  parrot_exe.SetIfStable(true);
-	  //parrot_exe.SetIfOff(true);
 	  //get current absolute time
 	  utils::getSystemTime(str_time);
 	  std::cout<<"str_time: "<< str_time<< std::endl;
