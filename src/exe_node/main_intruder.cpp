@@ -72,8 +72,8 @@ int main(int argc, char** argv)
      if_joy= parrot_exe.GetIfJoy();
      parrot_exe.PubIfStable();
      //take off coordination
-     if(!parrot_exe.GetIfOff() )
-     //if(!parrot_exe.GetIfOff() && monitor.ifSomeTakeOff(0) )
+     //if(!parrot_exe.GetIfOff() )
+     if(!parrot_exe.GetIfOff() && monitor.ifSomeTakeOff(0) )
      {//take off when it knows A takes off
        std::cout<<"take off"<< std::endl;
        parrot_exe.sendTakeoff();
