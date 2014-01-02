@@ -1,5 +1,5 @@
 %load the file
-log_data =fopen('../../data/20140101-021204:path.txt','r');
+log_data =fopen('../../data/20140101-032724:path.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -39,7 +39,7 @@ while ischar(log_line)
 end
 
 %load the other file
-log_data =fopen('../../data/20140101-021156:other.txt','r');
+log_data =fopen('../../data/20140101-032715:other.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
