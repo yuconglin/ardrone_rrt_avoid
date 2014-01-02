@@ -69,7 +69,7 @@ int main(int argc, char** argv)
    while(ros::ok() )
    {
      idx_uav_state= parrot_exe.GetUavStateIdx();
-     //std::cout<<"uav_state: "<< idx_uav_state<< std::endl;
+     std::cout<<"uav_state: "<< idx_uav_state<< std::endl;
      if_joy= parrot_exe.GetIfJoy();
      parrot_exe.PubIfStable();
      //take off coordination
