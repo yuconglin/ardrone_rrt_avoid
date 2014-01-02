@@ -1,5 +1,5 @@
 %load the file
-log_data =fopen('../../data/20131227-044252:path.txt','r');
+log_data =fopen('../../data/20140101-021204:path.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -39,7 +39,7 @@ while ischar(log_line)
 end
 
 %load the other file
-log_data =fopen('../../data/20131227-044240:other.txt','r');
+log_data =fopen('../../data/20140101-021156:other.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -71,8 +71,7 @@ while ischar(log_line)
       
    pre_state= state;
    
-   %if(if_log== 1 && (state== 3 || state== 7) )
-   if(if_log==1)
+   if(if_log== 1 && (state== 3 || state== 7) )
       t= t-t0;
       reg_other = [reg_other; [t,vx,vy,vz,vw,yaw,state,x,y,z] ]; 
    end
@@ -89,7 +88,7 @@ for i=1:size(reg,1)
     if( t< reg_other(1,1) )
       obs_match = [obs_match; reg_other(1,:)];
     elseif( t> reg_other( size(reg_other,1),1) )
-      obs_match = [obs_match; obs(size(reg_other,1),:) ];
+      obs_match = [obs_match; reg_other(size(reg_other,1),:) ];
     else
       while(1)
          if (idx+1<= size(reg_other,1) && reg_other(idx,1)<=t && t<= reg_other(idx+1,1)) || (idx+1 == size(reg_other,1) )
@@ -98,11 +97,15 @@ for i=1:size(reg,1)
            idx = idx +1;
          end
       end %while ends
+      
+      if(idx > size(reg,1) ) 
+         idx= idx-1;
+      end
       %idx,t
       obs_match= [obs_match; reg_other(idx,:)];
     end
     
-    dis = sqrt( (reg(idx,8)-reg_other(i,8))^2+(reg(idx,9)-reg_other(i,9))^2 +(reg(idx,10)-reg_other(i,10))^2 );
+    dis = sqrt( (reg(i,8)-reg_other(idx,8))^2+(reg(i,9)-reg_other(idx,9))^2 +(reg(i,10)-reg_other(idx,10))^2 );
     dis_rec = [dis_rec; dis];
 end
 min(dis_rec)
