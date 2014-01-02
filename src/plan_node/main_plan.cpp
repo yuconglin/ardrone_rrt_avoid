@@ -98,9 +98,10 @@ int main(int argc, char** argv)
     planner.SetObsUpdater(new ObsUpdaterReal(0,1) );
     /*  
     std::vector<std::string> filenames;
-    filenames.push_back(std::string("/home/yucong/ros_workspace/ardrone_rrt_avoid/record_4.txt") );
+    //filenames.push_back(std::string("/home/yucong/ros_workspace/ardrone_rrt_avoid/virtual_obs/v1.0_the0.0.txt") );
+    filenames.push_back(std::string("/home/yucong/ros_workspace/ardrone_rrt_avoid/virtual_obs/v-1.0_t7.0.txt") );
     planner.SetObsUpdater(new ObsUpdaterVirtual(filenames,1.,0.5) );
-    */  
+    */ 
     planner.SetTOffset(1.0); 
     planner.working();    
     //planner.PathPlanning();

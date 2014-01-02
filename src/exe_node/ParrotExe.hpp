@@ -119,7 +119,8 @@ class ParrotExe{
    void newCallback(const std_msgs::Bool::ConstPtr& msg);
    void navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr);
    void joyCb(const sensor_msgs::JoyConstPtr joy_msg);
-   
+   void ifdangerCallback(const std_msgs::Bool::ConstPtr& msg);
+
    //to publish commands
    void SendControlToDrone(ControlCommand cmd);
    void SendCommand(double cx,double cy,double cz,double cw);
@@ -173,6 +174,7 @@ class ParrotExe{
    //subscribers
    ros::Subscriber sub_path;//subscribe to generated path
    ros::Subscriber sub_if_new;//subscribe to see if a new path is generated
+   ros::Subscriber sub_if_danger;//subscribe to see if danger
    ros::Subscriber joy_sub;//subscribe to joystick command
    ros::Subscriber nav_sub;//subscribe to navdateCb
 
