@@ -85,7 +85,7 @@ int main(int argc, char** argv)
     }//for ends
     obs2d_file.close();
     //
-    yc_rrt.SetObs2D( obs2d );
+    //yc_rrt.SetObs2D( obs2d );
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(true);

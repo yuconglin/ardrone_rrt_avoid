@@ -45,7 +45,7 @@ int main(int argc, char** argv)
    //Set initial position
    double e= 0.6096; 
    //double x0=9*e,y0=0*e,z0=0.7,the0=M_PI;
-   double x0= 7.5,y0=0,z0=0.8,the0=M_PI;
+   double x0= 10.,y0=0,z0=0.8,the0=M_PI;
    double x1=e,y1=0,z1=0.7,the1=M_PI;
    QuadCfg start(x0+5,y0,z0,the0);
    QuadCfg end(x1,y1,z1,the1);
