@@ -146,6 +146,7 @@ class ParrotExe{
    bool if_new_path= false;
    //if the flag of if_new_path is received
    bool if_new_rec= false;
+   bool if_path_update= false;
    //if it is controlled by joysticks
    bool if_joy= false;
    int uav_state_idx= -1;

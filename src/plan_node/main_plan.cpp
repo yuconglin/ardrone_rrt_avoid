@@ -76,7 +76,7 @@ int main(int argc, char** argv)
     yc_rrt.CheckFlagsSet();
     //set the obstacles
     vector<obstacle2D> obs2d;
-    obs2d.push_back( obstacle2D(7.3152,-0.2032,0.6,0.6) );
+    obs2d.push_back( obstacle2D(7.5,-2,0.6,0.6) );
     //write the 2D obstacles to a text file
     ofstream obs2d_file("obs2ds.txt");
     for(int i=0;i!=obs2d.size();++i)
@@ -95,13 +95,13 @@ int main(int argc, char** argv)
         
     //initialize the object
     ParrotPlan planner(&yc_rrt,file_log);
-    planner.SetObsUpdater(new ObsUpdaterReal(0,1) );
-    /*  
+    //planner.SetObsUpdater(new ObsUpdaterReal(0,1) );
+      
     std::vector<std::string> filenames;
     //filenames.push_back(std::string("/home/yucong/ros_workspace/ardrone_rrt_avoid/virtual_obs/v1.0_the0.0.txt") );
     filenames.push_back(std::string("/home/yucong/ros_workspace/ardrone_rrt_avoid/virtual_obs/v-1.0_t7.0.txt") );
     planner.SetObsUpdater(new ObsUpdaterVirtual(filenames,1.,0.5) );
-    */ 
+     
     planner.SetTOffset(1.0); 
     planner.working();    
     //planner.PathPlanning();

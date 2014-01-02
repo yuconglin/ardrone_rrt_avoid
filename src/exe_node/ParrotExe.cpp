@@ -173,11 +173,12 @@ void ParrotExe::pathCallback(const ardrone_rrt_avoid::DubinPath_msg::ConstPtr& m
 
 void ParrotExe::ifdangerCallback(const std_msgs::Bool::ConstPtr& msg)
 {
-  //cout<<"danger danger"<< endl; 
-  if(msg->data) {
-   cout<<"danger danger"<< endl;	  
-   if_receive= false;
-  }
+   if(msg->data ) 
+   {
+     if_receive= false;
+     SetRestartDefault();
+     cout<<"danger danger"<< endl;
+   }
 }//ifdangerCallback
 
 void ParrotExe::newCallback(const std_msgs::Bool::ConstPtr& msg)

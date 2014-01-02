@@ -104,6 +104,7 @@ namespace Ardrone_rrt_avoid{
     t_limit= rrt_pt->GetTimeLimit();
     //start the process
     //while loop: keep planning and sending
+    ros::Rate r(10);
     while(ros::ok() )
     { //if arrived at the goal
       if(if_reach==2)
@@ -126,10 +127,11 @@ namespace Ardrone_rrt_avoid{
 	     if_new_msg.data= true;
 	     pub_if_new.publish(if_new_msg);
 	   }
+	   
 	   //publish if a new path is generated
 	   if(if_receive && if_new_rec)
 	   {
-	     if_danger= false;
+	     //if_danger= false;
 	     if(if_path_good){
 	       //first check if the previous path is still collision free
 	       cout<<"path_ready good"<< endl;
@@ -200,6 +202,7 @@ namespace Ardrone_rrt_avoid{
 	       else
 	       {
 		 cout<<"plan no path"<<endl;
+		 cout<<"if danger true"<< endl;
 		 if_danger= true;
 		 if_path_good= false;
 	       }
@@ -264,7 +267,8 @@ namespace Ardrone_rrt_avoid{
 	       }
 	       else
 	       {
-		 //cout<<"sorry,we need a new path"<<endl;
+		 cout<<"sorry,we need a new path"<<endl;
+		 cout<<"if_danger true"<< endl;
 		 //case_idx= TREE_EXPAND0;
 		 if_danger= true;
 	         case_idx= WAIT_STATE;
@@ -294,8 +298,10 @@ namespace Ardrone_rrt_avoid{
       //pub if_danger
       if_danger_msg.data= if_danger;
       pub_if_danger.publish(if_danger_msg);
+      if(if_receive && if_danger) if_danger= false;
 
       ros::spinOnce();
+      r.sleep();  
     }//while ends
       
     return 0;
