@@ -44,7 +44,8 @@ namespace Ardrone_rrt_avoid {
        user_types::ObsUpdater* updater_pt;     
        bool SeeObsUpdate();
        void UpdateObs(double t);
-       
+       void PubIfDanger();
+
        //callback functions
        void receiveCb(const std_msgs::Bool::ConstPtr& msg);
        void recNewCb(const std_msgs::Bool::ConstPtr& msg);
@@ -58,12 +59,13 @@ namespace Ardrone_rrt_avoid {
        bool if_new_rec;
        int if_reach;
        bool if_state;
-       //bool if_obs0;
+       bool if_danger;
        //ros NodeHandle
        ros::NodeHandle nh;
        //publishers
        ros::Publisher pub_path;
        ros::Publisher pub_if_new;
+       ros::Publisher pub_if_danger;
        //subscribers
        ros::Subscriber sub_receive;
        ros::Subscriber sub_if_new_rec;

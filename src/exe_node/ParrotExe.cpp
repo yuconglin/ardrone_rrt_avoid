@@ -89,6 +89,7 @@ ParrotExe::ParrotExe(Controller_MidLevelCnt& _controlMid,char* file_nav,char* xm
    //Subscribers
    sub_path = nh.subscribe("path", 1, &ParrotExe::pathCallback,this);
    sub_if_new= nh.subscribe("if_new_path",1, &ParrotExe::newCallback,this);
+   sub_if_danger= nh.subscribe("if_danger",1,&ParrotExe::ifdangerCallback,this);
    joy_sub= nh.subscribe(nh.resolveName("joy"), 1, &ParrotExe::joyCb, this);
    nav_sub= nh.subscribe("ardrone/navdata", 1, &ParrotExe::navdataCb, this);
    //for simulation
@@ -170,6 +171,11 @@ void ParrotExe::pathCallback(const ardrone_rrt_avoid::DubinPath_msg::ConstPtr& m
    }//end if
 }//pathCallback ends
 
+void ParrotExe::ifdangerCallback(const std_msgs::Bool::ConstPtr& msg)
+{
+   if(msg->data) if_receive= false;
+}//ifdangerCallback
+
 void ParrotExe::newCallback(const std_msgs::Bool::ConstPtr& msg)
 {
    if_new_path= msg->data;
@@ -184,6 +190,8 @@ void ParrotExe::newCallback(const std_msgs::Bool::ConstPtr& msg)
      if_reach= 0;
    }
 }//newCallback ends
+
+
 
 void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
 {
