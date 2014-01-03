@@ -66,7 +66,6 @@ int main(int argc, char** argv)
        idx_uav_state= parrot_exe.GetUavStateIdx();
        if_joy= parrot_exe.GetIfJoy();
       
-
        parrot_exe.PubIfOff();
        parrot_exe.PubIfStable();
 

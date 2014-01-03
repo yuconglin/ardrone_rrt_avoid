@@ -62,7 +62,7 @@ int main(int argc, char** argv)
     //set the root and the goal
     double e= 0.6096; 
     double x_root=0,y_root=0,z_root=0.7,yaw_root=0.;
-    double x_goal=16,y_goal=0,z_goal=0.8,yaw_goal=0.;
+    double x_goal=18,y_goal=0,z_goal=0.8,yaw_goal=0.;
     //double x_goal= 8., y_goal=0.,z_goal=0.8,yaw_goal=0.; 
     yc_rrt.SetRoot(new ArdroneState(x_root,y_root,z_root,0.,yaw_root) );
     yc_rrt.SetGoal(new ArdroneState(x_goal,y_goal,z_goal,0.,yaw_goal) );
@@ -96,12 +96,11 @@ int main(int argc, char** argv)
     //initialize the object
     ParrotPlan planner(&yc_rrt,file_log);
     //planner.SetObsUpdater(new ObsUpdaterReal(0,1) );
-      
+    
     std::vector<std::string> filenames;
-    //filenames.push_back(std::string("/home/yucong/ros_workspace/ardrone_rrt_avoid/virtual_obs/v1.0_the0.0.txt") );
-    filenames.push_back(std::string("/home/yucong/ros_workspace/ardrone_rrt_avoid/virtual_obs/v-1.0_t7.0.txt") );
-    planner.SetObsUpdater(new ObsUpdaterVirtual(filenames,1.,0.5) );
-     
+    filenames.push_back(std::string("/home/yucong/ros_workspace/ardrone_rrt_avoid/virtual_obs/static2.txt") );
+    filenames.push_back(std::string("/home/yucong/ros_workspace/ardrone_rrt_avoid/virtual_obs/static1.txt") );
+    planner.SetObsUpdater(new ObsUpdaterVirtual(filenames,1.,0.5) ); 
     planner.SetTOffset(1.0); 
     planner.working();    
     //planner.PathPlanning();
