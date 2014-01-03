@@ -1,5 +1,5 @@
 %load the file
-log_data =fopen('../../data/20131227-044240:other.txt','r');
+log_data =fopen('../../data/20140102-160108:path.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end

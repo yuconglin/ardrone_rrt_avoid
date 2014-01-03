@@ -1,5 +1,6 @@
+close all;
 %load the file
-log_data =fopen('../../data/20131227-044252:path.txt','r');
+log_data =fopen('../../data/20140102-222404:path.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -26,20 +27,23 @@ while ischar(log_line)
    
    if(pre_state~= 4 && state== 4)
       if_log= 1;
-      t0 = t;
+      t=0;
    end
+%    if(t<10) 
+%      if_log= 1;
+%    end
       
    pre_state= state;
    
    if(if_log== 1 && (state== 3 || state== 7) )
-      t= t-t0;
+      %t= t-t0;
       reg= [reg; [t,vx,vy,vz,vw,yaw,state,x,y,z] ]; 
    end
    
 end
 
 %logged virtual file
-obs_rec =fopen('/home/yucong/.ros/record_4.txt','r');
+obs_rec =fopen('../../virtual_obs/static1.txt','r');
 if obs_rec == -1
     error('File obs_rec.txt could not be opened, check name or path.' ); 
 end

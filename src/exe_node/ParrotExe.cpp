@@ -173,7 +173,12 @@ void ParrotExe::pathCallback(const ardrone_rrt_avoid::DubinPath_msg::ConstPtr& m
 
 void ParrotExe::ifdangerCallback(const std_msgs::Bool::ConstPtr& msg)
 {
-   if(msg->data) if_receive= false;
+   if(msg->data ) 
+   {
+     if_receive= false;
+     SetRestartDefault();
+     cout<<"danger danger"<< endl;
+   }
 }//ifdangerCallback
 
 void ParrotExe::newCallback(const std_msgs::Bool::ConstPtr& msg)
@@ -239,7 +244,7 @@ void ParrotExe::navdataCb(const ardrone_autonomy::NavdataConstPtr navdataPtr)
    zm_pre= z_mea;
    //cout<<"navdata: "<< x_est<<" "<<y_est<<" "<<z_mea<<endl;
    //log
-   log_nav<<tk<<" "<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<" "<<" "<<vzm_est<<" "<<wz_est<<" "<<uav_state_idx<<endl;
+   log_nav<<tk.toSec()-t_init<<" "<<x_est<<" "<<y_est<<" "<<z_mea<<" "<<yaw_est*180/M_PI<<" "<<vx_est<<" "<<vy_est<<" "<<" "<<vzm_est<<" "<<wz_est<<" "<<uav_state_idx<<endl;
 
 }//navdataCb ends
 
