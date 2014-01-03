@@ -1,5 +1,5 @@
 %load the file
-log_data =fopen('../../data/20131227-044252:path.txt','r');
+log_data =fopen('../../data/20140102-001503:path.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -39,7 +39,7 @@ while ischar(log_line)
 end
 
 %logged virtual file
-obs_rec =fopen('/home/yucong/.ros/record_4.txt','r');
+obs_rec =fopen('../../virtual_obs/v-1.0_t7.0.txt','r');
 if obs_rec == -1
     error('File obs_rec.txt could not be opened, check name or path.' ); 
 end
