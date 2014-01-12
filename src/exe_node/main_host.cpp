@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     //ParrotExe initialization
     ParrotExe parrot_exe(controlMid,file_nav,xmlfile);
     //monitor other drones if any
-    OthersMonitor monitor(0,1);
+    OthersMonitor monitor(0,0);
     //Set initial position
     double e= 0.6096; 
     double x0= 0, y0= 0;
@@ -53,8 +53,10 @@ int main(int argc, char** argv)
     //stop for settle down
     ros::Duration(1.0).sleep();
     //flat trim and take off
-    parrot_exe.sendFlattrim();
-              
+    //parrot_exe.sendFlattrim();
+    //parrot_exe.sendTakeoff();
+    //parrot_exe.SetIfOff(true);
+
     bool if_start= false;
     //the start config when switch from takeoff to hover
     QuadCfg cfg_start;
@@ -66,7 +68,6 @@ int main(int argc, char** argv)
        idx_uav_state= parrot_exe.GetUavStateIdx();
        if_joy= parrot_exe.GetIfJoy();
       
-
        parrot_exe.PubIfOff();
        parrot_exe.PubIfStable();
 
