@@ -1,6 +1,10 @@
 close all;
 %load the file
+<<<<<<< HEAD
+log_data =fopen('../../data/20140102-001503:path.txt','r');
+=======
 log_data =fopen('../../data/20140102-222404:path.txt','r');
+>>>>>>> a77b4e94a11f486e5e45af949ee80fa3f48cc3e9
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -43,7 +47,11 @@ while ischar(log_line)
 end
 
 %logged virtual file
+<<<<<<< HEAD
+obs_rec =fopen('../../virtual_obs/v-1.0_t7.0.txt','r');
+=======
 obs_rec =fopen('../../virtual_obs/static1.txt','r');
+>>>>>>> a77b4e94a11f486e5e45af949ee80fa3f48cc3e9
 if obs_rec == -1
     error('File obs_rec.txt could not be opened, check name or path.' ); 
 end

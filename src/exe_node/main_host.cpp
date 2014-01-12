@@ -53,8 +53,10 @@ int main(int argc, char** argv)
     //stop for settle down
     ros::Duration(1.0).sleep();
     //flat trim and take off
-    parrot_exe.sendFlattrim();
-              
+    //parrot_exe.sendFlattrim();
+    //parrot_exe.sendTakeoff();
+    //parrot_exe.SetIfOff(true);
+
     bool if_start= false;
     //the start config when switch from takeoff to hover
     QuadCfg cfg_start;
