@@ -1,5 +1,5 @@
-%f_traj =fopen('../../bin/traj_rec.txt','r');
-f_traj= fopen('/home/yucong/.ros/virtual_replan_rec.txt','r');
+f_traj =fopen('../../bin/traj_rec.txt','r');
+%f_traj= fopen('/home/yucong/.ros/virtual_replan_rec.txt','r');
 if f_traj == -1
     error('File traj_rec.txt could not be opened, check name or path.')
 end
@@ -15,7 +15,7 @@ while ischar(traj_line)
    traj_line= fgetl(f_traj);
 end
 
-log_data =fopen('../../data/20131127-202642:path.txt','r');
+log_data =fopen('../../data/20131202-020315_path_good.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -66,8 +66,8 @@ while ischar(log_line)
    
 end
 
-%f_obs =fopen('../../bin/obs2ds.txt','r');
-f_obs =fopen('/home/yucong/.ros/obs2ds.txt','r');
+f_obs =fopen('../../bin/obs2ds.txt','r');
+%f_obs =fopen('/home/yucong/.ros/obs2ds.txt','r');
 if f_obs == -1
     error('File obstacles.txt could not be opened, check name or path.')
 end
@@ -85,7 +85,7 @@ end
 
 figure;
 hold on;
-axis auto;
+%axis auto;
 grid on;
 %axis([ 0, 15, -5, 5, 0, 10 ]);
 title('plot');
