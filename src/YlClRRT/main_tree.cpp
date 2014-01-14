@@ -34,8 +34,8 @@ int main(int argc, char** argv)
     
     double e= 0.6096;
     //set the root and the goal
-    double x_root=0.,y_root=e,z_root=0.8,yaw_root=0.;
-    double x_goal=11.,y_goal=1,z_goal=0.5,yaw_goal=0.;
+    double x_root=0.,y_root=0,z_root=0.8,yaw_root=0.;
+    double x_goal=10,y_goal=0.6,z_goal=0.5,yaw_goal=0.;
     yc_rrt.SetGoal(new ArdroneState(x_goal,y_goal,z_goal,0.,yaw_goal) );
     //set the uav behavior
     yc_rrt.SetBehavior(new ArdroneBehavior() );
@@ -55,21 +55,22 @@ int main(int argc, char** argv)
     obs2d_file.close();
     //
     yc_rrt.SetObs2D( obs2d );
-
+    /*
     vector<obstacle3D> obs3d;
     obs3d.push_back( obstacle3D(4.97718,-0.768277,0.685,-0.0217654,-0.16154,0.0299748,0.20059,0.5,0.5) );
     yc_rrt.SetObs3D( obs3d );
-
+    */
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(false);
     
     yc_rrt.ClearToDefault();
     yc_rrt.ClearTree();
-    yc_rrt.SetRoot(new ArdroneState(-0.107024,-0.118648,0.736,5.93662e-05,-0.0126186,0.0168764,0.00381639,0.0299871,-0.0083747) );
+    yc_rrt.SetRoot(new ArdroneState(x_root,y_root,z_root,0,0) );
+    //yc_rrt.SetRoot(new ArdroneState(-0.107024,-0.118648,0.736,5.93662e-05,-0.0126186,0.0168764,0.00381639,0.0299871,-0.0083747) );
     yc_rrt.SetSampleParas();
     yc_rrt.ExpandTree();
-    ArdroneState* st_current= new ArdroneState(x_root+0.1,y_root-0.1,z_root,0,0);
+    ArdroneState* st_current= new ArdroneState(x_root,y_root,z_root,0,0);
     yc_rrt.PathCheckRepeat(st_current);
     GeneralState* st_time= yc_rrt.TimeStateEstimate(0,1.0);
     std::cout<<"st_time: "<<st_time->x<<" "<<st_time->y<<" "<<st_time->z<<" "<< std::endl;
