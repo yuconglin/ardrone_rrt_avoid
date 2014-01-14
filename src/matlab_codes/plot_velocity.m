@@ -2,7 +2,7 @@ close all;
 
 %log_data =fopen('../../data/20131111-160035:0.5:0.0:0.0:test.txt','r');
 %log_data =fopen('../../data/20131111-154548:1.0:0.0:0.0:good.txt','r');
-log_data =fopen('../../data/20131108-231624:1.0:1.0:0.0:test.txt','r');
+log_data =fopen('../../data/20140113-000615:1.0:0.0:0.0:0.0:u.txt','r');
 
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
@@ -28,7 +28,7 @@ while ischar(log_line)
   
    log_line= fgetl(log_data);
    
-   if(pre_state== 6 && state== 4)
+   if(pre_state==4 && state== 4)
       if_log= 1;
       t0 = t;
    end
@@ -45,7 +45,7 @@ while ischar(log_line)
    
    pre_state= state;
    
-   if(if_log== 1 && state== 3 || state== 7)
+   if(if_log== 1 && state ==3)
    %if(if_log== 1 && state ~= 2 && state ~= 8 && state ~=0 && state~=6 && state~=4)
    %if(if_log== 1)
       t= t-t0;
