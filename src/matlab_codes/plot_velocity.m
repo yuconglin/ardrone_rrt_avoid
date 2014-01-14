@@ -156,31 +156,40 @@ end
 
 %plot velocity compare
 figure;
+xlabel('t(s)');
+ylabel('velocity(m/s)');
 hold on;
 plot( reg_c(:,1), reg_c(:,6), '*r' );
 plot( reg_c(:,1), reg_c(:,7), '*g' );
 plot( reg_c(:,1), reg_c(:,8), '*b' );
-plot( reg(:,1), reg(:,3), '--r' );
-plot( reg(:,1), reg(:,4), '--g' );
-plot( reg(:,1), reg(:,5), '--b' );
-legend('vx_c','vy_c','vz_c','vx','vy','vz');
+plot( reg(:,1), reg(:,3), '--r','LineWidth',2 );
+plot( reg(:,1), reg(:,4), '--g','LineWidth',2 );
+plot( reg(:,1), reg(:,5), '--b','LineWidth',2 );
+h1= legend('vx_c','vy_c','vz_c','vx','vy','vz');
+set(h1,'FontSize',12);
 
 %plot angular
 figure;
+xlabel('t(s)');
+ylabel('yaw(degree)/ yaw\_rate(degree/s)');
 hold on;
 ylim([-90 90]);
 plot( reg_c(:,1), reg_c(:,9)*180/pi, '*k' );
 plot( reg_c(:,1), reg_c(:,5), '*b' );
-plot( reg(:,1), reg(:,6)*180/pi, '--k' );
-plot( reg(:,1), reg(:,7), '--r' );
-legend('yaw\_rate_c','yaw_c','yaw_rate','yaw');
+plot( reg(:,1), reg(:,6)*180/pi, '--k','LineWidth',2 );
+plot( reg(:,1), reg(:,7), '--r', 'LineWidth',2);
+h2= legend('yaw\_rate_c','yaw_c','yaw\_rate','yaw');
+set(h2,'FontSize',12);
 
 figure;
+xlabel('t(s)');
+ylabel('position(m)');
 hold on;
 plot( reg_c(:,1), reg_c(:,2), '*r' );
 plot( reg_c(:,1), reg_c(:,3), '*g' );
 plot( reg_c(:,1), reg_c(:,4), '*b' );
-plot( reg(:,1), reg(:,11), '-r' );
-plot( reg(:,1), reg(:,12), '-g' );
-plot( reg(:,1), reg(:,2), '-b' );
-legend('x_c','y_c','z_c','x','y','z');
+plot( reg(:,1), reg(:,11), '-r','LineWidth',2);
+plot( reg(:,1), reg(:,12), '-g','LineWidth',2);
+plot( reg(:,1), reg(:,2), '-b','LineWidth',2);
+h3= legend('x_c','y_c','z_c','x','y','z');
+set(h3,'FontSize',12);
