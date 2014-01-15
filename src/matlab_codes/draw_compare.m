@@ -1,5 +1,7 @@
+close all;
 %load the file
-log_data =fopen('../../data/20140101-032724:path.txt','r');
+log_data =fopen('../../data/20140101-024549:path.txt','r');
+
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -25,6 +27,7 @@ while ischar(log_line)
    log_line= fgetl(log_data);
    
    if(pre_state~= 4 && state== 4)
+   %if(t<0.01) 
       if_log= 1;
       t0 = t;
    end
@@ -39,7 +42,7 @@ while ischar(log_line)
 end
 
 %load the other file
-log_data =fopen('../../data/20140101-032715:other.txt','r');
+log_data =fopen('../../data/20140101-024525:other.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -66,7 +69,7 @@ while ischar(log_line)
    
    if(pre_state~= 4 && state== 4)
       if_log= 1;
-      t0 = t;
+      t0 = t-8;
    end
       
    pre_state= state;
@@ -115,19 +118,29 @@ figure;
 hold on;
 axis auto;
 grid on;
-xlabel('Easting(km)');
-ylabel('Northing(km)');
-zlabel('Altitude(ft)');
-%unit sphere
-r = 1.5;
-[x,y,z] = sphere;
-hSphere = surf( r*x+obs_match(1,6),r*y+obs_match(1,7),r*z+obs_match(1,8) );
+xlabel('x(m)');
+ylabel('y(m)');
+zlabel('z(m)');
+axis([ 0, 15, -2, 3, -1, 2.5 ]);
 %draw every point
-for i=1:size(reg,1)
+%for k=1:16
+    %for i=1:size(reg,1)
+    %unit sphere
+    r = 1.5;
+    [x,y,z] = sphere;
+    hSphere = surf( r*x+obs_match(1,6),r*y+obs_match(1,7),r*z+obs_match(1,8) );
+    
+    %k=1;
+    %for i=1:10*k 
     %pause(0.1);
-    plot3( reg(i,8),reg(i,9),reg(i,10), 'r*' );
-    delete(hSphere);
-    hSphere = surf( r*x+obs_match(i,8),r*y+obs_match(i,9),r*z+obs_match(i,10) );
-    view(3);
-    drawnow;
-end
+    for i=1:size(reg,1)
+        plot3( reg(i,8),reg(i,9),reg(i,10), 'r*' );
+        delete(hSphere);
+        hSphere = surf( r*x+obs_match(i,8),r*y+obs_match(i,9),r*z+obs_match(i,10) );
+        view(3);
+        drawnow;
+    end
+%     filename= sprintf('/home/yucong/Dropbox/iros_icuas/iros2014/figs/matlab_figs/move%d.fig',k);
+%     saveas(gcf,filename);
+    close all;
+%end

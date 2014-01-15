@@ -1,3 +1,4 @@
+close all;
 f_traj =fopen('../../bin/traj_rec.txt','r');
 %f_traj= fopen('/home/yucong/.ros/virtual_replan_rec.txt','r');
 if f_traj == -1
@@ -15,7 +16,7 @@ while ischar(traj_line)
    traj_line= fgetl(f_traj);
 end
 
-log_data =fopen('../../data/20131202-020315_path_good.txt','r');
+log_data =fopen('../../data/20131203-203310_path_good.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -88,29 +89,51 @@ hold on;
 %axis auto;
 grid on;
 %axis([ 0, 15, -5, 5, 0, 10 ]);
-title('plot');
-xlabel('Easting(km)');
-ylabel('Northing(km)');
-zlabel('Altitude(ft)');
+%title('plot');
+xlabel('x(m)');
+ylabel('y(m)');
+zlabel('z(m)');
+% for i=1:1:size(virtual_traj,1)
+%   %t = virtual_traj(i,4);
+%   plot3( virtual_traj(i,1),virtual_traj(i,2),virtual_traj(i,3), 'r*' );
+% end
+% h1= legend('plan');
+% for i=1:1:size(reg,1)
+%   plot3( reg(i,8),reg(i,9),reg(i,10),'k+' );
+% end
+% h2= legend('actual');
+% view(3);
+% set(h1,'FontSize',12);
+% set(h2,'FontSize',12);
+text( 0, 0, 0.8, 'start',...
+	                 'VerticalAlignment','top',...
+	                 'HorizontalAlignment','left',...
+	                 'FontSize',14 );
+text( 10, 0.6, 0.5, 'goal' ,...
+	                 'VerticalAlignment','top',...
+	                 'HorizontalAlignment','left',...
+	                 'FontSize',14 );
 
+plot3( virtual_traj(:,1),virtual_traj(:,2),virtual_traj(:,3), 'r*' );
+plot3( reg(:,8),reg(:,9),reg(:,10), 'k+' );
+h= legend('plan','actual');
+set(h,'FontSize',12);
+
+dis_array= [];
 for j=1:size(obs,1) 
  x_c = obs(j,1);
  y_c = obs(j,2);
  r = obs(j,3);
  dr = obs(j,4);
+%  for i=1:size(reg,1)
+%     dis= sqrt( (reg(i,8)-x_c)^2+(reg(i,9)-y_c)^2 );
+%     dis_array= [ dis_array; dis ];
+%  end
+%  min(dis_array)
  [x,y,z] = cylinder(r+dr);
  ob_x= x+ x_c;
  ob_y= y+ y_c;
- surf( ob_x, ob_y, z );
-end
-
-for i=1:1:size(virtual_traj,1)
-  %t = virtual_traj(i,4);
-  plot3( virtual_traj(i,1),virtual_traj(i,2),virtual_traj(i,3), 'r*' );
-end
-
-for i=1:1:size(reg,1)
-  plot3( reg(i,8),reg(i,9),reg(i,10),'k+' );
+ surf( ob_x, ob_y, z, 'FaceColor', 'g');
 end
 
 view(3);

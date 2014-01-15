@@ -9,9 +9,9 @@ using namespace user_types;
 int main(int argc, char** argv)
 {
    ArdroneState quad_state;
-   quad_state.z= 0.8;
+   quad_state.z= 1.2;
    double dt= 0.1;
-   double t_limit= 4.0;
+   double t_limit= 3.7;
    //velocity command
    arma::vec::fixed<3> u;
    u<< 1.0<< 0.0 << 0.;
