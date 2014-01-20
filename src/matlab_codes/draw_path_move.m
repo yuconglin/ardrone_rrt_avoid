@@ -1,24 +1,25 @@
 close all;
 clear all;
-%part2
-f_traj =fopen('../../data/20140101-032724_2.txt','r');
-%f_traj= fopen('/home/yucong/.ros/virtual_replan_rec.txt','r');
-if f_traj == -1
-    error('File traj_rec.txt could not be opened, check name or path.')
-end
-traj_line= fgetl(f_traj);
-vtraj_2 = [];
-while ischar(traj_line)
-   log_traj = textscan(traj_line,'%f %f %f %f');
-   x = log_traj{1};
-   y = log_traj{2};
-   z = log_traj{3};
-   t = log_traj{4};
-   vtraj_2 = [ vtraj_2; [x,y,z,t] ];
-   traj_line= fgetl(f_traj);
-end
+% %part2
+% f_traj =fopen('../../data/20140101-032724_2.txt','r');
+% %f_traj= fopen('/home/yucong/.ros/virtual_replan_rec.txt','r');
+% if f_traj == -1
+%     error('File traj_rec.txt could not be opened, check name or path.')
+% end
+% traj_line= fgetl(f_traj);
+% vtraj_2 = [];
+% while ischar(traj_line)
+%    log_traj = textscan(traj_line,'%f %f %f %f');
+%    x = log_traj{1};
+%    y = log_traj{2};
+%    z = log_traj{3};
+%    t = log_traj{4};
+%    vtraj_2 = [ vtraj_2; [x,y,z,t] ];
+%    traj_line= fgetl(f_traj);
+% end
 %part1
-f_traj =fopen('../../data/20140101-032724_1.txt','r');
+
+f_traj =fopen('../../data/20140102-001846_1.txt','r');
 if f_traj == -1
     error('File traj_rec.txt could not be opened, check name or path.')
 end
@@ -34,7 +35,7 @@ while ischar(traj_line)
    traj_line= fgetl(f_traj);
 end
 %part0
-f_traj =fopen('../../data/20140101-032724_0.txt','r');
+f_traj =fopen('../../data/20140102-001846_0.txt','r');
 if f_traj == -1
     error('File traj_rec.txt could not be opened, check name or path.')
 end
@@ -51,16 +52,16 @@ while ischar(traj_line)
 end
 %find the one in vtraj_1 closest to vtraj_2's start
 %[m,n]= size(vtraj_2);
-vend_2= vtraj_2(1,:);
-i_temp_2= 0;
-dis_t= 100000;
-for i=1:size(vtraj_1,1)
-    dis= sqrt( (vend_2(1)-vtraj_1(i,1))^2+ (vend_2(2)-vtraj_1(i,2))^2+ (vend_2(3)-vtraj_1(i,3))^2 );
-    if(dis< dis_t)
-       i_temp_2= i;
-       dis_t= dis;
-    end
-end
+% vend_2= vtraj_2(1,:);
+% i_temp_2= 0;
+% dis_t= 100000;
+% for i=1:size(vtraj_1,1)
+%     dis= sqrt( (vend_2(1)-vtraj_1(i,1))^2+ (vend_2(2)-vtraj_1(i,2))^2+ (vend_2(3)-vtraj_1(i,3))^2 );
+%     if(dis< dis_t)
+%        i_temp_2= i;
+%        dis_t= dis;
+%     end
+% end
 %%%%%%%%%%
 vend_1= vtraj_1(1,:);
 i_temp_1= 0;
@@ -73,7 +74,7 @@ for i=1:size(vtraj_0,1)
     end
 end
 %uav
-log_data =fopen('../../data/20140101-032724:path.txt','r');
+log_data =fopen('../../data/20140102-001846:path.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -137,10 +138,11 @@ text( reg(m,8), reg(m,9), reg(m,10), 'goal' ,...
 	                 'VerticalAlignment','top',...
 	                 'HorizontalAlignment','left',...
 	                 'FontSize',14 );
-% plot3( vtraj_0(1:i_temp_1,1),vtraj_0(1:i_temp_1,2),vtraj_0(1:i_temp_1,3), 'r*' );
-% plot3( vtraj_1(1:i_temp_2,1),vtraj_1(1:i_temp_2,2),vtraj_1(1:i_temp_2,3), 'r*' );
+plot3( vtraj_0(1:i_temp_1,1),vtraj_0(1:i_temp_1,2),vtraj_0(1:i_temp_1,3), 'r*' );
+%plot3( vtraj_1(1:i_temp_2,1),vtraj_1(1:i_temp_2,2),vtraj_1(1:i_temp_2,3), 'r*' );
+plot3( vtraj_1(:,1),vtraj_1(:,2),vtraj_1(:,3), 'r*' );
 % plot3( vtraj_2(:,1),vtraj_2(:,2),vtraj_2(:,3), 'r*' );
-plot3( vtraj_0(1:177,1),vtraj_0(1:177,2),vtraj_0(1:177,3), 'r*' );
+%plot3( vtraj_0(1:177,1),vtraj_0(1:177,2),vtraj_0(1:177,3), 'r*' );
 plot3( reg(:,8),reg(:,9),reg(:,10), 'k+' );
 
 h= legend('plan','actual');
