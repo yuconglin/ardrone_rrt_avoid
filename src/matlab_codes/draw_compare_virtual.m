@@ -1,6 +1,6 @@
 close all;
 %load the file
-log_data =fopen('../../data/20140101-224638:path.txt','r');
+log_data =fopen('../../data/20140101-230417:path.txt','r');
 if log_data == -1
      error('File log_data could not be opened, check name or path.')
 end
@@ -94,59 +94,59 @@ for i=1:size(reg,1)
     dis = sqrt( (obs(idx,6)-reg(i,8))^2+(obs(idx,7)-reg(i,9))^2 +(obs(idx,8)-reg(i,10))^2 );
     dis_rec = [dis_rec; dis];
 end
-%min(dis_rec);
-%logged virtual file
-% obs_rec =fopen('../../virtual_obs/v-1.0_t5.0.txt','r');
-% if obs_rec == -1
-%     error('File obs_rec.txt could not be opened, check name or path.' ); 
-% end
-% obs_line= fgetl(obs_rec);
-% obs = [];
-% while ischar(obs_line)
-%    log_obs = textscan(obs_line,'%f %f %f %f %f %f %f %f');
-%    t = log_obs{1};
-%    if t> 0
-%      if size(obs,1)== 0
-%         t0 = log_obs{1};
-%      end
-%      vx = log_obs{2};
-%      vy = log_obs{3};
-%      vz = log_obs{4};
-%      w = log_obs{5};
-%      x = log_obs{6};
-%      y = log_obs{7};
-%      z = log_obs{8};
-%      obs = [ obs; [t-t0,vx,vy,vz,w,x,y,z] ];
-%    end%if ends
-%    obs_line= fgetl(obs_rec);
-% end
-% 
-% obs_match1 = [];
-% dis_rec = [];
-% %quad and obstacle time matching
-% idx = 1;
-% for i=1:size(reg,1)
-%     t= reg(i,1);
-%     
-%     if( t< obs(1,1) )
-%       obs_match1 = [obs_match1; obs(1,:)];
-%     elseif( t> obs( size(obs,1),1) )
-%       obs_match1 = [obs_match1; obs(size(obs,1),:) ];
-%     else
-%       while(1)
-%          if (idx+1<= size(obs,1) && obs(idx,1)<=t && t<= obs(idx+1,1)) || (idx+1 == size(obs,1) )
-%             break; 
-%          else
-%            idx = idx +1;
-%          end
-%       end %while ends
-%       %idx,t
-%       obs_match1= [obs_match1; obs(idx,:)];
-%     end
-%     
-%     dis = sqrt( (obs(idx,6)-reg(i,8))^2+(obs(idx,7)-reg(i,9))^2 +(obs(idx,8)-reg(i,10))^2 );
-%     dis_rec = [dis_rec; dis];
-% end
+min(dis_rec);
+
+obs_rec =fopen('../../virtual_obs/v-1.0_t5.0.txt','r');
+if obs_rec == -1
+    error('File obs_rec.txt could not be opened, check name or path.' ); 
+end
+obs_line= fgetl(obs_rec);
+obs = [];
+while ischar(obs_line)
+   log_obs = textscan(obs_line,'%f %f %f %f %f %f %f %f');
+   t = log_obs{1};
+   if t> 0
+     if size(obs,1)== 0
+        t0 = log_obs{1};
+     end
+     vx = log_obs{2};
+     vy = log_obs{3};
+     vz = log_obs{4};
+     w = log_obs{5};
+     x = log_obs{6};
+     y = log_obs{7};
+     z = log_obs{8};
+     obs = [ obs; [t-t0,vx,vy,vz,w,x,y,z] ];
+   end%if ends
+   obs_line= fgetl(obs_rec);
+end
+
+obs_match1 = [];
+dis_rec = [];
+%quad and obstacle time matching
+idx = 1;
+for i=1:size(reg,1)
+    t= reg(i,1);
+    
+    if( t< obs(1,1) )
+      obs_match1 = [obs_match1; obs(1,:)];
+    elseif( t> obs( size(obs,1),1) )
+      obs_match1 = [obs_match1; obs(size(obs,1),:) ];
+    else
+      while(1)
+         if (idx+1<= size(obs,1) && obs(idx,1)<=t && t<= obs(idx+1,1)) || (idx+1 == size(obs,1) )
+            break; 
+         else
+           idx = idx +1;
+         end
+      end %while ends
+      %idx,t
+      obs_match1= [obs_match1; obs(idx,:)];
+    end
+    
+    dis = sqrt( (obs(idx,6)-reg(i,8))^2+(obs(idx,7)-reg(i,9))^2 +(obs(idx,8)-reg(i,10))^2 );
+    dis_rec = [dis_rec; dis];
+end
 
 %drawing
 figure;
@@ -162,7 +162,7 @@ axis([ 0, 15, -5, 5, -1, 3]);
 r = 1.5;
 [x,y,z] = sphere;
 hSphere = surf( r*x+obs_match(1,6),r*y+obs_match(1,7),r*z+obs_match(1,8),'FaceColor','b' );
-%hSphere1= surf( r*x+obs_match1(1,6),r*y+obs_match1(1,7),r*z+obs_match1(1,8),'FaceColor','g' );
+hSphere1= surf( r*x+obs_match1(1,6),r*y+obs_match1(1,7),r*z+obs_match1(1,8),'FaceColor','g' );
 %draw every point
 k=1;
 for i=1:size(reg,1)
@@ -171,8 +171,8 @@ for i=1:size(reg,1)
     plot3( reg(i,8),reg(i,9),reg(i,10), 'r*' );
     delete(hSphere);
     hSphere = surf( r*x+obs_match(i,6),r*y+obs_match(i,7),r*z+obs_match(i,8),'FaceColor','b' );
-    %delete(hSphere1);
-    %hSphere1= surf( r*x+obs_match1(i,6),r*y+obs_match1(i,7),r*z+obs_match1(i,8),'FaceColor','g' );
+    delete(hSphere1);
+    hSphere1= surf( r*x+obs_match1(i,6),r*y+obs_match1(i,7),r*z+obs_match1(i,8),'FaceColor','g' );
     view(3);
     drawnow;
 %     if mod(i,10)==0
@@ -181,3 +181,5 @@ for i=1:size(reg,1)
 %       k=k+1;
 %     end
 end
+filename= sprintf('/home/yucong/Dropbox/iros_icuas/iros2014/figs/matlab_figs/virtual%d.fig',16);
+saveas(gcf,filename);

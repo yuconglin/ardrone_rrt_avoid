@@ -1,16 +1,16 @@
 close all;
 clear all;
 exe_files=[
-'20140101-224638:path.txt'
-'20140101-225051:path.txt'
-'20140101-225407:path.txt'
-'20140101-225638:path.txt'
-'20140102-053627:path.txt'
+'20140102-001846:path.txt'
+'20140102-163708:path.txt'
+'20140102-163921:path.txt'
+'20140102-202930:path.txt'
+'20140102-203250:path.txt'
 ];
 virtual_files={
       %'v1.0_the0.0.txt';
-      %'v-1.0_t5.0.txt';
-      'v1.0_the0.0.txt'
+      'v-1.0_t7.0.txt';
+      %'v4.0_the0.0.txt'
     };
 %virtual_char= char(virtual_files);
 min_dis= zeros( size(virtual_files,1), size(exe_files,1) );
@@ -115,3 +115,4 @@ for l=1:size(exe_files,1)
     end
     
 end
+min_tran= min_dis';
