@@ -152,8 +152,11 @@ add_library(lib_user_types
 	    src/user_types/Sampler/SamplerRect.cpp
 	    src/user_types/Sampler/SamplerPole.cpp
 	    src/user_types/UavBehavior/ArdroneBehavior.cpp
+	    src/user_types/UavBehavior/BirdBehavior.cpp
             src/user_types/UavConfig/ArdroneConfig.cpp
+	    src/user_types/UavConfig/BirdConfig.cpp
             src/user_types/UavState/ArdroneState.cpp
+	    src/user_types/UavState/BirdState.cpp
 	    src/user_types/ObsUpdater/ObsUpdaterVirtual.cpp
 	    src/user_types/ObsUpdater/ObsUpdaterReal.cpp
            )
