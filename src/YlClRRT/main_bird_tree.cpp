@@ -12,7 +12,7 @@
 #include "Sampler/SamplerPole.hpp"
 
 using namespace std;
-using namespace Bird_rrt_avoid;
+using namespace Ardrone_rrt_avoid;
 using namespace user_types;
 
 int main(int argc, char** argv)
@@ -20,11 +20,12 @@ int main(int argc, char** argv)
     YlClRRT yc_rrt;
     //set config
     yc_rrt.SetConfig(new BirdConfig() );
-    yc_rrt.ConfigFill("/home/yucong/fuerte_workspace/sandbox/ardrone_rrt_avoid/params/bird_params.xml");
+    //yc_rrt.ConfigFill("/home/yucong/fuerte_workspace/sandbox/ardrone_rrt_avoid/params/bird_params.xml");
+    yc_rrt.ConfigFill("/home/yucong/.ros/bird_param.xml");
     yc_rrt.SetCheckParas();
     //set geo fence
     vector<point2D> vec_rect;
-    double scale= 70;
+    double scale= 69;
     double h=40*scale,r=10*scale,l=-10*scale;
     vec_rect.push_back(point2D(0,l) );
     vec_rect.push_back(point2D(h,l) );
@@ -50,11 +51,11 @@ int main(int argc, char** argv)
     
     yc_rrt.ClearToDefault();
     yc_rrt.ClearTree();
-    yc_rrt.SetRoot(new ArdroneState(x_root,y_root,z_root,0,0) );
+    yc_rrt.SetRoot(new BirdState(x_root,y_root,z_root,0,0) );
     //expand tree
     yc_rrt.SetSampleParas();
     yc_rrt.ExpandTree();
-    ArdroneState* st_current= new ArdroneState(x_root,y_root,z_root,0,0);
+    BirdState* st_current= new BirdState(x_root,y_root,z_root,0,0);
     yc_rrt.PathCheckRepeat(st_current);
     delete st_current;
     //clear the tree

@@ -107,6 +107,7 @@ namespace utils{
 	   //std::cout<<"u: "<< u(0)<<" "<<u(1)<<" "<<u(2)<< std::endl;
 	   st_now->Update(u,config_pt->dt);
            *sub_length_pt+= sqrt(pow(st_now->x - st_pre->x,2)+pow(st_now->y - st_pre->y,2)+pow(st_now->z - st_pre->z,2) ); 
+	   //cout<<"kusi: "<< sqrt(pow(st_now->x - st_pre->x,2)+pow(st_now->y - st_pre->y,2)+pow(st_now->z - st_pre->z,2) ) << endl;
 	   delete st_pre;
            
 	   //collision check
@@ -158,6 +159,7 @@ namespace utils{
 	*st_final= *st_now;
 	//std::cout<<"st_final: "<<st_final->x<<" "<<st_final->y<<" "<<st_final->z << std::endl;
 	delete st_now;
+	//std::cout<<"n_seg: "<< n_seg<< std::endl;
         if(if_colli) result= -1;
         return result;
 

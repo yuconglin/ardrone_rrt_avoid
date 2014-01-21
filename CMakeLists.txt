@@ -175,6 +175,8 @@ rosbuild_add_executable(test_sample src/YlClRRT/main_test.cpp)
 target_link_libraries(test_sample lib_clrrt lib_user_types lib_utils lib_ticpp dubin ${ARMADILLO_LIBRARIES} )
 rosbuild_add_executable(test_tree src/YlClRRT/main_tree.cpp)
 target_link_libraries(test_tree lib_clrrt lib_user_types lib_utils lib_ticpp dubin ${ARMADILLO_LIBRARIES} )
+rosbuild_add_executable(bird_tree src/YlClRRT/main_bird_tree.cpp)
+target_link_libraries(bird_tree lib_clrrt lib_user_types lib_utils lib_ticpp dubin ${ARMADILLO_LIBRARIES} )
 
 #planner node
 add_library(plan_node src/plan_node/ParrotPlan.cpp)

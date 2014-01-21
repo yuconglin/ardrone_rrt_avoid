@@ -84,6 +84,12 @@ namespace Ardrone_rrt_avoid{
       checkparas_pt->end_r= std::max( config_pt->speed*config_pt->dt,0.15 );
       checkparas_pt->ds_check= config_pt->speed*config_pt->dt;
       checkparas_pt->ds_insert= 5*checkparas_pt->ds_check;
+      //checkparas_pt->end_r= std::max( config_pt->v*config_pt->dt,0.15 );
+      //checkparas_pt->ds_check= config_pt->v*config_pt->dt;
+      //checkparas_pt->ds_insert= 5*checkparas_pt->ds_check;
+
+      std::cout<<"ds_insert: "<< checkparas_pt->ds_insert
+	       <<" ds_check: "<< checkparas_pt->ds_check << std::endl;
       if_checkparas_set= true;
    }//CheckParasSet ends
 
@@ -181,7 +187,7 @@ namespace Ardrone_rrt_avoid{
        double if_radius= utils::NotInRadius(x_root,y_root,the_a,x_a,y_a,rho);
        if(!if_radius) 
        {
-	 std::cout<<"in radius"<< std::endl;
+	 //std::cout<<"in radius"<< std::endl;
 	 continue;
        }
        //if too steep
@@ -200,7 +206,8 @@ namespace Ardrone_rrt_avoid{
 	 continue;
        }//if out of geo fence
        bool if_in= spaceLimit_pt->TellIn(x_a,y_a,z_a);
-       if(!if_in) std::cout<<"out fence"<<std::endl;
+       //if(!if_in) std::cout<<"out fence"<<std::endl;
+       if(!if_in) {;}
        else break;
      }//while ends
      //std::cout<<x_a <<" "<<y_a <<" "<<z_a<< " "<< the_a*180./M_PI<< std::endl; 
@@ -273,7 +280,9 @@ namespace Ardrone_rrt_avoid{
      int sample_count = 0;//effective sample
      int sample_raw= 0;//raw samples
      CheckGoalReach( main_tree.begin());
-     
+     sec_count= ros::Time::now().toSec()-t_start.toSec();
+     cout<< "goal time: "<< sec_count << endl;
+ 
      //main loop starts here
      while(1)
      {
@@ -321,16 +330,24 @@ namespace Ardrone_rrt_avoid{
 	      if(colli!=-1)
 	      {
 		++sample_count;
-		if( temp_log.size()> 10)
+	        if( temp_log.size()> 10)
 		  InsertDubinsNode( tree_it ); 
 		TempLogClear();
 		dubin_collects.push_back(dubin_3d);
 		//cout << "sample 1 genertated" <<endl;
+		//too see the time to generate a sample
+                if(sample_count==1)
+		{
+                  sec_count= ros::Time::now().toSec()-t_start.toSec();
+                  cout<< "one time: "<< sec_count
+		      <<" nodes= "<<tree_vector.size()<< endl;
+		}//if ends
+		//ends
 		delete st_final;
 		break;
 	      } //if check ends
-	      else
-		cout<<"sample collision"<< endl;
+	      else {;}
+		//cout<<"sample collision"<< endl;
 	   } //else ends
 	   TempLogClear();
            delete st_final;
@@ -357,6 +374,7 @@ namespace Ardrone_rrt_avoid{
 	   delete sample_node.state_pt;
 	   break;
         }
+	//if(sample_count==1) break;
         //free sample_node
         delete sample_node.state_pt;	
      }//while ends
@@ -683,7 +701,9 @@ namespace Ardrone_rrt_avoid{
      
      TREEIter insert_it;
      double step= config_pt->speed*config_pt->dt; 
-     int N_ITER = floor( checkparas_pt->ds_insert/step );//insert interval
+     //int N_ITER = floor( checkparas_pt->ds_insert/step );//insert interval
+     int N_ITER =5;
+     cout<<"N_ITER: "<< N_ITER<<" temp_log size: "<<temp_log.size()<< endl;
      //set dubin index
      int _idx_dubin= dubin_collects.size();
      //start_it.idx_dubin= _idx_dubin; 

@@ -227,6 +227,7 @@ namespace Ardrone_rrt_avoid{
 	   {
 	     if(st_root_pt) delete st_root_pt;
 	     //st_root_pt= st_current.copy();
+	     //if there is path, estimate from path; otherwise just extropolate
 	     st_root_pt= st_current.InterPolate(t_limit);
 	     cout<<"get root"<< endl;
              UpdateObs(st_current.t);

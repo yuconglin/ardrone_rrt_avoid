@@ -5,10 +5,13 @@
 
 //user types
 #include "UavConfig/ArdroneConfig.h"
+#include "UavConfig/BirdConfig.h"
 #include "point2D.h"
 #include "UavBehavior/ArdroneBehavior.hpp"
+#include "UavBehavior/BirdBehavior.hpp"
 #include "SpaceLimit.h"
 #include "UavState/ArdroneState.h"
+#include "UavState/BirdState.h"
 #include "ObsCollect.h"
 #include "Sampler/SamplerPole.hpp"
 //quad related
@@ -30,15 +33,17 @@ int main(int argc, char** argv)
    yc_rrt.SetCheckParas();
    //seg geo fence
    vector<point2D> vec_rect;
-   vec_rect.push_back(point2D(0,-3) );
-   vec_rect.push_back(point2D(10,-3) );
-   vec_rect.push_back(point2D(10,3) );
-   vec_rect.push_back(point2D(0,3) );
+   //double h=19*0.6096,r=2*0.6,l=-2*0.6;
+   double h= 40, r=10,l=-10;
+   vec_rect.push_back(point2D(0,l) );
+   vec_rect.push_back(point2D(h,l) );
+   vec_rect.push_back(point2D(h,r) );
+   vec_rect.push_back(point2D(0,r) );
    double h_max= 2., h_min= 0.5;
    yc_rrt.SetGeoFence( new SpaceLimit(h_max,h_min,vec_rect) );
    //set the root and the goal
    double x_root=0.,y_root=0.,z_root=0.8,yaw_root=0.;
-   double x_goal=8.,y_goal=4.,z_goal=0.8,yaw_goal=0.;
+   double x_goal=14,y_goal=0.6,z_goal=0.8,yaw_goal=0.;
    yc_rrt.SetRoot(new ArdroneState(x_root,y_root,z_root,0.,yaw_root) );
    yc_rrt.SetGoal(new ArdroneState(x_goal,y_goal,z_goal,0.,yaw_goal) );
    //set the uav behavior
@@ -87,4 +92,6 @@ int main(int argc, char** argv)
    myfile.close();
    delete st_final;
    delete st_init;
+   //try bird
+
 }//main ends

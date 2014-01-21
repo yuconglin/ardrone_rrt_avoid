@@ -93,18 +93,7 @@ grid on;
 xlabel('x(m)');
 ylabel('y(m)');
 zlabel('z(m)');
-% for i=1:1:size(virtual_traj,1)
-%   %t = virtual_traj(i,4);
-%   plot3( virtual_traj(i,1),virtual_traj(i,2),virtual_traj(i,3), 'r*' );
-% end
-% h1= legend('plan');
-% for i=1:1:size(reg,1)
-%   plot3( reg(i,8),reg(i,9),reg(i,10),'k+' );
-% end
-% h2= legend('actual');
-% view(3);
-% set(h1,'FontSize',12);
-% set(h2,'FontSize',12);
+
 text( 0, 0, 0.8, 'start',...
 	                 'VerticalAlignment','top',...
 	                 'HorizontalAlignment','left',...
@@ -125,11 +114,7 @@ for j=1:size(obs,1)
  y_c = obs(j,2);
  r = obs(j,3);
  dr = obs(j,4);
-%  for i=1:size(reg,1)
-%     dis= sqrt( (reg(i,8)-x_c)^2+(reg(i,9)-y_c)^2 );
-%     dis_array= [ dis_array; dis ];
-%  end
-%  min(dis_array)
+
  [x,y,z] = cylinder(r+dr);
  ob_x= x+ x_c;
  ob_y= y+ y_c;

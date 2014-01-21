@@ -15,16 +15,16 @@ namespace user_types{
       
       double vx_b= vx*cos(yaw)+ vy*sin(yaw);
       double vy_b= -vx*sin(yaw)+ vy*cos(yaw);
-      double kp_vx= 5*MULTIROTOR_SPEEDCONTROLLER_VX_KP;
-      double kp_vy= 5*MULTIROTOR_SPEEDCONTROLLER_VY_KP;
+      double kp_vx= 1*MULTIROTOR_SPEEDCONTROLLER_VX_KP;
+      double kp_vy= 1*MULTIROTOR_SPEEDCONTROLLER_VY_KP;
       double kp_yaw= MULTIROTOR_SPEEDCONTROLLER_YAW_KP;
-      double kp_vz= -5*MULTIROTOR_SPEEDCONTROLLER_Z_KP;
+      double kp_vz= -1*MULTIROTOR_SPEEDCONTROLLER_Z_KP;
       //max values
       double vxy_max=78.19;
       double yaw_rate_max= 70./180*M_PI;
       double vz_max= 10.5;
       //equations
-      double vx_d,vy_<d;
+      double vx_d,vy_d;
       //vx,x
       if( abs(ux) >vxy_max ) 
 	vx_d= (ux < 0 ? -1.0 : 1.0) * vxy_max;
@@ -45,7 +45,6 @@ namespace user_types{
 
       //yaw
       double yaw_d= atan2( u(1),u(0) );
-      double yaw_rate_max= 70./180*M_PI;
       double dyaw= kp_yaw*(yaw_d-yaw);
       //std::cout<<"yaw= "<< yaw<< std::endl;
       
@@ -60,7 +59,6 @@ namespace user_types{
       y+= dx*sin(yaw)+ dy*cos(yaw);
       //vx= vx_b, vy= vy_b, x+= dx, y+= dy;
       //z
-      double vz_max= 2.0;
       double vz_d= 0.;
       
       if( abs(u(2)) >vz_max )
@@ -71,7 +69,10 @@ namespace user_types{
       double az= kp_vz*(vz_d- vz);
       z+= vz*dt+ 0.5*az*dt*dt;
       vz+= az*dt;
-
+      //to print
+      //std::cout<<"ax="<<ax<<" ay="<< ay<< std::endl;
+      //std::cout<<"vx="<<vx<<" vy= "<<vy<< std::endl;
+      //std::cout<<"v="<< sqrt(vx*vx+vy*vy) << std::endl;
       //t
       t+= dt;
       return 0;

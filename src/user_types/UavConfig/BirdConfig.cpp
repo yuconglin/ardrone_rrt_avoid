@@ -2,6 +2,7 @@
 #include "ticpp.h"
 #include <cmath>
 #include "armadillo"
+#include "iostream"
 
 namespace user_types{
 
@@ -31,7 +32,10 @@ namespace user_types{
  	       this->yaw_rate= atof(iter->GetText().c_str() );
         }//for child ends
 	speed= sqrt(v*v+vz*vz);
+	//speed= v;
 	rho= v/yaw_rate;
+        //rho= speed/yaw_rate;
+	std::cout<<"speed: "<< speed<<" rho: "<< rho<< std::endl;
         //end_r= max(speed*dt,0.15);
       }
       catch(ticpp::Exception& error)
@@ -72,6 +76,8 @@ namespace user_types{
       }
       else 
         u<<0.<<0.<<0.;
+      //std::cout<<"u: "<< u(0)<<" "<<u(1)<<" "<<u(2)<< std::endl;
+      //std::cout<<"u: "<< sqrt(u(0)*u(0)+u(1)*u(1) ) << std::endl;
    }//NormalizeU ends
 
 };

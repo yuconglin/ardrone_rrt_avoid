@@ -24,7 +24,8 @@ int main(int argc, char** argv)
     yc_rrt.SetCheckParas();
     //seg geo fence
     vector<point2D> vec_rect;
-    double h=19*0.6096,r=2*0.6,l=-2*0.6;
+    //double h=19*0.6096,r=2*0.6,l=-2*0.6;
+    double h= 40, r=10,l=-10;
     vec_rect.push_back(point2D(0,l) );
     vec_rect.push_back(point2D(h,l) );
     vec_rect.push_back(point2D(h,r) );
@@ -35,7 +36,7 @@ int main(int argc, char** argv)
     double e= 0.6096;
     //set the root and the goal
     double x_root=0.,y_root=0,z_root=0.8,yaw_root=0.;
-    double x_goal=10,y_goal=0.6,z_goal=0.5,yaw_goal=0.;
+    double x_goal=14,y_goal=0.6,z_goal=0.8,yaw_goal=0.;
     yc_rrt.SetGoal(new ArdroneState(x_goal,y_goal,z_goal,0.,yaw_goal) );
     //set the uav behavior
     yc_rrt.SetBehavior(new ArdroneBehavior() );
@@ -44,6 +45,7 @@ int main(int argc, char** argv)
     //check all the flags
     //yc_rrt.CheckFlagsSet();
     //set the obstacles
+    /*
     vector<obstacle2D> obs2d;
     obs2d.push_back( obstacle2D(7.3152,0.2032,0.6,0.0) );
     //write the 2D obstacles to a text file
@@ -55,11 +57,12 @@ int main(int argc, char** argv)
     obs2d_file.close();
     //
     yc_rrt.SetObs2D( obs2d );
-    /*
-    vector<obstacle3D> obs3d;
-    obs3d.push_back( obstacle3D(4.97718,-0.768277,0.685,-0.0217654,-0.16154,0.0299748,0.20059,0.5,0.5) );
-    yc_rrt.SetObs3D( obs3d );
     */
+    
+    vector<obstacle3D> obs3d;
+    obs3d.push_back( obstacle3D(7,0,0.7,-1,0,0,0,0.5,0.5) );
+    yc_rrt.SetObs3D( obs3d );
+    
     //set parameters for tree expand
     yc_rrt.SetTimeLimit(1.0);
     yc_rrt.SetIfInRos(false);
