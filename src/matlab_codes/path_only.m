@@ -1,5 +1,5 @@
 close all;
-f_traj =fopen('../../bin/traj_bird.txt','r');
+f_traj =fopen('../../bin/traj_rec.txt','r');
 %f_traj= fopen('/home/yucong/.ros/virtual_replan_rec.txt','r');
 if f_traj == -1
     error('File traj_rec.txt could not be opened, check name or path.')
@@ -27,4 +27,13 @@ ylabel('y(m)');
 zlabel('z(m)');
 
 plot3( virtual_traj(:,1),virtual_traj(:,2),virtual_traj(:,3), 'r*' );
+text( virtual_traj(1,1),virtual_traj(1,2),virtual_traj(1,3), 'start',...
+	                 'VerticalAlignment','top',...
+	                 'HorizontalAlignment','left',...
+	                 'FontSize',14 );
+[m,n]= size(virtual_traj);
+text( virtual_traj(m,1), virtual_traj(m,2), virtual_traj(m,3), 'goal' ,...
+	                 'VerticalAlignment','top',...
+	                 'HorizontalAlignment','left',...
+	                 'FontSize',14 );
 view(3);

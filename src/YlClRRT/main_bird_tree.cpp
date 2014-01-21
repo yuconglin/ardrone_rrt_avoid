@@ -25,7 +25,7 @@ int main(int argc, char** argv)
     yc_rrt.SetCheckParas();
     //set geo fence
     vector<point2D> vec_rect;
-    double scale= 69;
+    double scale= 69.45;
     double h=40*scale,r=10*scale,l=-10*scale;
     vec_rect.push_back(point2D(0,l) );
     vec_rect.push_back(point2D(h,l) );
@@ -62,11 +62,15 @@ int main(int argc, char** argv)
     yc_rrt.ClearTree();
     vector<GeneralState*>* traj_pt= yc_rrt.GetTrajRecPt();
     ofstream myfile("traj_bird.txt");
+    double pre_x,pre_y=0,pre_z=0,length=0;
     for(int i=0;i!= traj_pt->size();++i)
     {
        GeneralState* st= traj_pt->at(i);
        myfile<< st->x<<" "<< st->y<<" "<< st->z<<" "<< st->t << endl;
+       if(i>1) length+= sqrt( pow(st->x-pre_x,2)+pow(st->y-pre_y,2)+pow(st->z-pre_z,2) );
+       pre_x= st->x, pre_y= st->y, pre_z= st->z;
        delete st;
     }//for ends
+    cout <<"path length: "<< length << endl;
     myfile.close();
 }//main ends

@@ -83,11 +83,15 @@ int main(int argc, char** argv)
     yc_rrt.ClearTree();
     vector<GeneralState*>* traj_pt= yc_rrt.GetTrajRecPt();
     ofstream myfile("traj_rec.txt");
+    double pre_x=0,pre_y=0,pre_z=0,length=0;
     for(int i=0;i!= traj_pt->size();++i)
     {
        GeneralState* st= traj_pt->at(i);
        myfile<< st->x<<" "<< st->y<<" "<< st->z<<" "<< st->t << endl;
+       if(i>1) length+= sqrt( pow(st->x-pre_x,2)+pow(st->y-pre_y,2)+pow(st->z-pre_z,2) );
+       pre_x= st->x, pre_y= st->y, pre_z= st->z;
        delete st;
     }//for ends
+    cout <<"path length: "<< length << endl;
     myfile.close();
 }//main ends

@@ -18,7 +18,7 @@ namespace user_types{
       double kp_vx= 1*MULTIROTOR_SPEEDCONTROLLER_VX_KP;
       double kp_vy= 1*MULTIROTOR_SPEEDCONTROLLER_VY_KP;
       double kp_yaw= MULTIROTOR_SPEEDCONTROLLER_YAW_KP;
-      double kp_vz= -1*MULTIROTOR_SPEEDCONTROLLER_Z_KP;
+      double kp_vz= -0.05*MULTIROTOR_SPEEDCONTROLLER_Z_KP;
       //max values
       double vxy_max=78.19;
       double yaw_rate_max= 70./180*M_PI;
