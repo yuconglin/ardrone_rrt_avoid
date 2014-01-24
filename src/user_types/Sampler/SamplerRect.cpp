@@ -27,7 +27,7 @@ namespace user_types{
       z0= z_root;
       theta= atan2(Dy,Dx);
       x_len= r0;
-      y_len= 0.5*r0;
+      y_len= r0;
             
    }//SetParams ends
 

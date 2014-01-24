@@ -2,6 +2,7 @@
 //utilities
 #include "NotInRadius.h"
 #include "DubinsTotalCheck.h"
+#include "CollectCheck.h"
 //#include "systemtime.h"
 //dubins
 #include "dubins.h"
@@ -9,6 +10,7 @@
 #include "UavBehavior/GeneralBehavior.hpp"
 #include "UavConfig/GeneralConfig.h"
 #include "UavState/GeneralState.h"
+#include "UavState/ArdroneState.h"
 #include "UavState/GSnode.h"
 #include "SpaceLimit.h"
 #include "checkParas.h"
@@ -32,6 +34,8 @@
 using namespace user_types;
 using namespace utils;
 using namespace std;
+//a reluctant global variable for log nodes
+ofstream nodelog("/home/yucong/fuerte_workspace/sandbox/ardrone_rrt_avoid/bin/node_log.txt");
 
 namespace Ardrone_rrt_avoid{
 
@@ -280,11 +284,10 @@ namespace Ardrone_rrt_avoid{
        t_start = ros::Time::now();//timing start point
      }
      //for matlab draw steps purpose
-     if(if_for_plot)
-     {//initialize a file
-       ofstream filelog("/home/yucong/fuerte_workspace/sandbox/ardrone_rrt_avoid/bin/branch_line.txt");
-       ofstream samplelog("/home/yucong/fuerte_workspace/sandbox/ardrone_rrt_avoid/bin/sample_line.txt");
-     }
+     //if(if_for_plot)
+     //initialize a file
+     ofstream filelog("/home/yucong/fuerte_workspace/sandbox/ardrone_rrt_avoid/bin/branch_line.txt");
+     ofstream samplelog("/home/yucong/fuerte_workspace/sandbox/ardrone_rrt_avoid/bin/sample_line.txt");
      
      cout<<"tree expand starts"<<endl;
      int sample_count = 0;//effective sample
@@ -292,7 +295,7 @@ namespace Ardrone_rrt_avoid{
      CheckGoalReach( main_tree.begin());
      sec_count= ros::Time::now().toSec()-t_start.toSec();
      cout<< "goal time: "<< sec_count << endl;
-     int N_step= 10;
+     int N_step= 50;
      double step= config_pt->speed*config_pt->dt;
      double dt= config_pt->dt;
      //main loop starts here
@@ -301,7 +304,7 @@ namespace Ardrone_rrt_avoid{
         SampleNode();
 	++sample_raw;
 	//cout<<"sample_raw: "<< sample_raw<< endl;
-	CalHeuri();  
+	CalHeuriLine();  
 	SortNodes();
         //the closest node
         TREEIter tree_it = tree_vector_sort[0];
@@ -309,7 +312,7 @@ namespace Ardrone_rrt_avoid{
 	double s_x= sample_node.state_pt->x;
 	double s_y= sample_node.state_pt->y;
 	double s_z= sample_node.state_pt->z;
-        samplelog<<s_x<<" "<<s_y<<" "<<s_z<< endl;
+        if(if_for_plot) samplelog<<s_x<<" "<<s_y<<" "<<s_z<< endl;
 
 	double n_x= tree_it->state_pt->x;
 	double n_y= tree_it->state_pt->y;
@@ -321,18 +324,22 @@ namespace Ardrone_rrt_avoid{
 	double yaw_p= atan2(s_y-n_y,s_x-n_x);
 	bool if_colli= false;
 	//tree_it to sample for N 
-	for(int l=0;l!= N_step;++l)
+	//for(int l=0;l!= N_step;++l)
+	while(1)
 	{
-           xp+= step*dt*cx;
-	   yp+= step*dt*cy;
-	   zp+= step*dt*cz;
+           xp+= step*cx;
+	   yp+= step*cy;
+	   zp+= step*cz;
 	   tp+= dt;
-	   temp_log.push_back(new GeneralState(xp,yp,zp,tp,yaw_p) );
+	   temp_log.push_back(new ArdroneState(xp,yp,zp,tp,yaw_p) );
            if_colli= CollectCheck( temp_log.back(), obs_collect );
 	   if(if_colli) break;
+	   double dis_p= sqrt(pow(n_x-xp,2)+pow(n_y-yp,2)+pow(n_z-zp,2) ); 
+	   if(dis_p > dis) break;
 	}//for ends
         if(!if_colli){ 
-           //log file
+           ++sample_count;
+	   //log file
 	   if(if_for_plot)
 	   {
 	     for(int l=0;l!=temp_log.size();++l)
@@ -340,21 +347,36 @@ namespace Ardrone_rrt_avoid{
 	   }
            //Insert nodes
 	   user_types::GSnode cp_node;
-	   cp_node.state_pt= temp_log[i]->copy();
-	   cp_node.cost= start_it->cost+ N_step*step;
+	   cp_node.state_pt= temp_log.back()->copy();
+           //log the nodes
+	   if(if_for_plot)
+	     nodelog << cp_node.state_pt->x <<" "
+		     << cp_node.state_pt->y <<" "
+		     << cp_node.state_pt->z << endl;
+
+	   cp_node.cost= tree_it->cost+ N_step*step;
 	   //cp_node.idx_dubin= _idx_dubin;
 	   //cp_node.idx_state= i;
 	   //cp_node.idx_length= seg_len;
-	   insert_it=main_tree.append_child(tree_it,cp_node);
+	   TREEIter insert_it=main_tree.append_child(tree_it,cp_node);
 	   tree_vector.push_back( insert_it );
         }//if_colli ends
         TempLogClear();
+        double sec_count= ros::Time::now().toSec()-t_start.toSec();
+	if( sec_count >= t_limit || sample_raw >100 || sample_count> 10 )
+	//if(sec_count >= t_limit)
+	{
+	  //if_limit_reach= true;
+	  cout<<"stop"<<endl;
+	  break;
+	}// 
  
      }//while(1) ends
 
      if(if_for_plot){
        filelog.close();
        samplelog.close();
+       nodelog.close();
      }
    
    }//ExpandTreeLine() ends
@@ -367,12 +389,10 @@ namespace Ardrone_rrt_avoid{
        t_start = ros::Time::now();//timing start point
      }
      //for matlab draw steps purpose
-     if(if_for_plot)
-     {//initialize a file
-       ofstream filelog("/home/yucong/fuerte_workspace/sandbox/ardrone_rrt_avoid/bin/branch_log.txt");
-       ofstream samplelog("/home/yucong/fuerte_workspace/sandbox/ardrone_rrt_avoid/bin/sample_dubin.txt");
-
-     }
+     //if(if_for_plot)
+     //initialize a file
+     ofstream filelog("/home/yucong/fuerte_workspace/sandbox/ardrone_rrt_avoid/bin/branch_log.txt");
+     ofstream samplelog("/home/yucong/fuerte_workspace/sandbox/ardrone_rrt_avoid/bin/sample_dubin.txt");
 
      cout<<"tree expand starts"<<endl;
      int sample_count = 0;//effective sample
@@ -385,7 +405,7 @@ namespace Ardrone_rrt_avoid{
      while(1)
      {
         SampleNode();
-	if(if_for_log)
+	if(if_for_plot)
 	{
           double s_x= sample_node.state_pt->x;
 	  double s_y= sample_node.state_pt->y;
@@ -435,17 +455,19 @@ namespace Ardrone_rrt_avoid{
 	      if(colli!=-1)
 	      {
 		++sample_count;
-	        if( temp_log.size()> 10)
-		  InsertDubinsNode( tree_it ); 
-		TempLogClear();
-		dubin_collects.push_back(dubin_3d);
+		//for log
                 //log file
 		if(if_for_plot)
                 {
                   for(int l=0;l!=temp_log.size();++l)
 		    filelog<<temp_log[l]->x<<" "<<temp_log[l]->y<<" "<<temp_log[l]->z<< endl;
 		}
-		//cout << "sample 1 genertated" <<endl;
+
+	        if( temp_log.size()> 10)
+		  InsertDubinsNode( tree_it ); 
+		TempLogClear();
+		dubin_collects.push_back(dubin_3d);
+                		//cout << "sample 1 genertated" <<endl;
 		//too see the time to generate a sample
                 if(sample_count==1)
 		{
@@ -491,7 +513,8 @@ namespace Ardrone_rrt_avoid{
      }//while ends
      if(if_for_plot){ 
        filelog.close();
-       samplelog.close(); 
+       samplelog.close();
+       nodelog.close();
      }
      TempLogClear(); 
    }//ExpandTree() ends
@@ -848,6 +871,12 @@ namespace Ardrone_rrt_avoid{
 	   if(i== N_ITER) insert_it = start_it;//the first one
 	   user_types::GSnode cp_node;
 	   cp_node.state_pt= temp_log[i]->copy();
+	   //log the nodes
+	   if(if_for_plot)
+             nodelog << cp_node.state_pt->x <<" "
+	             << cp_node.state_pt->y <<" "
+		     << cp_node.state_pt->z << endl;
+
 	   cp_node.cost= start_it->cost+ seg_len;
 	   cp_node.idx_dubin= _idx_dubin;
 	   //cp_node.idx_state= i;
@@ -999,7 +1028,7 @@ namespace Ardrone_rrt_avoid{
         it->heuri=Heuristics(*it);	          
    }
 
-   void CalHeuriLine()
+   void YlClRRT::CalHeuriLine()
    {
      double s_x= sample_node.state_pt->x;
      double s_y= sample_node.state_pt->y;

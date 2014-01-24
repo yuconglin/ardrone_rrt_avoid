@@ -136,6 +136,7 @@ namespace Ardrone_rrt_avoid{
        bool CheckGoalReach( TREEIter it); 
        double Heuristics(user_types::GSnode& node);
        void CalHeuri();
+       void CalHeuriLine();
        void SortNodes();
        void InsertDubinsNode(TREEIter it);
        void TempLogClear();

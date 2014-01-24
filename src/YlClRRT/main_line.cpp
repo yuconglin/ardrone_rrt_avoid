@@ -10,6 +10,7 @@
 #include "UavState/ArdroneState.h"
 #include "obstacle3D.h"
 #include "Sampler/SamplerPole.hpp"
+#include "Sampler/SamplerRect.hpp"
 
 using namespace std;
 using namespace Ardrone_rrt_avoid;
@@ -41,7 +42,8 @@ int main(int argc, char** argv)
     //set the uav behavior
     yc_rrt.SetBehavior(new ArdroneBehavior() );
     //set the sampler
-    yc_rrt.SetSampler(new SamplerPole() );
+    //yc_rrt.SetSampler(new SamplerPole() );
+    yc_rrt.SetSampler(new SamplerRect() );
     //check all the flags
     //yc_rrt.CheckFlagsSet();
     //set the obstacles
@@ -62,7 +64,7 @@ int main(int argc, char** argv)
     yc_rrt.SetObs3D( obs3d );
     */
     //set parameters for tree expand
-    yc_rrt.SetTimeLimit(0.2);
+    yc_rrt.SetTimeLimit(0.5);
     yc_rrt.SetIfInRos(false);
     yc_rrt.SetIfPlot(true);
     
@@ -71,26 +73,8 @@ int main(int argc, char** argv)
     yc_rrt.SetRoot(new ArdroneState(x_root,y_root,z_root,0,0) );
     //yc_rrt.SetRoot(new ArdroneState(-0.107024,-0.118648,0.736,5.93662e-05,-0.0126186,0.0168764,0.00381639,0.0299871,-0.0083747) );
     yc_rrt.SetSampleParas();
-    yc_rrt.ExpandTree();
-    ArdroneState* st_current= new ArdroneState(x_root,y_root,z_root,0,0);
-    yc_rrt.PathCheckRepeat(st_current);
-    GeneralState* st_time= yc_rrt.TimeStateEstimate(0,1.0);
-    std::cout<<"st_time: "<<st_time->x<<" "<<st_time->y<<" "<<st_time->z<<" "<< std::endl;
-    delete st_current;
-    //yc_rrt.PathGen();
+    yc_rrt.ExpandTreeLine();
+    
     //clear the tree
     yc_rrt.ClearTree();
-    vector<GeneralState*>* traj_pt= yc_rrt.GetTrajRecPt();
-    ofstream myfile("traj_rec.txt");
-    double pre_x=0,pre_y=0,pre_z=0,length=0;
-    for(int i=0;i!= traj_pt->size();++i)
-    {
-       GeneralState* st= traj_pt->at(i);
-       myfile<< st->x<<" "<< st->y<<" "<< st->z<<" "<< st->t << endl;
-       if(i>1) length+= sqrt( pow(st->x-pre_x,2)+pow(st->y-pre_y,2)+pow(st->z-pre_z,2) );
-       pre_x= st->x, pre_y= st->y, pre_z= st->z;
-       delete st;
-    }//for ends
-    cout <<"path length: "<< length << endl;
-    myfile.close();
 }//main ends
