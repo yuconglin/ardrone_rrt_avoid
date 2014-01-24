@@ -69,9 +69,11 @@ namespace Ardrone_rrt_avoid{
        //time related
        inline void SetTimeLimit(double _limit){t_limit= _limit;}
        inline void SetIfInRos(bool _if_in_ros){if_in_ros= _if_in_ros;}
+       inline void SetIfPlot(bool _if_plot){if_for_plot= _if_plot;}
        inline void SetStartTime(ros::Time _t_start){t_start= _t_start;}
        //expand trees
        void ExpandTree();
+       void ExpandTreeLine();
        //clear to default
        void ClearToDefault();
        //clean the tree
@@ -128,6 +130,7 @@ namespace Ardrone_rrt_avoid{
        ros::Time t_start;
        bool if_limit_reach;
        bool if_in_ros;
+       bool if_for_plot;
        double sec_count;
        //private function
        bool CheckGoalReach( TREEIter it); 
