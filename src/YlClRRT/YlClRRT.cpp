@@ -295,7 +295,7 @@ namespace Ardrone_rrt_avoid{
      CheckGoalReach( main_tree.begin());
      sec_count= ros::Time::now().toSec()-t_start.toSec();
      cout<< "goal time: "<< sec_count << endl;
-     int N_step= 50;
+     int N_step= 20;
      double step= config_pt->speed*config_pt->dt;
      double dt= config_pt->dt;
      //main loop starts here
@@ -307,6 +307,7 @@ namespace Ardrone_rrt_avoid{
 	CalHeuriLine();  
 	SortNodes();
         //the closest node
+	//cout<<"sort size:"<< tree_vector_sort.size()<< endl;
         TREEIter tree_it = tree_vector_sort[0];
         
 	double s_x= sample_node.state_pt->x;
@@ -324,8 +325,8 @@ namespace Ardrone_rrt_avoid{
 	double yaw_p= atan2(s_y-n_y,s_x-n_x);
 	bool if_colli= false;
 	//tree_it to sample for N 
-	//for(int l=0;l!= N_step;++l)
-	while(1)
+	for(int l=0;l!= N_step;++l)
+	//while(1)
 	{
            xp+= step*cx;
 	   yp+= step*cy;
@@ -354,7 +355,7 @@ namespace Ardrone_rrt_avoid{
 		     << cp_node.state_pt->y <<" "
 		     << cp_node.state_pt->z << endl;
 
-	   cp_node.cost= tree_it->cost+ N_step*step;
+	   cp_node.cost= tree_it->cost+ (temp_log.size()-1)*step;
 	   //cp_node.idx_dubin= _idx_dubin;
 	   //cp_node.idx_state= i;
 	   //cp_node.idx_length= seg_len;
@@ -363,7 +364,7 @@ namespace Ardrone_rrt_avoid{
         }//if_colli ends
         TempLogClear();
         double sec_count= ros::Time::now().toSec()-t_start.toSec();
-	if( sec_count >= t_limit || sample_raw >100 || sample_count> 10 )
+	if( sec_count >= t_limit || sample_raw >100 || sample_count> 20 )
 	//if(sec_count >= t_limit)
 	{
 	  //if_limit_reach= true;
